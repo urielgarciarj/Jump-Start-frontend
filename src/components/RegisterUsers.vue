@@ -5,7 +5,7 @@
       <!-- Nombre -->
       <div class="form-group">
         <label for="input-nombre">Nombre</label>
-        <input type="text" class="form-control" id="input-nombre" v-model="usuario.nombre" required>
+        <input type="text" class="form-control" id="input-nombre" v-model="usuario.name" required>
       </div>
 
       <!-- Email -->
@@ -27,26 +27,42 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       usuario: {
-        nombre: '',
+        name: '',
         email: '',
-        password: ''
-      }
+        password: '',
+        age: 24
+      },
+      token: 'xyz123'
     };
   },
   methods: {
-    registrarUsuario() {
-      // Aquí puedes agregar la lógica para enviar los datos a tu backend
-      // Por ejemplo, puedes imprimir los datos en la consola para verificar
-      console.log('Usuario registrado:', this.usuario);
-      // Luego puedes enviar los datos usando Axios u otra biblioteca para hacer solicitudes HTTP
+    async registrarUsuario() {
+      try {
+        // Configurar los headers
+        const config = {
+          headers: {
+            Authorization: this.token, // Usando Bearer token
+            'Content-Type': 'application/json' // Asegúrate de establecer el tipo de contenido correcto
+          }
+        };
+
+        // Enviar los datos al backend
+        const response = await axios.post('http://localhost:3000/users', this.usuario, config);
+        console.log('Usuario registrado:', response.data);
+      } catch (error) {
+        console.error('Error al registrar el usuario:', error);
+      }
     }
   }
 };
 </script>
+
 
 <style scoped>
 /* Estilos opcionales */
