@@ -13,7 +13,13 @@
 		  <label for="input-nombre">Nombre</label>
 		  <input type="text" class="form-control" id="input-nombre" v-model="usuario.name" required>
 		</div>
-  
+
+		<!-- Apellido -->
+		<div class="form-group">
+		  <label for="input-apellido">Apellido</label>
+		  <input type="text" class="form-control" id="input-nombre" v-model="usuario.lastName" required>
+		</div>
+
 		<!-- Email -->
 		<div class="form-group">
 		  <label for="input-email">Email</label>
@@ -24,6 +30,17 @@
 		<div class="form-group">
 		  <label for="input-password">Contraseña</label>
 		  <input type="password" class="form-control" id="input-password" v-model="usuario.password" required>
+		</div>
+
+		<!-- Role -->
+		<div class="form-group">
+			<label for="options">Selecciona una opción:</label>
+			<select v-model="usuario.role" id="options" class="form-control" required>
+				<option value="estudiante">Estudiante</option>
+				<option value="docente">Docente</option>
+				<option value="universidad">Universidad</option>
+				<option value="empresa">Empresa</option>
+			</select>
 		</div>
   
 		<br />
@@ -42,8 +59,10 @@ export default {
     return {
       usuario: {
         name: '',
+		lastName: '',
         password: '',
-        email: ''
+        email: '',
+		role: ''
       },
 	  error: null
     };
