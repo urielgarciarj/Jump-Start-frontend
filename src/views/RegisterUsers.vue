@@ -1,4 +1,10 @@
 <template>
+	<div v-if="error" class="alert alert-danger d-flex align-items-center" role="alert">
+		<svg class="bi flex-shrink-0 me-2" width="24" height="24">
+			<use xlink:href="#exclamation-triangle-fill"></use>
+		</svg>
+		<div>{{ error }}</div>
+	</div>
 	<div class="container mt-4">
 	  <h2>Registro de Usuario</h2>
 	  <form @submit.prevent="registrarUsuario">
@@ -25,6 +31,7 @@
 		<button type="submit" class="btn btn-primary">Registrar</button>
 	  </form>
 	</div>
+
 </template>
 
 <script>
@@ -38,7 +45,7 @@ export default {
         password: '',
         email: ''
       },
-      token: 'xyz123'
+	  error: null
     };
   },
   methods: {
@@ -49,6 +56,12 @@ export default {
         console.log('Usuario registrado:', response.data);
       } catch (error) {
         console.error('Error al registrar el usuario:', error);
+        // Verificar si el error es un 409
+        if (error.response && error.response.status === 409) {
+          this.error = 'No se puede registrar el correo porque ya existe.';
+        } else {
+          this.error = 'Ocurrió un error inesperado. Intenta nuevamente.';
+        }
       }
     }
   }
