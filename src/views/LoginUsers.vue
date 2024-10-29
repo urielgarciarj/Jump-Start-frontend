@@ -45,13 +45,13 @@ export default {
     async loginUsers() {
       try {
         // Send info to the backend
-        const response = await axios.post('http://localhost:3000/login', this.usuario);
+        const response = await axios.post('http://localhost:3000/users/login', this.usuario);
         console.log('Usuario ingresado:', response.data);
       } catch (error) {
         console.error('Error to trying access:', error);
         // Validate if it is 409 error
-        if (error.response && error.response.status === 409) {
-          this.error = 'Incorrect email';
+        if (error.response && error.response.status === 401) {
+          this.error = 'Incorrect credentials';
         } else {
           this.error = 'An unexpected error occurred, please try again.';
         }
