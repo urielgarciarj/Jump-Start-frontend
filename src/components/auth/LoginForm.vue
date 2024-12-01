@@ -1,80 +1,74 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { Form } from 'vee-validate';
+import axios, { AxiosError } from 'axios';
+import { useRouter } from 'vue-router'; // Importar useRouter
 
-/*Social icons*/
-import google from '@/assets/images/svgs/google-icon.svg';
-import facebook from '@/assets/images/svgs/facebook-icon.svg';
+const router = useRouter();
+const user = ref({
+    email: '',
+    password: '',
+});
 
-const checkbox = ref(false);
 const valid = ref(false);
-const show1 = ref(false);
-const password = ref('admin123');
-const username = ref('info@wrappixel.com');
-const passwordRules = ref([
-    (v: string) => !!v || 'Password is required',
-    (v: string) => (v && v.length <= 10) || 'Password must be less than 10 characters'
-]);
-const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 
-function validate(values: any, { setErrors }: any) {
-    const authStore = useAuthStore();
-    return authStore.login(username.value, password.value).catch((error) => setErrors({ apiError: error }));
-}
+// Reglas de validación
+const emailRules = [
+  (value: string) => !!value || 'El correo electrónico es obligatorio.',
+  (value: string) => /.+@.+\..+/.test(value) || 'El correo electrónico debe ser válido.'
+];
+
+const passwordRules = [
+  (value: string) => !!value || 'La contraseña es obligatoria.'
+];
+
+const error = ref<string | null>(null);
+
+// Método para registrar usuario
+const authUser = async () => {
+    if (valid.value) {
+        try {
+            const response = await axios.post('http://localhost:3000/users/login', user.value);
+            console.log('Usuario autenticado:', response.data);
+        
+            // Redirigir a la página de inicio si la solicitud es exitosa
+            router.push('/'); // Cambia la ruta según sea necesario
+        
+        } catch (err) {
+            console.error('Error al iniciar sesion:', err);
+        
+            // Tipar el error como AxiosError
+            const errorAxios = err as AxiosError;
+        
+            // Manejar el error en función del código de estado
+            if (errorAxios.response && errorAxios.response.status === 401) {
+            error.value = 'Credenciales incorrectas';
+            } else {
+            error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
+            }
+        }
+    }
+};
 </script>
 
 <template>
-    <v-row class="d-flex mb-3">
-        <v-col cols="6" sm="6" class="pr-2">
-            <v-btn variant="outlined" size="large"  class="border text-subtitle-1 hover-link-primary" block>
-                <img :src="google" height="16" class="mr-2" alt="google" />
-                Google
-            </v-btn>
-        </v-col>
-        <v-col cols="6" sm="6" class="pl-2">
-            <v-btn variant="outlined" size="large" class="border text-subtitle-1  hover-link-primary" block>
-                <img :src="facebook" width="20" class="mr-1" alt="facebook" />
-                Facebook
-            </v-btn>
-        </v-col>
-    </v-row>
-    <div class="d-flex align-center text-center mb-6">
-        <div class="text-h6 w-100 px-5 font-weight-regular auth-divider position-relative">
-            <span class="bg-surface px-5 py-3 position-relative">or sign in with</span>
-        </div>  
-    </div>
-    <Form @submit="validate" v-slot="{ errors, isSubmitting }" class="mt-5">
-        <v-label class="font-weight-semibold pb-2 text-grey200">Username</v-label>
-        <VTextField
-            v-model="username"
-            :rules="emailRules"
-            class="mb-8"
-            required
-            hide-details="auto"
-        ></VTextField>
-        <v-label class="font-weight-semibold pb-2 text-grey200">Password</v-label>
-        <VTextField
-            v-model="password"
-            :rules="passwordRules"
-            required
-            hide-details="auto"
-            type="password"
-            class="pwdInput"
-        ></VTextField>
-        <div class="d-flex flex-wrap align-center my-3 ml-n2">
-            <v-checkbox class="pe-2" v-model="checkbox" :rules="[(v:any) => !!v || 'You must agree to continue!']" required hide-details color="primary">
-                <template v-slot:label class="font-weight-medium">Remeber this Device</template>
-            </v-checkbox>
-            <div class="ml-sm-auto">
-                <RouterLink to="" class="text-primary text-decoration-none font-weight-medium"
-                    >Forgot Password ?</RouterLink
-                >
-            </div>
-        </div>
-        <v-btn size="large" :loading="isSubmitting" color="primary" :disabled="valid" block type="submit" flat>Sign In</v-btn>
-        <div v-if="errors.apiError" class="mt-2">
-            <v-alert color="error">{{ errors.apiError }}</v-alert>
-        </div>
-    </Form>
+    <v-form v-model="valid" @submit.prevent="authUser">
+        <v-row class="d-flex mb-3">
+            <v-col cols="12">
+                <v-alert v-if="error" type="error" dismissible>
+                    {{ error }}
+                </v-alert>
+            </v-col>
+            <v-col cols="12">
+                <v-label class="font-weight-bold mb-1">Correo electrónico</v-label>
+                <v-text-field v-model="user.email" :rules="emailRules"  variant="outlined" density="compact" type="email" color="primary" required></v-text-field>
+            </v-col>
+            <v-col cols="12">
+                <v-label class="font-weight-bold mb-1">Contraseña</v-label>
+                <v-text-field v-model="user.password" :rules="passwordRules" variant="outlined"  density="compact" type="password" color="primary" required></v-text-field>
+            </v-col>
+            <v-col cols="12" class="pt-0">
+                <v-btn :disabled="!valid" @click="authUser" color="primary" size="large" block   flat>Iniciar Sesión</v-btn>
+            </v-col>
+        </v-row>
+    </v-form>
 </template>
