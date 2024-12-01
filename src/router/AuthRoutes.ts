@@ -6,12 +6,12 @@ const AuthRoutes = {
     },
     children: [
         {
-            name: 'Boxed Login',
+            name: 'Login',
             path: '/auth/login',
             component: () => import('@/views/authentication/SideLogin.vue')
         },
         {
-            name: 'Boxed Register',
+            name: 'Register',
             path: '/auth/register',
             component: () => import('@/views/authentication/SideRegister.vue')
         },

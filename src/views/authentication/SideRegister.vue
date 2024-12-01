@@ -11,17 +11,16 @@ import RegisterForm from '@/components/auth/RegisterForm.vue';
                 <div class="d-flex justify-center align-center h-100">
                     <div class="mt-xl-0 mt-5 auth-card">
                         <LogoIcon />
-                        <h2 class="text-h3 my-3 heading">Sign Up</h2>
-                        <div class="mb-6">Your Admin Dashboard</div>
+                        <h2 class="text-h3 my-3 heading">Registrarse</h2>
+                        <div class="mb-6">Jump Start</div>
                         <RegisterForm />
                         <p class="d-flex align-center justify-center text-textSecondary mt-6 font-weight-medium">
-                            Already have an Account?
                             <RouterLink
                                 class="pl-0 text-primary opacity-1 pl-2 font-weight-medium text-decoration-none"
                                 height="auto"
                                 to="/auth/login"
                                 variant="plain"
-                                >Sign in</RouterLink
+                                >Iniciar Sesión</RouterLink
                             >
                         </p>
                     </div>
@@ -37,15 +36,12 @@ import RegisterForm from '@/components/auth/RegisterForm.vue';
                     <v-row class="justify-center z-index-2">
                         <v-col cols="6">
                             <h1 class="text-h1">
-                                Welcome to
-                                <br />
-                                MatDash
+                                Bienvenido a Jump Start 
                             </h1>
                             <p class="text-h6 opacity-80 font-weight-regular mt-4">
-                                MatDash helps developers to build organized and well<br />
-                                coded dashboards full of beautiful and rich modules.
+                                Registrate para acceder a ofertas laborales, conectar con profesores y mostrar tus proyectos personales.<br />
+                                ¡Es el primer paso hacia tu futuro profesional!
                             </p>
-                            <v-btn to="/" size="large" color="primary" class="mt-5"> Learn More </v-btn>
                         </v-col>
                     </v-row>
                 </div>
