@@ -1,0 +1,13 @@
+.v-breadcrumbs{
+    .v-breadcrumbs-item{
+        .v-breadcrumbs-item--link{
+            display: none;
+        }
+        &.v-breadcrumbs-item--disabled{
+            opacity: 1;
+            .v-breadcrumbs-item--link{
+                display: block;
+            }
+        }
+    }
+}
