@@ -25,7 +25,15 @@ const breadcrumbs = ref([
         <v-col cols="12" md="12">
             <v-card elevation="10" >
                 <v-card-item>
-                    <v-card-title class="text-h5">Sample Title</v-card-title>
+                    <v-card-title class="text-h5">Sample Titleeeee</v-card-title>
+                    <v-card-subtitle class="text-subtitle-1 textSecondary">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,</v-card-subtitle>
+                </v-card-item>
+            </v-card>
+        </v-col>
+        <v-col cols="12" md="12">
+            <v-card elevation="10" >
+                <v-card-item>
+                    <v-card-title class="text-h5">Sample Titleeeee</v-card-title>
                     <v-card-subtitle class="text-subtitle-1 textSecondary">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,</v-card-subtitle>
                 </v-card-item>
             </v-card>
