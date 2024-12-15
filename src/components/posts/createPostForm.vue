@@ -34,6 +34,15 @@ const createPost = async () => {
             const newPost = response.data;
             emit('postCreated', newPost);
             isActive.value = false; // Close dialog
+            // Limpiar el formulario
+            post.value = {
+                title: '',
+                description: '',
+                category: '',
+                dateCreated: '2024-12-15',
+                mediaUrl: 'www.icarly.com',
+                userId: '11'
+            };
         } catch (err) {
             console.error('Error:', err);
             // Tipar el error como AxiosError
