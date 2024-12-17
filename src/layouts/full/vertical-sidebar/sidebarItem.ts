@@ -17,13 +17,24 @@ export interface menu {
 }
 const sidebarItem: menu[] = [
     {
-        header: 'Home',
+        header: 'JumpStart',
         id: 1,
         children: [
             {
-                title: 'Starter Page',
+                title: 'Mi Cuenta',
+                icon: 'shield-user-line-duotone',
+                to: '/myaccount'
+            },
+            {
+                title: 'Publicaciones',
                 icon: 'widget-add-line-duotone',
-                to: '/'
+                to: '/',
+                children: [
+                    {
+                        title: 'Mis Publicaciones',
+                        to: '/apps/user/profile'
+                    }
+                ]
             }
         ]
     },
