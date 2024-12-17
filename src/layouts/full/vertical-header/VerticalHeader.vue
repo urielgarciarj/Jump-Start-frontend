@@ -61,23 +61,6 @@ watch(priority, (newPriority) => {
         <ThemeToggler/>
 
         <!-- ---------------------------------------------- -->
-        <!-- translate -->
-        <!-- ---------------------------------------------- -->
-        <div class="hidden-sm-and-down">
-            <LanguageDD />
-        </div>
-
-    
-        <!-- ---------------------------------------------- -->
-        <!-- ShoppingCart -->
-        <!-- ---------------------------------------------- -->
-        <v-btn icon class="custom-hover-primary hidden-sm-and-down" size="small"  variant="text" color="primary" to="">
-            <v-badge color="error" :content="0">
-                <Icon icon="solar:cart-large-2-outline" height="22"   />
-            </v-badge>
-        </v-btn>
-
-        <!-- ---------------------------------------------- -->
         <!-- Notification -->
         <!-- ---------------------------------------------- -->
         <div class="hidden-sm-and-down">
