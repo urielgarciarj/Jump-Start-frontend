@@ -28,8 +28,9 @@ const authUser = async () => {
     if (valid.value) {
         try {
             const response = await axios.post('http://localhost:3000/users/login', user.value);
-            console.log('Usuario autenticado:', response.data);
-        
+            console.log('Usuario autenticado:');
+            const access_token = response.data.access_token;
+            sessionStorage.setItem('access_token',access_token);
             // Redirigir a la página de inicio si la solicitud es exitosa
             router.push('/'); // Cambia la ruta según sea necesario
         

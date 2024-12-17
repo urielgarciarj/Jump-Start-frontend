@@ -5,6 +5,8 @@ import { profileDD } from '@/_mockApis/headerData';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
+const token = sessionStorage.getItem('access_token');
+console.log('token',token)
 </script>
 
 <template>
