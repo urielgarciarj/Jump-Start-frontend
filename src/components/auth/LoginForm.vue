@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import axios, { AxiosError } from 'axios';
-import { useRouter } from 'vue-router'; // Importar useRouter
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const user = ref({
