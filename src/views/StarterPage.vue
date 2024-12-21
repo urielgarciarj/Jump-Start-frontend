@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue';
 
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import PostForm from '@/components/posts/createPostForm.vue';
+import PostItem from '@/components/posts/PostItem.vue';
 import axios from 'axios';
 
 const page = ref({ title: 'Publicaciones' });
@@ -42,8 +43,7 @@ const addNewPost = (newPost: any) => {
   posts.value.unshift(newPost);
   // Mostrar la notificación de éxito
   snackbarMessage.value = '¡Nueva publicación creada con éxito!';
-  showAlert.value = true; // Hacer visible el snackbar
-  // Cerrar la alerta después de 3 segundos (opcional)
+  showAlert.value = true;
   setTimeout(() => {
     showAlert.value = false;
   }, 5000);
@@ -76,7 +76,8 @@ const addNewPost = (newPost: any) => {
     </v-row>
     <v-row>
         <v-col v-for="post in filteredPosts" :key="post.id" cols="12" md="12">
-            <v-card elevation="10">
+          <PostItem :post="post" />  
+          <!-- <v-card elevation="10">
                 <v-card-item>
                     <v-card-title class="text-h5 d-flex justify-start">{{ post.title }}</v-card-title>
                     <v-card-subtitle class="text-subtitle-1 d-flex justify-end">{{ post.dateCreated }}</v-card-subtitle>
@@ -84,7 +85,7 @@ const addNewPost = (newPost: any) => {
                     <v-chip color="primary" class="font-weight-bold d-flex justify-end" size="default" rounded="sm"> {{ post.category }}</v-chip>
                     <v-card-text>{{ post.description }}</v-card-text>
                 </v-card-item>
-            </v-card>
+            </v-card> -->
         </v-col>
     </v-row>
 </template>

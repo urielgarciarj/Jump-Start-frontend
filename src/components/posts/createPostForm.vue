@@ -10,7 +10,7 @@ const post = ref({
     title: '',
     description: '',
     category: '',
-    dateCreated: '2024-12-15',
+    dateCreated: new Date().toISOString(),
     mediaUrl: 'www.icarly.com',
     userId: '11'
 });
@@ -39,7 +39,7 @@ const createPost = async () => {
                 title: '',
                 description: '',
                 category: '',
-                dateCreated: '2024-12-15',
+                dateCreated: '',
                 mediaUrl: 'www.icarly.com',
                 userId: '11'
             };
