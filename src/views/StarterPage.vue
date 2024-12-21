@@ -9,7 +9,6 @@ import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 const userId = authStore.userId; // Obtener el userId desde el store
-console.log('User ID:', userId);
 
 const page = ref({ title: 'Publicaciones' });
 const breadcrumbs = ref([
