@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Comments from './Comments.vue';
+import PostActions from './postActions.vue';
 import { Message2Icon } from 'vue-tabler-icons';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
+import { router } from '@/router';
 
 const authStore = useAuthStore();
 const userId = authStore.userId;
@@ -72,6 +74,11 @@ const getCategoryColor = (category: string) => {
     return categoryColors[category as keyof typeof categoryColors] || '';  
 };
 
+// Redirigir a la lista de posts después de eliminar
+const handlePostDeleted = () => {
+    router.push('/'); // Ajusta la ruta si es necesario
+};
+
 // Función para formatear fecha, hora y minutos
 const formatDateTime = (date: string) => {
   if (!date) return '';
@@ -97,6 +104,9 @@ const formatDateTime = (date: string) => {
                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
                         {{ formatDateTime(post?.dateCreated) }}
                     </span>
+                </div>
+                <div v-if="post?.user.id === userId" class="d-block d-sm-flex align-center gap-3">
+                    <PostActions :postId="post?.id" @deletePost="handlePostDeleted"/>
                 </div>
             </div>
             <div class="d-flex justify-end">

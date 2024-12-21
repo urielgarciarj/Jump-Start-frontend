@@ -52,6 +52,7 @@ const addNewPost = (newPost: any) => {
     showAlert.value = false;
   }, 5000);
 };
+
 </script>
 
 <template>
