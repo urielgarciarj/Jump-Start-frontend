@@ -3,6 +3,10 @@ import { ref } from 'vue';
 import Comments from './Comments.vue';
 import { Message2Icon } from 'vue-tabler-icons';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+const userId = authStore.userId;
 
 const props = defineProps({
     post: Object || Array
@@ -21,7 +25,7 @@ const categoryColors = {
   "Cultura y Diversidad": "#4FAA69"
 };
 
-const showCommentBox = ref(true);  // Inicia como verdadero para cargar los comentarios
+const showCommentBox = ref(false);  // Inicia como verdadero para cargar los comentarios
 const searchValue = ref('');
 const comments = ref<any[]>([]);
 const loadingComments = ref(false);
@@ -50,7 +54,7 @@ const addComment = async (postid: any, comment: any) => {
     try {
         const newComment: any = {
             postId: postid,
-            userId: '14',
+            userId: userId,
             dateCreated: new Date().toISOString(),
             text: comment
         }

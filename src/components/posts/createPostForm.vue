@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import axios, { AxiosError } from 'axios';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+const userId = authStore.userId;
 
 const emit = defineEmits<{
   (e: 'postCreated', newPost: any): void;
@@ -12,7 +16,7 @@ const post = ref({
     category: '',
     dateCreated: new Date().toISOString(),
     mediaUrl: 'www.icarly.com',
-    userId: '11'
+    userId: userId
 });
 
 const valid = ref(false);
@@ -31,7 +35,7 @@ const createPost = async () => {
     if (valid.value) {
         try {
             const response = await axios.post('http://localhost:3000/posts/create', post.value);
-            console.log('Post created:', response.data);
+            //console.log('Post created:', response.data);
             
             // Emitir el evento con el nuevo post
             const newPost = response.data;
@@ -44,7 +48,7 @@ const createPost = async () => {
                 category: '',
                 dateCreated: '',
                 mediaUrl: 'www.icarly.com',
-                userId: '11'
+                userId: ''
             };
         } catch (err) {
             console.error('Error:', err);
@@ -70,6 +74,11 @@ const createPost = async () => {
                     <v-toolbar color="primary" class="px-6">Nueva publicación</v-toolbar>
                     <v-card-text>
                         <v-row>
+                            <v-col cols="12">
+                                <v-alert v-if="error" type="error" dismissible>
+                                    {{ error }}
+                                </v-alert>
+                            </v-col>
                             <v-col cols="12">
                                 <v-text-field v-model="post.title" :rules="notEmptyRule" label="Titulo" required></v-text-field>
                             </v-col>

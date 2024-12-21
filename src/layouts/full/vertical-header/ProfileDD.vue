@@ -1,28 +1,30 @@
 <script setup lang="ts">
 import { profileDD } from '@/_mockApis/headerData';
 import { useAuthStore } from '@/stores/auth';
-import { useJwt } from '@vueuse/integrations/useJwt';
-import { ref } from 'vue';
+import axios from 'axios';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const userId = authStore.userId; // Obtener el userId desde el store
 
-const token = sessionStorage.getItem('access_token');
-console.log('token',token)
+const user = ref({
+    name: '',
+    lastName: '',
+    email: '',
+});
 
-const encodedJwt = ref(token);  // Usamos ref para almacenar el token
-console.log('encodedJwt', encodedJwt)
-// Usamos useJwt para obtener el header y el payload
-const { header, payload } = useJwt(encodedJwt);
-
-// // Asegúrate de ver los valores en consola si el token es válido
-console.log('header', header.value);
-console.log('payload', payload.value);
-const user = payload.value;
+onMounted(async () => {
+  try {
+    const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
+    user.value = response.data;
+  } catch (error) {
+    console.error('Error al obtener los posts:', error);
+  }
+});
 
 const logOut = async () => {
-    sessionStorage.removeItem('access_token');
     authStore.logout();
 }
 </script>
@@ -42,7 +44,7 @@ const logOut = async () => {
                 <div class="d-flex align-center pb-6">
                     <v-avatar size="55" color="error" variant="flat" class="text-h5 font-weight-medium"> C </v-avatar>
                     <div class="ml-3">
-                        <h6 class="text-subtitle-1 mb-n1">David McMichael <span class="text-success text-caption">Pro</span></h6>
+                        <h6 class="text-subtitle-1 mb-n1">{{ user.name }} {{ user.lastName }}</h6>
                         <span class="text-subtitle-1 text-textSecondary">{{ user.email }}</span>
                     </div>
                 </div>
