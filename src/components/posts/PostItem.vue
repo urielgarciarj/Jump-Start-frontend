@@ -112,13 +112,6 @@ const formatDateTime = (date: string) => {
             </div> -->
         </v-card-item>
         
-        <!--If Comment-->
-        <!-- <div v-if="post?.data.comments" class="pa-5 pt-0">
-            <div v-for="comments in post?.data.comments">
-                <Comments :comments="comments" :postId="post?.id" />
-            </div>
-        </div> -->
-    
         <v-card-item>
             <!-- Botón para cargar/ocultar los comentarios -->
              <div  class="d-flex gap-3 justify-end">
@@ -132,7 +125,6 @@ const formatDateTime = (date: string) => {
                 <div v-for="comment in comments">
                     <Comments :comments="comment" :postId="post?.id" />
                 </div>
-
                 <v-divider />
                 <div class="d-block d-sm-flex gap-3 align-center mb-4 px-4 pt-4">
                     <v-avatar size="40" color="secondary" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>

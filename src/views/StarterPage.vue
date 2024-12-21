@@ -76,16 +76,7 @@ const addNewPost = (newPost: any) => {
     </v-row>
     <v-row>
         <v-col v-for="post in filteredPosts" :key="post.id" cols="12" md="12">
-          <PostItem :post="post" />  
-          <!-- <v-card elevation="10">
-                <v-card-item>
-                    <v-card-title class="text-h5 d-flex justify-start">{{ post.title }}</v-card-title>
-                    <v-card-subtitle class="text-subtitle-1 d-flex justify-end">{{ post.dateCreated }}</v-card-subtitle>
-                    <v-divider />
-                    <v-chip color="primary" class="font-weight-bold d-flex justify-end" size="default" rounded="sm"> {{ post.category }}</v-chip>
-                    <v-card-text>{{ post.description }}</v-card-text>
-                </v-card-item>
-            </v-card> -->
+          <PostItem :post="post" />
         </v-col>
     </v-row>
 </template>
