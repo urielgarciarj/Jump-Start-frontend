@@ -16,7 +16,10 @@ const post = ref({
 });
 
 const valid = ref(false);
-
+const categories = ref([
+    "Investigación y Ciencia", "Recursos Académicos", "Consejos de Estudio", "Tecnología y Herramientas de Estudio",
+    "Vida Universitaria", "Desarrollo Personal y Profesional", "Intereses y Hobbies", "Innovación y Emprendimiento", "Cultura y Diversidad"
+]);
 // Reglas de validación
 const notEmptyRule = [
   (value: string) => !!value || 'Es obligatorio llenar este campo.'
@@ -75,7 +78,7 @@ const createPost = async () => {
                             </v-col>
                             <v-col cols="12">
                                 <v-select v-model="post.category" :rules="notEmptyRule"
-                                    :items="['Informativo', 'Software', 'Aviso', 'Producto']"
+                                    :items="categories"
                                     label="Categoría"
                                     required>
                                 </v-select>

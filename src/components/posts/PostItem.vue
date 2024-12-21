@@ -8,6 +8,19 @@ const props = defineProps({
     post: Object || Array
 });
 
+// Mapa de colores para cada categoría
+const categoryColors = {
+  "Investigación y Ciencia": "primary",
+  "Recursos Académicos": "secondary",
+  "Consejos de Estudio": "success",
+  "Tecnología y Herramientas de Estudio": "error",
+  "Vida Universitaria": "warning",
+  "Intereses y Hobbies": "info",
+  "Desarrollo Personal y Profesional": "#FFBDF5",
+  "Innovación y Emprendimiento": "#F0A048",
+  "Cultura y Diversidad": "#4FAA69"
+};
+
 const showCommentBox = ref(true);  // Inicia como verdadero para cargar los comentarios
 const searchValue = ref('');
 const comments = ref<any[]>([]);
@@ -51,6 +64,10 @@ const addComment = async (postid: any, comment: any) => {
     }
 };
 
+const getCategoryColor = (category: string) => {
+    return categoryColors[category as keyof typeof categoryColors] || '';  
+};
+
 // Función para formatear fecha, hora y minutos
 const formatDateTime = (date: string) => {
   if (!date) return '';
@@ -79,7 +96,7 @@ const formatDateTime = (date: string) => {
                 </div>
             </div>
             <div class="d-flex justify-end">
-                <v-chip color="primary" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
+                <v-chip :color="getCategoryColor(post?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
                     {{ post?.category }}
                 </v-chip>
             </div>
