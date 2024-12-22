@@ -6,16 +6,13 @@ import { Icon } from "@iconify/vue";
 
 // Definir las propiedades que se recibirán desde el componente principal
 const props = defineProps({
-    postId: String
+    commentId: String
 });
-
-// Definir el evento para emitir
-const emit = defineEmits(['deletePost']);
 
 // Acciones
 const router = useRouter();
 const showConfirmation = ref(false);
-const postIdToDelete = ref<string | undefined>(undefined); 
+const commentIdToDelete = ref<string | undefined>(undefined); 
 
 // Función para editar el post
 const editPost = (postId: string) => {
@@ -25,25 +22,23 @@ const editPost = (postId: string) => {
 };
 
 const handleDeletePost = () => {
-    postIdToDelete.value = props.postId; 
+    commentIdToDelete.value = props.commentId; 
     showConfirmation.value = true; 
 };
 // Function to confirm deletion
 const confirmDelete = async () => {
-  if (postIdToDelete.value !== undefined) {
+  if (commentIdToDelete.value !== undefined) {
     try {
-        const response = await axios.delete(`http://localhost:3000/posts/delete/${postIdToDelete.value}`);
-        console.log('comment deleted:', response.data);
-        emit('deletePost', postIdToDelete.value);
+        // const response = await axios.delete(`http://localhost:3000/posts/delete/${commentIdToDelete.value}`);
+        // console.log('comment deleted:', response.data);
     } catch (err) {
 
     }
-    postIdToDelete.value = undefined; 
+    commentIdToDelete.value = undefined; 
     showConfirmation.value = false; 
   }
 };
 </script>
-
 
 <template>
     <div class="d-flex justify-end gap-2">

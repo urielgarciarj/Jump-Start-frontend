@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+import CommentActions from './commentActions.vue';
+
+const authStore = useAuthStore();
+const userId = authStore.userId;
+
 const props = defineProps({
     comments: Object || Array,
     postId: String
@@ -28,6 +34,9 @@ const formatDateTime = (date: string) => {
                     <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
                     {{ formatDateTime(comments?.dateCreated) }}
                 </span>
+                <div v-if="comments?.user.id === userId">
+                    <CommentActions/>
+                </div>
             </div>
         </div>
         <div class="py-3 text-body-1">

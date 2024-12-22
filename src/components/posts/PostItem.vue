@@ -27,16 +27,16 @@ const categoryColors = {
   "Cultura y Diversidad": "#4FAA69"
 };
 
-const showCommentBox = ref(false);  // Inicia como verdadero para cargar los comentarios
+const showCommentBox = ref(false);
 const searchValue = ref('');
 const comments = ref<any[]>([]);
 const loadingComments = ref(false);
 
 // Función para mostrar u ocultar los comentarios
-const toggleCommentbox = (postId: string) => {
+const toggleCommentbox = async (postId: string) => {
   showCommentBox.value = !showCommentBox.value;
-  if (!showCommentBox.value && comments.value.length === 0) {
-    loadComments(postId);
+  if (showCommentBox.value && comments.value.length === 0) {
+    await loadComments(postId);
   }
 };
 
