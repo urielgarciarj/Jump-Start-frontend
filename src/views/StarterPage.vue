@@ -45,12 +45,16 @@ const filteredPosts = computed(() => {
 // Función para actualizar la lista de posts cuando se crea un nuevo post
 const addNewPost = (newPost: any) => {
   posts.value.unshift(newPost);
-  // Mostrar la notificación de éxito
   snackbarMessage.value = '¡Nueva publicación creada con éxito!';
   showAlert.value = true;
   setTimeout(() => {
     showAlert.value = false;
   }, 5000);
+};
+
+// Elimina el post del array filtrando el que se ha eliminado
+const handlePostDelete = (deletedPostId: string) => {
+  posts.value = posts.value.filter(post => post.id !== deletedPostId);
 };
 
 </script>
@@ -81,7 +85,7 @@ const addNewPost = (newPost: any) => {
     </v-row>
     <v-row>
         <v-col v-for="post in filteredPosts" :key="post.id" cols="12" md="12">
-          <PostItem :post="post" />
+          <PostItem :post="post"  @deletePost="handlePostDelete"/>
         </v-col>
     </v-row>
 </template>

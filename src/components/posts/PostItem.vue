@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Comments from './Comments.vue';
-import PostActions from './postActions.vue';
 import { Message2Icon } from 'vue-tabler-icons';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import { router } from '@/router';
+import { Icon } from "@iconify/vue";
 
 const authStore = useAuthStore();
 const userId = authStore.userId;
 
 const props = defineProps({
-    post: Object || Array
+    post: Object
 });
 
 // Mapa de colores para cada categoría
@@ -28,23 +28,28 @@ const categoryColors = {
 };
 
 const showCommentBox = ref(false);
-const searchValue = ref('');
+const commentText = ref('');
 const comments = ref<any[]>([]);
 const loadingComments = ref(false);
 
+const emit = defineEmits(['deletePost']);
+const showConfirmation = ref(false);
+const postIdToDelete = ref<string | undefined>(undefined);
+
 // Función para mostrar u ocultar los comentarios
 const toggleCommentbox = async (postId: string) => {
-  showCommentBox.value = !showCommentBox.value;
-  if (showCommentBox.value && comments.value.length === 0) {
-    await loadComments(postId);
-  }
+    if(!postId) return;
+    showCommentBox.value = !showCommentBox.value;
+    if (showCommentBox.value && comments.value.length === 0) {
+        await loadComments(postId);
+    }
 };
 
 async function loadComments(postId: string) {
     loadingComments.value = true;
     try {
         const response = await axios.get(`http://localhost:3000/post-comments/list/by-post/${postId}`);
-        comments.value = response.data;
+        comments.value = response.data || [];
     } catch (error) {
         console.error('Error al obtener los comentarios:', error);
     } finally {
@@ -64,7 +69,7 @@ const addComment = async (postid: any, comment: any) => {
         //console.log('comment created:', response.data);
         const comment_new = response.data;
         comments.value.push(comment_new);
-        searchValue.value = '';
+        commentText.value = '';
     } catch (err) {
         console.error('Error:', err);
     }
@@ -74,11 +79,33 @@ const getCategoryColor = (category: string) => {
     return categoryColors[category as keyof typeof categoryColors] || '';  
 };
 
-// Redirigir a la lista de posts después de eliminar
-const handlePostDeleted = () => {
-    router.push('/'); // Ajusta la ruta si es necesario
+// Función para editar el post
+const editPost = () => {
+    console.log('Editando el post con ID:');
 };
 
+const handleDeletePost = () => {
+    postIdToDelete.value = props.post ? props.post.id : ''; 
+    showConfirmation.value = true; 
+};
+// Function to confirm deletion
+const confirmDelete = async () => {
+  if (postIdToDelete.value !== undefined) {
+    try {
+        await axios.delete(`http://localhost:3000/posts/delete/${postIdToDelete.value}`);
+        emit('deletePost', postIdToDelete.value);
+    } catch (err) {
+        console.log('Error', err);
+    }
+    postIdToDelete.value = undefined; 
+    showConfirmation.value = false; 
+  }
+};
+
+// Comentario eliminado
+const handleDeletedComment = (deletedCommentId: string) => {
+  comments.value = comments.value.filter(comment => comment.id !== deletedCommentId);
+};
 // Función para formatear fecha, hora y minutos
 const formatDateTime = (date: string) => {
   if (!date) return '';
@@ -106,7 +133,16 @@ const formatDateTime = (date: string) => {
                     </span>
                 </div>
                 <div v-if="post?.user.id === userId" class="d-block d-sm-flex align-center gap-3">
-                    <PostActions :postId="post?.id" @deletePost="handlePostDeleted"/>
+                    <!-- Edit post action-->
+                    <v-btn icon color="lightsuccess" size="32">
+                        <Icon icon="solar:pen-linear" class="text-success" height="18" />
+                        <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
+                    </v-btn>
+                    <!-- Delete post action-->
+                    <v-btn @click.stop="handleDeletePost()" icon color="lighterror" size="32">
+                        <Icon icon="solar:trash-bin-minimalistic-linear" class="text-error" height="18"/>
+                        <v-tooltip activator="parent" location="bottom">Eliminar</v-tooltip>
+                    </v-btn>
                 </div>
             </div>
             <div class="d-flex justify-end">
@@ -146,26 +182,26 @@ const formatDateTime = (date: string) => {
         <v-card-item>
             <!-- Botón para cargar/ocultar los comentarios -->
              <div  class="d-flex gap-3 justify-end">
-                 <v-btn @click="toggleCommentbox(post?.id)" color="primary" outlined>
+                 <v-btn v-if="post?.id" @click="toggleCommentbox(post?.id)" color="primary" outlined>
                      <Message2Icon size="20" stroke-width="1.5" class="mr-2" />
                      {{ showCommentBox ? 'Ocultar Comentarios' : 'Cargar Comentarios' }}
                  </v-btn>
              </div>
             <div v-if="showCommentBox" class="pa-5 pt-0">
                 <br/>
-                <div v-for="comment in comments">
-                    <Comments :comments="comment" :postId="post?.id" />
+                <div v-if="comments.length > 0" v-for="comment in comments">
+                    <Comments v-if="comment" :comment="comment" @deleteComment="handleDeletedComment"/>
                 </div>
                 <v-divider />
                 <div class="d-block d-sm-flex gap-3 align-center mb-4 px-4 pt-4">
                     <v-avatar size="40" color="secondary" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>
-                    <v-text-field variant="outlined" color="primary" v-model="searchValue" placeholder="Escribe tu comentario" hide-details></v-text-field>
+                    <v-text-field variant="outlined" color="primary" v-model="commentText" placeholder="Escribe tu comentario" hide-details></v-text-field>
                     <v-btn
                         color="primary"
                         variant="flat"
-                        :disabled="searchValue === ''"
+                        :disabled="commentText === ''"
                         class="mt-3 mt-sm-0"
-                        @click="addComment(post?.id, searchValue)"
+                        @click="addComment(post?.id, commentText)"
                     >
                         Enviar
                     </v-btn>
@@ -173,4 +209,18 @@ const formatDateTime = (date: string) => {
             </div>
         </v-card-item>
     </v-card>
+    
+    <!-- Confirmation Dialog -->
+    <v-dialog v-model="showConfirmation" max-width="500px">
+        <v-card>
+            <v-card-title class="pa-4 bg-primary">Eliminar Publicación</v-card-title>
+            <v-card-text>
+                <h5 class="text-16">¿Estás seguro de que deseas eliminar esta publicación?</h5>
+            </v-card-text>
+            <v-card-actions class="d-flex justify-end">
+                <v-btn variant="tonal" class="px-4" @click="showConfirmation = false">Cancelar</v-btn>
+                <v-btn color="primary" class="px-4" variant="tonal" @click="confirmDelete">Si, Eliminar</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
