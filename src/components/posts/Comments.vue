@@ -24,7 +24,6 @@ const editedText = ref(props.comment?.text || '');
 const editComment = () => {
     isEditing.value = true; // Cambiar al modo de edición
 };
-
 // Función para guardar el comentario editado
 const saveComment = async () => {
     if (props.comment?.id && editedText.value !== props.comment.text) {
@@ -42,14 +41,12 @@ const saveComment = async () => {
         isEditing.value = false; // Si no hubo cambios, solo salimos del modo de edición
     }
 };
-
 const handleCommentDeleted = () => {
     if (props.comment?.id) {
         commentIdToDelete.value = props.comment.id;
         showConfirmation.value = true;
     } 
 };
-
 // Function to confirm deletion
 const confirmDelete = async () => {
   if (commentIdToDelete.value !== undefined) {

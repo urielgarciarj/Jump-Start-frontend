@@ -36,6 +36,10 @@ const emit = defineEmits(['deletePost']);
 const showConfirmation = ref(false);
 const postIdToDelete = ref<string | undefined>(undefined);
 
+const showEditForm = ref(false);
+const editedTitle = ref(props.post?.title || '');
+const editedDescription = ref(props.post?.description || '');
+const editedCategory = ref(props.post?.category || '');
 // Función para mostrar u ocultar los comentarios
 const toggleCommentbox = async (postId: string) => {
     if(!postId) return;
@@ -44,7 +48,6 @@ const toggleCommentbox = async (postId: string) => {
         await loadComments(postId);
     }
 };
-
 async function loadComments(postId: string) {
     loadingComments.value = true;
     try {
@@ -56,7 +59,7 @@ async function loadComments(postId: string) {
         loadingComments.value = false;
     }
 };
-
+// Funcion para agregar un nuevo comentario [axios]
 const addComment = async (postid: any, comment: any) => {
     try {
         const newComment: any = {
@@ -74,21 +77,44 @@ const addComment = async (postid: any, comment: any) => {
         console.error('Error:', err);
     }
 };
-
 const getCategoryColor = (category: string) => {
     return categoryColors[category as keyof typeof categoryColors] || '';  
 };
-
 // Función para editar el post
 const editPost = () => {
-    console.log('Editando el post con ID:');
+    showEditForm.value = true;
+    // Copiar los valores actuales del post a las variables de edición
+    editedTitle.value = props.post?.title;
+    editedDescription.value = props.post?.description;
+    editedCategory.value = props.post?.category;
 };
-
+const savePost = async () => {
+    if (props.post?.id && (editedTitle.value !== props.post.title || editedDescription.value !== props.post.description || editedCategory.value !== props.post.category)) {
+        try {
+            const updatedPost = {
+                title: editedTitle.value,
+                description: editedDescription.value,
+                category: editedCategory.value
+            };
+            // Enviar la solicitud de actualización al servidor
+            await axios.put(`http://localhost:3000/posts/update/${props.post.id}`, updatedPost);
+            // Actualiza la vista del post con los nuevos datos
+            props.post.title = editedTitle.value;
+            props.post.description = editedDescription.value;
+            props.post.category = editedCategory.value;
+            showEditForm.value = false;
+        } catch (err) {
+            console.error('Error al actualizar el post:', err);
+        }
+    } else {
+        showEditForm.value = false; // Si no hubo cambios, solo salimos del modo de edición
+    }
+};
+//Funcion para manejar eliminar un post
 const handleDeletePost = () => {
     postIdToDelete.value = props.post ? props.post.id : ''; 
     showConfirmation.value = true; 
 };
-// Function to confirm deletion
 const confirmDelete = async () => {
   if (postIdToDelete.value !== undefined) {
     try {
@@ -101,8 +127,7 @@ const confirmDelete = async () => {
     showConfirmation.value = false; 
   }
 };
-
-// Comentario eliminado
+// Comentario eliminado refresh
 const handleDeletedComment = (deletedCommentId: string) => {
   comments.value = comments.value.filter(comment => comment.id !== deletedCommentId);
 };
@@ -134,7 +159,7 @@ const formatDateTime = (date: string) => {
                 </div>
                 <div v-if="post?.user.id === userId" class="d-block d-sm-flex align-center gap-3">
                     <!-- Edit post action-->
-                    <v-btn icon color="lightsuccess" size="32">
+                    <v-btn @click.stop="editPost()" icon color="lightsuccess" size="32">
                         <Icon icon="solar:pen-linear" class="text-success" height="18" />
                         <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
                     </v-btn>
@@ -150,11 +175,22 @@ const formatDateTime = (date: string) => {
                     {{ post?.category }}
                 </v-chip>
             </div>
-            <v-card-text>
+            <v-card-text v-if="!showEditForm">
                 <h3>{{ post?.title }} </h3>
                 {{ post?.description }}
             </v-card-text>
-                
+            <!-- Formulario de edición -->
+            <div v-if="showEditForm">
+                <v-card-text v-if="showEditForm">
+                    <v-text-field v-model="editedTitle" label="Título" outlined dense autofocus/>
+                    <v-textarea v-model="editedDescription" label="Descripción" outlined dense/>
+                    <v-select v-model="editedCategory" :items="Object.keys(categoryColors)" label="Categoría" outlined dense/>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn @click="showEditForm = false" variant="tonal" size="small">Cancelar</v-btn>
+                    <v-btn @click="savePost" variant="tonal" size="small" color="primary">Guardar</v-btn>
+                </v-card-actions>
+            </div>
             <!---If Images-->
             <!-- <v-row v-if="post?.data.images">
                 <v-col :md="photo.featured ? '12' : '6'" v-for="photo in post?.data.images">
