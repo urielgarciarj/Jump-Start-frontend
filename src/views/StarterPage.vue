@@ -40,4 +40,3 @@ const breadcrumbs = ref([
         </v-col>
     </v-row>
 </template>
-
