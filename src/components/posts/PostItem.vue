@@ -219,7 +219,7 @@ const formatDateTime = (date: string) => {
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
                 <v-btn variant="tonal" class="px-4" @click="showConfirmation = false">Cancelar</v-btn>
-                <v-btn color="primary" class="px-4" variant="tonal" @click="confirmDelete">Si, Eliminar</v-btn>
+                <v-btn color="error" class="px-4" variant="tonal" @click="confirmDelete">Si, Eliminar</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

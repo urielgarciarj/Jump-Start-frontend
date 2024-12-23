@@ -16,9 +16,31 @@ const emit = defineEmits(['deleteComment']);
 const showConfirmation = ref(false);
 const commentIdToDelete = ref<string | undefined>(undefined);
 
+// Estado para controlar si el comentario está en modo de edición
+const isEditing = ref(false);
+const editedText = ref(props.comment?.text || '');
+
 // Función para editar el comentario
 const editComment = () => {
-    console.log('Editando el comentario con ID:');
+    isEditing.value = true; // Cambiar al modo de edición
+};
+
+// Función para guardar el comentario editado
+const saveComment = async () => {
+    if (props.comment?.id && editedText.value !== props.comment.text) {
+        try {
+            await axios.put(`http://localhost:3000/post-comments/update/${props.comment.id}`, {
+                text: editedText.value,
+            });
+            // Actualizar el texto del comentario en el componente
+            props.comment.text = editedText.value;
+            isEditing.value = false; // Salir del modo de edición
+        } catch (err) {
+            console.error('Error al guardar el comentario', err);
+        }
+    } else {
+        isEditing.value = false; // Si no hubo cambios, solo salimos del modo de edición
+    }
 };
 
 const handleCommentDeleted = () => {
@@ -67,7 +89,7 @@ const formatDateTime = (date: string) => {
                 </span>
                 <div v-if="comment?.user.id === userId" class="d-flex justify-end gap-2">
                     <!-- Edit post -->
-                    <v-btn icon color="lightsuccess" size="32">
+                    <v-btn @click="editComment" icon color="lightsuccess" size="32">
                         <Icon icon="solar:pen-linear" class="text-success" height="18" />
                         <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
                     </v-btn>
@@ -79,7 +101,12 @@ const formatDateTime = (date: string) => {
                 </div>
             </div>
         </div>
-        <div class="py-3 text-body-1">
+        <div v-if="isEditing" class="gap-2">
+            <v-textarea v-model="editedText" rows="3" />
+            <v-btn @click="isEditing = false" variant="tonal" size="small" class="mr-2">Cancelar</v-btn>
+            <v-btn @click="saveComment"  variant="tonal"  color="primary" size="small">Guardar</v-btn>
+        </div>
+        <div v-else class="py-3 text-body-1">
             {{ comment?.text }}
         </div>
     </v-card>
@@ -92,7 +119,7 @@ const formatDateTime = (date: string) => {
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
                 <v-btn variant="tonal" class="px-4" @click="showConfirmation = false">Cancelar</v-btn>
-                <v-btn color="primary" class="px-4" variant="tonal" @click="confirmDelete">Si, Eliminar</v-btn>
+                <v-btn color="error" class="px-4" variant="tonal" @click="confirmDelete">Si, Eliminar</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

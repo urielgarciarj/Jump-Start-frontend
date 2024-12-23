@@ -14,8 +14,15 @@ export const useAuthStore = defineStore({
     // Usar useJwt para decodificar el token
     userId: (state) => {
       if (state.token) {
-        const { header, payload } = useJwt(state.token);  // Extraemos el payload
+        const { payload } = useJwt(state.token);  // Extraemos el payload
         return payload.value ? payload.value.sub : null;  // Devuelve el ID del usuario desde el payload
+      }
+      return null;  // Si no hay token, devuelve null
+    },
+    userRole: (state) => {
+      if (state.token) {
+        const { payload } = useJwt(state.token);
+        return payload.value ? payload.value.role : null;
       }
       return null;  // Si no hay token, devuelve null
     },

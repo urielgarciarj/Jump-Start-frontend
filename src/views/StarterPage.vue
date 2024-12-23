@@ -5,10 +5,6 @@ import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import PostForm from '@/components/posts/createPostForm.vue';
 import PostItem from '@/components/posts/PostItem.vue';
 import axios from 'axios';
-import { useAuthStore } from '@/stores/auth';
-
-const authStore = useAuthStore();
-const userId = authStore.userId; // Obtener el userId desde el store
 
 const page = ref({ title: 'Publicaciones' });
 const breadcrumbs = ref([
