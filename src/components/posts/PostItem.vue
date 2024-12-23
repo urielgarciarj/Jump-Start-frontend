@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Comments from './Comments.vue';
+import EditPostForm from './updatePostForm.vue';
 import { Message2Icon } from 'vue-tabler-icons';
-import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
-import { router } from '@/router';
 import { Icon } from "@iconify/vue";
+import axios from 'axios';
 
 const authStore = useAuthStore();
 const userId = authStore.userId;
@@ -37,14 +37,6 @@ const showConfirmation = ref(false);
 const postIdToDelete = ref<string | undefined>(undefined);
 
 const showEditForm = ref(false);
-const editedTitle = ref(props.post?.title || '');
-const editedDescription = ref(props.post?.description || '');
-const editedCategory = ref(props.post?.category || '');
-
-const valid = ref(false);
-const notEmptyRule = [
-  (value: string) => !!value || 'Es obligatorio llenar este campo.'
-];
 // Función para mostrar u ocultar los comentarios
 const toggleCommentbox = async (postId: string) => {
     if(!postId) return;
@@ -87,33 +79,20 @@ const getCategoryColor = (category: string) => {
 };
 // Función para editar el post
 const editPost = () => {
-    showEditForm.value = true;
-    // Copiar los valores actuales del post a las variables de edición
-    editedTitle.value = props.post?.title;
-    editedDescription.value = props.post?.description;
-    editedCategory.value = props.post?.category;
+  showEditForm.value = true;
 };
-const savePost = async () => {
-    if (props.post?.id && valid.value && (editedTitle.value !== props.post.title || editedDescription.value !== props.post.description || editedCategory.value !== props.post.category)) {
-        try {
-            const updatedPost = {
-                title: editedTitle.value,
-                description: editedDescription.value,
-                category: editedCategory.value
-            };
-            // Enviar la solicitud de actualización al servidor
-            await axios.put(`http://localhost:3000/posts/update/${props.post.id}`, updatedPost);
-            // Actualiza la vista del post con los nuevos datos
-            props.post.title = editedTitle.value;
-            props.post.description = editedDescription.value;
-            props.post.category = editedCategory.value;
-            showEditForm.value = false;
-        } catch (err) {
-            console.error('Error al actualizar el post:', err);
-        }
-    } else {
-        showEditForm.value = false; // Si no hubo cambios, solo salimos del modo de edición
+// Función para manejar la actualización del post
+const handleUpdatePost = (updatedPost: { title: any; description: any; category: any; }) => {
+    if (props.post) {
+        props.post.title = updatedPost.title;
+        props.post.description = updatedPost.description;
+        props.post.category = updatedPost.category;
     }
+  showEditForm.value = false;
+};
+// Función para cancelar la edición
+const cancelEdit = () => {
+  showEditForm.value = false;
 };
 //Funcion para manejar eliminar un post
 const handleDeletePost = () => {
@@ -186,17 +165,11 @@ const formatDateTime = (date: string) => {
             </v-card-text>
             <!-- Formulario de edición -->
             <div v-if="showEditForm">
-                <v-form v-model="valid" @submit.prevent="savePost">
-                    <v-card-text v-if="showEditForm">
-                        <v-text-field v-model="editedTitle" label="Título" :rules="notEmptyRule" outlined dense autofocus required/>
-                        <v-textarea v-model="editedDescription" label="Descripción" :rules="notEmptyRule" outlined dense required/>
-                        <v-select v-model="editedCategory" :items="Object.keys(categoryColors)" label="Categoría" :rules="notEmptyRule" outlined dense required/>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn @click="showEditForm = false" variant="tonal" size="small">Cancelar</v-btn>
-                        <v-btn @click="savePost" :disabled="!valid" variant="tonal" size="small" color="primary">Guardar</v-btn>
-                    </v-card-actions>
-                </v-form>
+                <EditPostForm
+                    :post="post"
+                    @updatePost="handleUpdatePost"
+                    @cancelEdit="cancelEdit"
+                />
             </div>
             <!---If Images-->
             <!-- <v-row v-if="post?.data.images">
@@ -206,20 +179,7 @@ const formatDateTime = (date: string) => {
                     </v-avatar>
                 </v-col>
             </v-row> -->
-            
-            <!--- Comments count-->
-            <!-- <div class="my-4 mt-5 d-flex align-center">
-                <v-tooltip text="Comment">
-                    <template v-slot:activator="{ props }">
-                        <div class="d-flex gap-2 me-4 align-center">
-                            <v-btn icon v-bind="props" color="secondary" variant="flat" size="x-small" @click="toggleCommentbox">
-                                <Message2Icon size="16" />
-                            </v-btn>
-                            <span class="text-body-1 font-weight-semibold">{{ post?.data.comments ? post?.data.comments.length : 0 }}</span>
-                        </div>
-                    </template>
-                </v-tooltip>
-            </div> -->
+
         </v-card-item>
         
         <v-card-item>
@@ -253,7 +213,7 @@ const formatDateTime = (date: string) => {
         </v-card-item>
     </v-card>
     
-    <!-- Confirmation Dialog -->
+    <!-- Confirmation Dialog Delete Post-->
     <v-dialog v-model="showConfirmation" max-width="500px">
         <v-card>
             <v-card-title class="pa-4 bg-primary">Eliminar Publicación</v-card-title>
