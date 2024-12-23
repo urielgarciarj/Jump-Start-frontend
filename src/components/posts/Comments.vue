@@ -19,7 +19,10 @@ const commentIdToDelete = ref<string | undefined>(undefined);
 // Estado para controlar si el comentario está en modo de edición
 const isEditing = ref(false);
 const editedText = ref(props.comment?.text || '');
-
+const valid = ref(false);
+const notEmptyRule = [
+  (value: string) => !!value || 'Es obligatorio llenar este campo.'
+];
 // Función para editar el comentario
 const editComment = () => {
     isEditing.value = true; // Cambiar al modo de edición
@@ -99,9 +102,11 @@ const formatDateTime = (date: string) => {
             </div>
         </div>
         <div v-if="isEditing" class="gap-2">
-            <v-textarea v-model="editedText" rows="3" />
-            <v-btn @click="isEditing = false" variant="tonal" size="small" class="mr-2">Cancelar</v-btn>
-            <v-btn @click="saveComment"  variant="tonal"  color="primary" size="small">Guardar</v-btn>
+            <v-form v-model="valid" @submit.prevent="saveComment">
+                <v-textarea v-model="editedText" rows="3" />
+                <v-btn @click="isEditing = false" :rules="notEmptyRule" variant="tonal" size="small" class="mr-2">Cancelar</v-btn>
+                <v-btn @click="saveComment" :disabled="!valid" variant="tonal" :rules="notEmptyRule" color="primary" size="small">Guardar</v-btn>
+            </v-form>
         </div>
         <div v-else class="py-3 text-body-1">
             {{ comment?.text }}

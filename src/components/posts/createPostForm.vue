@@ -99,7 +99,7 @@ const createPost = async () => {
                     </v-card-text>
                     <v-card-actions class="justify-end">
                         <v-btn variant="tonal" @click="isActive.value = false" flat>Cancelar</v-btn>
-                        <v-btn color="primary" variant="tonal" @click="createPost" flat>Guardar</v-btn>
+                        <v-btn :disabled="!valid" color="primary" variant="tonal" @click="createPost" flat>Guardar</v-btn>
                     </v-card-actions>
                 </v-card>
             </template>

@@ -40,6 +40,11 @@ const showEditForm = ref(false);
 const editedTitle = ref(props.post?.title || '');
 const editedDescription = ref(props.post?.description || '');
 const editedCategory = ref(props.post?.category || '');
+
+const valid = ref(false);
+const notEmptyRule = [
+  (value: string) => !!value || 'Es obligatorio llenar este campo.'
+];
 // Función para mostrar u ocultar los comentarios
 const toggleCommentbox = async (postId: string) => {
     if(!postId) return;
@@ -89,7 +94,7 @@ const editPost = () => {
     editedCategory.value = props.post?.category;
 };
 const savePost = async () => {
-    if (props.post?.id && (editedTitle.value !== props.post.title || editedDescription.value !== props.post.description || editedCategory.value !== props.post.category)) {
+    if (props.post?.id && valid.value && (editedTitle.value !== props.post.title || editedDescription.value !== props.post.description || editedCategory.value !== props.post.category)) {
         try {
             const updatedPost = {
                 title: editedTitle.value,
@@ -181,15 +186,17 @@ const formatDateTime = (date: string) => {
             </v-card-text>
             <!-- Formulario de edición -->
             <div v-if="showEditForm">
-                <v-card-text v-if="showEditForm">
-                    <v-text-field v-model="editedTitle" label="Título" outlined dense autofocus/>
-                    <v-textarea v-model="editedDescription" label="Descripción" outlined dense/>
-                    <v-select v-model="editedCategory" :items="Object.keys(categoryColors)" label="Categoría" outlined dense/>
-                </v-card-text>
-                <v-card-actions>
-                    <v-btn @click="showEditForm = false" variant="tonal" size="small">Cancelar</v-btn>
-                    <v-btn @click="savePost" variant="tonal" size="small" color="primary">Guardar</v-btn>
-                </v-card-actions>
+                <v-form v-model="valid" @submit.prevent="savePost">
+                    <v-card-text v-if="showEditForm">
+                        <v-text-field v-model="editedTitle" label="Título" :rules="notEmptyRule" outlined dense autofocus required/>
+                        <v-textarea v-model="editedDescription" label="Descripción" :rules="notEmptyRule" outlined dense required/>
+                        <v-select v-model="editedCategory" :items="Object.keys(categoryColors)" label="Categoría" :rules="notEmptyRule" outlined dense required/>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn @click="showEditForm = false" variant="tonal" size="small">Cancelar</v-btn>
+                        <v-btn @click="savePost" :disabled="!valid" variant="tonal" size="small" color="primary">Guardar</v-btn>
+                    </v-card-actions>
+                </v-form>
             </div>
             <!---If Images-->
             <!-- <v-row v-if="post?.data.images">
