@@ -14,19 +14,33 @@ export const router = createRouter({
         AuthRoutes
     ]
 });
-
 router.beforeEach(async (to, from, next) => {
-    // redirect to login page if not logged in and trying to access a restricted page
-    const publicPages = ['/auth/login'];
+    // Define las rutas públicas donde no se requiere autenticación
+    const publicPages = ['/auth/login', '/auth/register'];
     const authRequired = !publicPages.includes(to.path);
-    const auth: any = useAuthStore();
-
+    const auth = useAuthStore();  // Obtiene el store de autenticación
+  
+    // console.log('Ruta:', to.fullPath);
+    // console.log('Requiere autenticación:', authRequired);
+    // console.log('Token:', auth.token);  // Verifica si el token está presente
+  
+    // Verifica si la ruta requiere autenticación
     if (to.matched.some((record) => record.meta.requiresAuth)) {
-        if (authRequired && !auth.user) {
-            auth.returnUrl = to.fullPath;
-            return next('/auth/login');
-        } else next();
+      //console.log('Requiere autenticación');
+  
+      // Si la ruta requiere autenticación y no hay un token, redirige al login
+      if (authRequired && !auth.token) {
+        //console.log('No hay token, redirigiendo al login...');
+        //auth.returnUrl = to.fullPath;  // Guarda la URL para redirigir después del login
+        return next('/auth/login');
+      } else {
+        //console.log('Autenticado o ruta pública');
+        next();  // Si está autenticado, continua con la navegación
+      }
     } else {
-        next();
+      // Si la ruta no requiere autenticación, permite el acceso
+      //console.log('Ruta pública, accediendo directamente...');
+      next();
     }
-});
+  });
+  

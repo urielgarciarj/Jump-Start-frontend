@@ -1,32 +1,45 @@
 import { defineStore } from 'pinia';
 import { router } from '@/router';
-import { fetchWrapper } from '@/utils/helpers/fetch-wrapper';
+import { useJwt } from '@vueuse/integrations/useJwt';
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
 
 export const useAuthStore = defineStore({
-    id: 'auth',
-    state: () => ({
-        // initialize state from local storage to enable user to stay logged in
-        // @ts-ignore
-        user: JSON.parse(localStorage.getItem('user')),
-        returnUrl: null
-    }),
-    actions: {
-        async login(username: string, password: string) {
-            const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
-
-            // update pinia state
-            this.user = user;
-            // store user details and jwt in local storage to keep user logged in between page refreshes
-            localStorage.setItem('user', JSON.stringify(user));
-            // redirect to previous url or default to home page
-            router.push(this.returnUrl || '/');
-        },
-        logout() {
-            this.user = null;
-            localStorage.removeItem('user');
-            router.push('/');
-        }
-    }
+  id: 'auth',
+  state: () => ({
+    token: sessionStorage.getItem('access_token') || null,
+    user: JSON.parse(sessionStorage.getItem('user') || '{}'),
+  }),
+  getters: {
+    // Usar useJwt para decodificar el token
+    userId: (state) => {
+      if (state.token) {
+        const { payload } = useJwt(state.token);  // Extraemos el payload
+        return payload.value ? payload.value.sub : null;  // Devuelve el ID del usuario desde el payload
+      }
+      return null;  // Si no hay token, devuelve null
+    },
+    userRole: (state) => {
+      if (state.token) {
+        const { payload } = useJwt(state.token);
+        return payload.value ? payload.value.role : null;
+      }
+      return null;  // Si no hay token, devuelve null
+    },
+    isAuthenticated: (state) => !!state.token,
+  },
+  actions: {
+    setToken(token: string) {
+      this.token = token;
+      sessionStorage.setItem('access_token', token);
+      router.push('/');
+    },
+    logout() {
+      this.token = null;
+      this.user = null;
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('user');
+      router.push('/auth/login');
+    },
+  },
 });

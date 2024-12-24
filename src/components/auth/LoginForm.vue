@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import axios, { AxiosError } from 'axios';
-import { useRouter } from 'vue-router'; // Importar useRouter
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
+const authStore = useAuthStore();
+
 const user = ref({
     email: '',
     password: '',
 });
-
 const valid = ref(false);
 
 // Reglas de validación
@@ -28,10 +30,9 @@ const authUser = async () => {
     if (valid.value) {
         try {
             const response = await axios.post('http://localhost:3000/users/login', user.value);
-            console.log('Usuario autenticado:', response.data);
-        
-            // Redirigir a la página de inicio si la solicitud es exitosa
-            router.push('/'); // Cambia la ruta según sea necesario
+            //console.log('Usuario autenticado:');
+            const access_token = response.data.access_token;
+            authStore.setToken(access_token);
         
         } catch (err) {
             console.error('Error al iniciar sesion:', err);
