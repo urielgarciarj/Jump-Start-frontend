@@ -16,6 +16,11 @@ const MainRoutes = {
             path: '/samplepage',
             component: () => import('@/views/Samplepage.vue')
         },
+        {
+            name: 'Sample Page 3',
+            path: '/photos',
+            component: () => import('@/views/Photospage.vue')
+        },
     ]
 };
 

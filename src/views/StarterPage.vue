@@ -85,4 +85,3 @@ const handlePostDelete = (deletedPostId: string) => {
         </v-col>
     </v-row>
 </template>
-
