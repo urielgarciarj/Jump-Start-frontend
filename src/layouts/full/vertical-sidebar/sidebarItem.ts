@@ -28,13 +28,7 @@ const sidebarItem: menu[] = [
             {
                 title: 'Publicaciones',
                 icon: 'widget-add-line-duotone',
-                to: '/',
-                children: [
-                    {
-                        title: 'Mis Publicaciones',
-                        to: '/apps/user/profile'
-                    }
-                ]
+                to: '/'
             }
         ]
     },
