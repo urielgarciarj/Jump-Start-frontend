@@ -29,7 +29,7 @@ const editComment = () => {
 };
 // Función para guardar el comentario editado
 const saveComment = async () => {
-    if (props.comment?.id && editedText.value !== props.comment.text) {
+    if (props.comment?.id && editedText.value !== props.comment.text && valid.value) {
         try {
             await axios.put(`http://localhost:3000/post-comments/update/${props.comment.id}`, {
                 text: editedText.value,
@@ -89,12 +89,12 @@ const formatDateTime = (date: string) => {
                 </span>
                 <div v-if="comment?.user.id === userId" class="d-flex justify-end gap-2">
                     <!-- Edit post -->
-                    <v-btn @click="editComment" icon color="lightsuccess" size="32">
-                        <Icon icon="solar:pen-linear" class="text-success" height="18" />
+                    <v-btn @click="editComment()" icon color="#F4F6FF" size="32">
+                        <Icon icon="solar:pen-linear" class="text-primary" height="18" />
                         <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
                     </v-btn>
                     <!-- Delete post -->
-                    <v-btn @click.stop="handleCommentDeleted()" icon color="lighterror" size="32">
+                    <v-btn @click.stop="handleCommentDeleted()" icon color="#F4F6FF" size="32">
                         <Icon icon="solar:trash-bin-minimalistic-linear" class="text-error" height="18"/>
                         <v-tooltip activator="parent" location="bottom">Eliminar</v-tooltip>
                     </v-btn>
@@ -103,9 +103,9 @@ const formatDateTime = (date: string) => {
         </div>
         <div v-if="isEditing" class="gap-2">
             <v-form v-model="valid" @submit.prevent="saveComment">
-                <v-textarea v-model="editedText" rows="3" />
-                <v-btn @click="isEditing = false" :rules="notEmptyRule" variant="tonal" size="small" class="mr-2">Cancelar</v-btn>
-                <v-btn @click="saveComment" :disabled="!valid" variant="tonal" :rules="notEmptyRule" color="primary" size="small">Guardar</v-btn>
+                <v-textarea v-model="editedText" :rules="notEmptyRule" rows="3" />
+                <v-btn @click="isEditing = false" variant="tonal" size="small" class="mr-2">Cancelar</v-btn>
+                <v-btn @click="saveComment" :disabled="!valid" variant="tonal" color="primary" size="small">Guardar</v-btn>
             </v-form>
         </div>
         <div v-else class="py-3 text-body-1">

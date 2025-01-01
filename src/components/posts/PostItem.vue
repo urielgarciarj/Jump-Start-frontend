@@ -132,6 +132,11 @@ const formatDateTime = (date: string) => {
 <template>
     <v-card variant="outlined">
         <v-card-item>
+            <div >
+                <v-chip :color="getCategoryColor(post?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
+                    {{ post?.category }}
+                </v-chip>
+            </div>
             <div class="d-flex gap-3 align-center">
                 <v-avatar size="40" color="warning" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>
                 <div class="d-block d-sm-flex align-center gap-3">
@@ -143,21 +148,16 @@ const formatDateTime = (date: string) => {
                 </div>
                 <div v-if="post?.user.id === userId" class="d-block d-sm-flex align-center gap-3">
                     <!-- Edit post action-->
-                    <v-btn @click.stop="editPost()" icon color="lightsuccess" size="32">
-                        <Icon icon="solar:pen-linear" class="text-success" height="18" />
+                    <v-btn @click.stop="editPost()" icon flat size="32">
+                        <Icon icon="solar:pen-linear" class="text-primary" height="18" />
                         <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
                     </v-btn>
                     <!-- Delete post action-->
-                    <v-btn @click.stop="handleDeletePost()" icon color="lighterror" size="32">
+                    <v-btn @click.stop="handleDeletePost()" icon flat size="32">
                         <Icon icon="solar:trash-bin-minimalistic-linear" class="text-error" height="18"/>
                         <v-tooltip activator="parent" location="bottom">Eliminar</v-tooltip>
                     </v-btn>
                 </div>
-            </div>
-            <div class="d-flex justify-end">
-                <v-chip :color="getCategoryColor(post?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
-                    {{ post?.category }}
-                </v-chip>
             </div>
             <v-card-text v-if="!showEditForm">
                 <h3>{{ post?.title }} </h3>
