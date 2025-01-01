@@ -131,12 +131,12 @@ const formatDateTime = (date: string) => {
 
 <template>
     <v-card variant="outlined">
+        <div >
+            <v-chip :color="getCategoryColor(post?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
+                {{ post?.category }}
+            </v-chip>
+        </div>
         <v-card-item>
-            <div >
-                <v-chip :color="getCategoryColor(post?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
-                    {{ post?.category }}
-                </v-chip>
-            </div>
             <div class="d-flex gap-3 align-center">
                 <v-avatar size="40" color="warning" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>
                 <div class="d-block d-sm-flex align-center gap-3">
