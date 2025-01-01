@@ -33,9 +33,8 @@ const filteredPosts = computed(() => {
   if (!searchQuery.value) {
     return posts.value;
   }
-
   const query = searchQuery.value.toLowerCase();
-  return posts.value.filter(post => post.title.toLowerCase().includes(query));
+  return posts.value.filter(post => post.title.toLowerCase().includes(query) || post.category.toLowerCase().includes(query));
 });
 
 // Función para actualizar la lista de posts cuando se crea un nuevo post
