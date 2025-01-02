@@ -47,7 +47,7 @@ export default defineComponent({
       formData.append('file', this.file);
 
       try {
-        const response = await axios.post('http://localhost:3000/profiles/upload-profile-picture', formData, {
+        const response = await axios.post('http://localhost:3000/profiles/upload-profile-picture/11', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

@@ -138,7 +138,14 @@ const formatDateTime = (date: string) => {
         </div>
         <v-card-item>
             <div class="d-flex gap-3 align-center">
-                <v-avatar size="40" color="warning" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>
+                <v-avatar size="40" class="text-h5 font-weight-medium"> 
+                    <template v-if="post?.user.profile?.picture">
+                        <img :src="post?.user.profile?.picture" alt="icon" height="40" />
+                    </template>
+                    <template v-else>
+                        {{ post?.user.name.charAt(0).toUpperCase() }}{{ post?.user.lastName.charAt(0).toUpperCase() }}
+                    </template>
+                </v-avatar>
                 <div class="d-block d-sm-flex align-center gap-3">
                     <h6 class="text-h6">{{ post?.user.name }} {{ post?.user.lastName }}</h6>
                     <span class="text-subtitle-2 opacity-50">
