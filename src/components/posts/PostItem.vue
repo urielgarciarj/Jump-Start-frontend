@@ -129,6 +129,14 @@ const formatDateTime = (date: string) => {
 };
 </script>
 
+<style scoped>
+.adjusted-image {
+  max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
+  max-height: 100%; /* Limita la altura máxima de la imagen */
+  object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
+}
+</style>
+
 <template>
     <v-card variant="outlined">
         <div >
@@ -179,14 +187,8 @@ const formatDateTime = (date: string) => {
                 />
             </div>
             <!---If Images-->
-            <v-row v-if="post?.mediaUrl">
-                <!-- <v-col :md="photo.featured ? '12' : '6'" v-for="photo in post?.data.images"> -->
-                    <!-- <v-img :src="post?.mediaUrl"></v-img> -->
-                    <img :src="post?.mediaUrl" />
-                    
-                    <!-- <v-avatar class="rounded-md w-100" size="360">
-                    </v-avatar> -->
-                <!-- </v-col> -->
+            <v-row v-if="post?.mediaUrl" class="d-flex justify-center align-center">
+                    <img :src="post?.mediaUrl" class="adjusted-image"/>
             </v-row>
 
         </v-card-item>

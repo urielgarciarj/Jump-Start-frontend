@@ -60,6 +60,7 @@ const cancelEdit = () => {
       <v-textarea v-model="editedDescription" label="Descripción" :rules="notEmptyRule" outlined dense required />
       <v-select v-model="editedCategory"
         :items="categories" label="Categoría" :rules="notEmptyRule" outlined dense required />
+      <v-file-input label="Adjuntar imagen" hide-details variant="outlined"> </v-file-input>
     </v-card-text>
     <v-card-actions>
       <v-btn @click="cancelEdit" variant="tonal" size="small">Cancelar</v-btn>
