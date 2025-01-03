@@ -82,11 +82,13 @@ const editPost = () => {
   showEditForm.value = true;
 };
 // Función para manejar la actualización del post
-const handleUpdatePost = (updatedPost: { title: any; description: any; category: any; }) => {
+const handleUpdatePost = (updatedPost: { title: any; description: any; category: any; mediaUrl: any; }) => {
+    console.log('handleUpdatePost', updatedPost)
     if (props.post) {
         props.post.title = updatedPost.title;
         props.post.description = updatedPost.description;
         props.post.category = updatedPost.category;
+        props.post.mediaUrl = updatedPost.mediaUrl;
     }
   showEditForm.value = false;
 };
@@ -187,9 +189,9 @@ const formatDateTime = (date: string) => {
                 />
             </div>
             <!---If Images-->
-            <v-row v-if="post?.mediaUrl" class="d-flex justify-center align-center">
+            <div v-if="post?.mediaUrl" class="d-flex justify-center align-center">
                     <img :src="post?.mediaUrl" class="adjusted-image"/>
-            </v-row>
+            </div>
 
         </v-card-item>
         

@@ -115,7 +115,7 @@ const handleFileChange = (event: Event) => {
                                 </v-select>
                             </v-col>
                             <v-col cols="12">
-                                <v-file-input @change="handleFileChange" label="Adjuntar imagen" hide-details variant="outlined"> </v-file-input>
+                                <v-file-input @change="handleFileChange" accept="image/*" label="Adjuntar imagen" hide-details variant="outlined"> </v-file-input>
                             </v-col>
                         </v-row>
                     </v-card-text>
