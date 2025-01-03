@@ -39,6 +39,7 @@ const filteredPosts = computed(() => {
 
 // Función para actualizar la lista de posts cuando se crea un nuevo post
 const addNewPost = (newPost: any) => {
+  console.log('addNewPost', newPost)
   posts.value.unshift(newPost);
   snackbarMessage.value = '¡Nueva publicación creada con éxito!';
   showAlert.value = true;

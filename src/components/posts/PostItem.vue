@@ -179,13 +179,15 @@ const formatDateTime = (date: string) => {
                 />
             </div>
             <!---If Images-->
-            <!-- <v-row v-if="post?.data.images">
-                <v-col :md="photo.featured ? '12' : '6'" v-for="photo in post?.data.images">
-                    <v-avatar class="rounded-md w-100" size="360">
-                        <img :src="photo.img" alt="photo" />
-                    </v-avatar>
-                </v-col>
-            </v-row> -->
+            <v-row v-if="post?.mediaUrl">
+                <!-- <v-col :md="photo.featured ? '12' : '6'" v-for="photo in post?.data.images"> -->
+                    <!-- <v-img :src="post?.mediaUrl"></v-img> -->
+                    <img :src="post?.mediaUrl" />
+                    
+                    <!-- <v-avatar class="rounded-md w-100" size="360">
+                    </v-avatar> -->
+                <!-- </v-col> -->
+            </v-row>
 
         </v-card-item>
         
@@ -204,7 +206,7 @@ const formatDateTime = (date: string) => {
                 </div>
                 <v-divider />
                 <div class="d-block d-sm-flex gap-3 align-center mb-4 px-4 pt-4">
-                    <v-avatar size="40" color="secondary" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>
+                    <Message2Icon size="0" stroke-width="1.5" class="mr-2" />
                     <v-text-field variant="outlined" color="primary" v-model="commentText" placeholder="Escribe tu comentario" hide-details></v-text-field>
                     <v-btn
                         color="primary"

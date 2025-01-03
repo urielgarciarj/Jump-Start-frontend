@@ -81,13 +81,13 @@ const formatDateTime = (date: string) => {
     <v-card variant="flat" class="mb-3 pa-5 bg-light">
         <div class="d-flex gap-3 align-center">
             <v-avatar size="40" class="text-h5 font-weight-medium"> 
-                    <template v-if="comment?.user.profile?.picture">
-                        <img :src="comment?.user.profile?.picture" alt="icon" height="40" />
-                    </template>
-                    <template v-else>
-                        {{ comment?.user.name.charAt(0).toUpperCase() }}{{ comment?.user.lastName.charAt(0).toUpperCase() }}
-                    </template>
-                </v-avatar>
+                <template v-if="comment?.user.profile?.picture">
+                    <img :src="comment?.user.profile?.picture" alt="icon" height="40" />
+                </template>
+                <template v-else>
+                    {{ comment?.user.name.charAt(0).toUpperCase() }}{{ comment?.user.lastName.charAt(0).toUpperCase() }}
+                </template>
+            </v-avatar>
             <div class="d-block d-sm-flex align-center gap-3">
                 <h6 class="text-h6">{{ comment?.user.name }} {{ comment?.user.lastName }}</h6>
                 <span class="text-subtitle-2 opacity-50">

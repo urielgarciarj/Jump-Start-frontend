@@ -15,10 +15,9 @@ const post = ref({
     description: '',
     category: '',
     dateCreated: new Date().toISOString(),
-    mediaUrl: 'www.icarly.com',
     userId: userId
 });
-
+const file = ref<File | null>(null);
 const valid = ref(false);
 const categories = ref([
     "Investigación y Ciencia", "Recursos Académicos", "Consejos de Estudio", "Tecnología y Herramientas de Estudio",
@@ -34,7 +33,22 @@ const error = ref<string | null>(null);
 const createPost = async () => {
     if (valid.value) {
         try {
-            const response = await axios.post('http://localhost:3000/posts/create', post.value);
+            const formData = new FormData();
+            formData.append('title', post.value.title);
+            formData.append('description', post.value.description);
+            formData.append('category', post.value.category);
+            formData.append('dateCreated', post.value.dateCreated);
+            formData.append('userId', post.value.userId);
+            
+            // Si hay una imagen seleccionada, agregarla al FormData
+            if (file.value) {
+                formData.append('file', file.value);
+            }
+            const response = await axios.post('http://localhost:3000/posts/create', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             //console.log('Post created:', response.data);
             
             // Emitir el evento con el nuevo post
@@ -47,7 +61,6 @@ const createPost = async () => {
                 description: '',
                 category: '',
                 dateCreated: '',
-                mediaUrl: 'www.icarly.com',
                 userId: ''
             };
         } catch (err) {
@@ -61,10 +74,19 @@ const createPost = async () => {
         }
     }
 };
+
+// Función para manejar el cambio de archivo
+const handleFileChange = (event: Event) => {
+    const inputEvent = event.target as HTMLInputElement;
+    if (inputEvent.files && inputEvent.files.length > 0) {
+        file.value = inputEvent.files[0];  // Guardamos solo el primer archivo
+    }
+};
+
 </script>
 
 <template>
-    <v-form v-model="valid" @submit.prevent="createPost">
+    <v-form v-model="valid" @submit.prevent="createPost" enctype="multipart/form-data">
         <v-dialog v-model="isActive"  transition="dialog-bottom-transition" class="dialog-mw">
             <template v-slot:activator="{ props }">
                 <v-btn color="primary" class="w-100" v-bind="props" flat>Nueva publicación</v-btn>
@@ -83,7 +105,7 @@ const createPost = async () => {
                                 <v-text-field v-model="post.title" :rules="notEmptyRule" label="Titulo" required></v-text-field>
                             </v-col>
                             <v-col cols="12">
-                                <v-text-field v-model="post.description" :rules="notEmptyRule" label="Descripción" required></v-text-field>
+                                <v-textarea v-model="post.description" :rules="notEmptyRule" label="Descripción" required></v-textarea>
                             </v-col>
                             <v-col cols="12">
                                 <v-select v-model="post.category" :rules="notEmptyRule"
@@ -93,7 +115,7 @@ const createPost = async () => {
                                 </v-select>
                             </v-col>
                             <v-col cols="12">
-                                <v-file-input multiple label="Adjuntar" hide-details variant="outlined"> </v-file-input>
+                                <v-file-input @change="handleFileChange" label="Adjuntar imagen" hide-details variant="outlined"> </v-file-input>
                             </v-col>
                         </v-row>
                     </v-card-text>
