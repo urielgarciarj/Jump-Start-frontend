@@ -210,7 +210,7 @@ const formatDateTime = (date: string) => {
                 </div>
                 <v-divider />
                 <div class="d-block d-sm-flex gap-3 align-center mb-4 px-4 pt-4">
-                    <Message2Icon size="0" stroke-width="1.5" class="mr-2" />
+                    <Message2Icon size="20" stroke-width="1.5" class="mr-2" />
                     <v-text-field variant="outlined" color="primary" v-model="commentText" placeholder="Escribe tu comentario" hide-details></v-text-field>
                     <v-btn
                         color="primary"
