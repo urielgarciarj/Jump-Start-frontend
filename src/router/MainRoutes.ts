@@ -21,6 +21,11 @@ const MainRoutes = {
             path: '/photos',
             component: () => import('@/views/Photospage.vue')
         },
+        {
+            name: 'my Profile',
+            path: '/profile',
+            component: () => import('@/views/Profilepage.vue')
+        },
     ]
 };
 
