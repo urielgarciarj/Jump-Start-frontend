@@ -40,7 +40,7 @@ onMounted(() => {
 
 <template>
     <v-card elevation="10" class="overflow-hidden">
-        <img :src="profileBg" alt="profile" class="w-100" />
+        <img :src="profileBg" alt="profile" class="w-100" height="160px" />
         <div>
             <v-row class="mt-1">
                 <v-col cols="12" lg="4" sm="12" class="order-sm-second">
