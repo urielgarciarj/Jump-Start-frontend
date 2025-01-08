@@ -16,6 +16,7 @@ const emit = defineEmits(['updatePost', 'cancelEdit']); // Emitir eventos para a
 const editedTitle = ref(props.post?.title || '');
 const editedDescription = ref(props.post?.description || '');
 const editedCategory = ref(props.post?.category || '');
+const file = ref<File | null>(null);
 
 const valid = ref(false);
 
@@ -32,15 +33,25 @@ const savePost = async () => {
         description: editedDescription.value,
         category: editedCategory.value,
       };
+      // Crear un FormData para enviar los datos y el archivo
+      const formData = new FormData();
+      formData.append('title', editedTitle.value);
+      formData.append('description', editedDescription.value);
+      formData.append('category', editedCategory.value);
+
+      // Si hay un archivo (imagen) seleccionado, añadirlo al FormData
+      if (file.value) {
+        formData.append('file', file.value);
+      }
 
       // Solicitud PUT para actualizar el post en el servidor
-      await axios.put(`http://localhost:3000/posts/update/${props.post.id}`, updatedPost);
-
-      // Emitir evento para actualizar el post en el componente principal
-      emit('updatePost', {
-        ...props.post,
-        ...updatedPost,
+      const response = await axios.put(`http://localhost:3000/posts/update/${props.post.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',  // Asegúrate de que el tipo de contenido sea multipart
+        },
       });
+      // Emitir evento para actualizar el post en el componente principal
+      emit('updatePost', {...props.post,...response.data,});
     } catch (err) {
       console.error('Error al actualizar el post:', err);
     }
@@ -51,6 +62,13 @@ const savePost = async () => {
 const cancelEdit = () => {
   emit('cancelEdit');
 };
+
+const handleFileChange = (event: Event) => {
+  const inputEvent = event.target as HTMLInputElement;
+  if (inputEvent.files && inputEvent.files.length > 0) {
+    file.value = inputEvent.files[0]; // Guardamos el archivo seleccionado
+  }
+};
 </script>
 
 <template>
@@ -60,6 +78,7 @@ const cancelEdit = () => {
       <v-textarea v-model="editedDescription" label="Descripción" :rules="notEmptyRule" outlined dense required />
       <v-select v-model="editedCategory"
         :items="categories" label="Categoría" :rules="notEmptyRule" outlined dense required />
+      <v-file-input @change="handleFileChange" accept="image/*" label="Adjuntar nueva imagen" hide-details variant="outlined"> </v-file-input>
     </v-card-text>
     <v-card-actions>
       <v-btn @click="cancelEdit" variant="tonal" size="small">Cancelar</v-btn>

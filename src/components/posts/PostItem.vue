@@ -82,11 +82,13 @@ const editPost = () => {
   showEditForm.value = true;
 };
 // Función para manejar la actualización del post
-const handleUpdatePost = (updatedPost: { title: any; description: any; category: any; }) => {
+const handleUpdatePost = (updatedPost: { title: any; description: any; category: any; mediaUrl: any; }) => {
+    console.log('handleUpdatePost', updatedPost)
     if (props.post) {
         props.post.title = updatedPost.title;
         props.post.description = updatedPost.description;
         props.post.category = updatedPost.category;
+        props.post.mediaUrl = updatedPost.mediaUrl;
     }
   showEditForm.value = false;
 };
@@ -129,11 +131,31 @@ const formatDateTime = (date: string) => {
 };
 </script>
 
+<style scoped>
+.adjusted-image {
+  max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
+  max-height: 100%; /* Limita la altura máxima de la imagen */
+  object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
+}
+</style>
+
 <template>
     <v-card variant="outlined">
+        <div >
+            <v-chip :color="getCategoryColor(post?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
+                {{ post?.category }}
+            </v-chip>
+        </div>
         <v-card-item>
             <div class="d-flex gap-3 align-center">
-                <v-avatar size="40" color="warning" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>
+                <v-avatar size="40" class="text-h5 font-weight-medium"> 
+                    <template v-if="post?.user.profile?.picture">
+                        <img :src="post?.user.profile?.picture" alt="icon" height="40" />
+                    </template>
+                    <template v-else>
+                        {{ post?.user.name.charAt(0).toUpperCase() }}{{ post?.user.lastName.charAt(0).toUpperCase() }}
+                    </template>
+                </v-avatar>
                 <div class="d-block d-sm-flex align-center gap-3">
                     <h6 class="text-h6">{{ post?.user.name }} {{ post?.user.lastName }}</h6>
                     <span class="text-subtitle-2 opacity-50">
@@ -143,21 +165,16 @@ const formatDateTime = (date: string) => {
                 </div>
                 <div v-if="post?.user.id === userId" class="d-block d-sm-flex align-center gap-3">
                     <!-- Edit post action-->
-                    <v-btn @click.stop="editPost()" icon color="lightsuccess" size="32">
-                        <Icon icon="solar:pen-linear" class="text-success" height="18" />
+                    <v-btn @click.stop="editPost()" icon flat size="32">
+                        <Icon icon="solar:pen-linear" class="text-primary" height="18" />
                         <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
                     </v-btn>
                     <!-- Delete post action-->
-                    <v-btn @click.stop="handleDeletePost()" icon color="lighterror" size="32">
+                    <v-btn @click.stop="handleDeletePost()" icon flat size="32">
                         <Icon icon="solar:trash-bin-minimalistic-linear" class="text-error" height="18"/>
                         <v-tooltip activator="parent" location="bottom">Eliminar</v-tooltip>
                     </v-btn>
                 </div>
-            </div>
-            <div class="d-flex justify-end">
-                <v-chip :color="getCategoryColor(post?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
-                    {{ post?.category }}
-                </v-chip>
             </div>
             <v-card-text v-if="!showEditForm">
                 <h3>{{ post?.title }} </h3>
@@ -172,13 +189,9 @@ const formatDateTime = (date: string) => {
                 />
             </div>
             <!---If Images-->
-            <!-- <v-row v-if="post?.data.images">
-                <v-col :md="photo.featured ? '12' : '6'" v-for="photo in post?.data.images">
-                    <v-avatar class="rounded-md w-100" size="360">
-                        <img :src="photo.img" alt="photo" />
-                    </v-avatar>
-                </v-col>
-            </v-row> -->
+            <div v-if="post?.mediaUrl" class="d-flex justify-center align-center">
+                    <img :src="post?.mediaUrl" class="adjusted-image"/>
+            </div>
 
         </v-card-item>
         
@@ -197,7 +210,7 @@ const formatDateTime = (date: string) => {
                 </div>
                 <v-divider />
                 <div class="d-block d-sm-flex gap-3 align-center mb-4 px-4 pt-4">
-                    <v-avatar size="40" color="secondary" variant="flat" class="text-h5 font-weight-medium"> D </v-avatar>
+                    <Message2Icon size="20" stroke-width="1.5" class="mr-2" />
                     <v-text-field variant="outlined" color="primary" v-model="commentText" placeholder="Escribe tu comentario" hide-details></v-text-field>
                     <v-btn
                         color="primary"
