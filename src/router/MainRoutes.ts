@@ -12,9 +12,9 @@ const MainRoutes = {
             component: () => import('@/views/StarterPage.vue')
         },
         {
-            name: 'Sample Page 2',
-            path: '/samplepage',
-            component: () => import('@/views/Samplepage.vue')
+            name: 'Vacancies',
+            path: '/vacancies',
+            component: () => import('@/views/Vacancies.vue')
         },
         {
             name: 'Sample Page 3',

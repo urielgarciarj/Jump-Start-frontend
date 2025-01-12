@@ -30,6 +30,12 @@ const sidebarItem: menu[] = [
                 icon: 'widget-add-line-duotone',
                 to: '/'
             }
+            ,
+            {
+                title: 'Ofertas Laborales',
+                icon: 'card-search-line-duotone',
+                to: '/vacancies'
+            }
         ]
     },
     {
