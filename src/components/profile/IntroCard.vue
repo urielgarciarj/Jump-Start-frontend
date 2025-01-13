@@ -23,6 +23,7 @@ const fetchUserData = async () => {
 const description = ref('None');
 const valid = ref(true);
 const dialog = ref(false);
+const checkbox1 = ref(true);
 
 onMounted(() => {
     fetchUserData();
@@ -53,40 +54,55 @@ function save() {
                             </template>
                             <v-card>
                                 <v-card-title class="pa-4 bg-primary">
-                                    <span class="title text-white">Editar Carta Presentación</span>
+                                    <span class="title text-white">Editar Carta de Presentación</span>
                                 </v-card-title>
 
                                 <v-card-text>
                                     <v-form ref="form" v-model="valid" lazy-validation>
                                         <v-row>
-                                            <v-col cols="12" sm="12">
-                                                <v-text-field variant="outlined" hide-details label="Description"></v-text-field>
-                                            </v-col>
-                                            <v-col cols="12" sm="6">
-                                                <v-text-field variant="outlined" hide-details label="Description"></v-text-field>
-                                            </v-col>
-                                            <v-col cols="12" sm="6">
-                                                <v-text-field variant="outlined" hide-details label="User info"></v-text-field>
-                                            </v-col>
-                                            <v-col cols="12" sm="6">
+                                            <v-col cols="12" lg="12">
+                                                <v-label class="mb-2 font-weight-medium">Educacion Universitaria</v-label>
                                                 <v-text-field
+                                                    hint="We'll never share your email with anyone else."
+                                                    persistent-hint
+                                                    variant="outlined"
+                                                    placeholder="Escribe tu institucion educativa"
+                                                    color="primary"
+                                                ></v-text-field>
+                                                <v-label class="mb-2 font-weight-medium mt-5">Email</v-label>
+                                                <v-text-field
+                                                    persistent-hint
                                                     variant="outlined"
                                                     hide-details
-                                                    label="User email"
-                                                    type="email"
+                                                    placeholder="Escribe tu correo electronico"
+                                                    color="primary"
                                                 ></v-text-field>
-                                            </v-col>
-                                            <v-col cols="12" sm="6">
-                                                <v-text-field variant="outlined" hide-details label="Phone" type="phone"></v-text-field>
-                                            </v-col>
-                                            <v-col cols="12" sm="6">
-                                                <v-text-field variant="outlined" hide-details label="Joining Date"></v-text-field>
-                                            </v-col>
-                                            <v-col cols="12" sm="6">
-                                                <v-text-field variant="outlined" hide-details label="Role"></v-text-field>
-                                            </v-col>
-                                            <v-col cols="12" sm="12">
-                                                <v-select variant="outlined" hide-details label="Role Background"></v-select>
+                                                <v-label class="mb-2 font-weight-medium mt-5">Sitio Web</v-label>
+                                                <v-text-field
+                                                    persistent-hint
+                                                    variant="outlined"
+                                                    hide-details
+                                                    placeholder="Escribe tu correo electronico"
+                                                    color="primary"
+                                                ></v-text-field>
+                                                <v-label class="mb-2 font-weight-medium mt-5">Ubicacion</v-label>
+                                                <v-text-field
+                                                    persistent-hint
+                                                    variant="outlined"
+                                                    hide-details
+                                                    placeholder="Ubicacion"
+                                                    color="primary"
+                                                ></v-text-field>
+                                                <div class="my-3">
+                                                    <v-checkbox
+                                                        density="compact"
+                                                        v-model="checkbox1"
+                                                        hide-details
+                                                        color="primary"
+                                                        label="Check Me Out!"
+                                                    ></v-checkbox>
+                                                </div>
+                                                <v-btn color="primary" flat>Submit</v-btn>
                                             </v-col>
                                         </v-row>
                                     </v-form>

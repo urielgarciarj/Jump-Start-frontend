@@ -21,6 +21,9 @@ const items = shallowRef([
 const fullName = ref('');
 const role = ref('');
 
+// Getting profile picture from profile of the user
+const profilePicture = ref('');
+
 const fetchUserData = async () => {
   try {
     const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
@@ -32,11 +35,30 @@ const fetchUserData = async () => {
   }
 };
 
+const fetchProfileData = async () => {
+    try {
+        const response = await axios.get(`http://localhost:3000/profiles/${userId}`);
+        const profileData = response.data;
+        profilePicture.value = profileData.picture;
+    } catch (error) {
+        console.error('Error fetching profile data:', error);
+    }
+};
+
 onMounted(() => {
   fetchUserData();
+  fetchProfileData();
 });
 
 </script>
+
+<style scoped>
+.adjusted-image {
+  max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
+  max-height: 100%; /* Limita la altura máxima de la imagen */
+  object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
+}
+</style>
 
 <template>
     <v-card elevation="10" class="overflow-hidden">
@@ -68,7 +90,7 @@ onMounted(() => {
                     <div class="text-center top-spacer">
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
-                                <img :src="UserImage" width="100" alt="Mathew" />
+                                <img :src="profilePicture || UserImage" alt="Mathew" width="100"/>
                             </v-avatar>
                         </div>
                         <h5 class="text-h5 mt-3">{{ fullName }}</h5>
