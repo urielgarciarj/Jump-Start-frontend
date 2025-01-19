@@ -25,14 +25,14 @@ const role = ref('');
 const profilePicture = ref('');
 
 const fetchUserData = async () => {
-  try {
-    const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
-    const userData = response.data;
-    fullName.value = `${userData.name} ${userData.lastName}`;
-    role.value = userData.role;
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-  }
+    try {
+        const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
+        const userData = response.data;
+        fullName.value = `${userData.name} ${userData.lastName}`;
+        role.value = userData.role;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
 };
 
 const fetchProfileData = async () => {
@@ -46,17 +46,16 @@ const fetchProfileData = async () => {
 };
 
 onMounted(() => {
-  fetchUserData();
-  fetchProfileData();
+    fetchUserData();
+    fetchProfileData();
 });
-
 </script>
 
 <style scoped>
 .adjusted-image {
-  max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
-  max-height: 100%; /* Limita la altura máxima de la imagen */
-  object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
+    max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
+    max-height: 100%; /* Limita la altura máxima de la imagen */
+    object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
 }
 </style>
 
@@ -90,7 +89,7 @@ onMounted(() => {
                     <div class="text-center top-spacer">
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
-                                <img :src="profilePicture || UserImage" alt="Mathew" width="100"/>
+                                <img :src="profilePicture || UserImage" alt="Mathew" width="100" />
                             </v-avatar>
                         </div>
                         <h5 class="text-h5 mt-3">{{ fullName }}</h5>
@@ -114,8 +113,8 @@ onMounted(() => {
                     </div>
                 </v-col>
                 <v-col md="12" class="order-sm-last">
-                    <v-tabs v-model="tab" color="primary"  class="profiletab bg-lightprimary">
-                        <v-tab v-for="item in items" :key="item.tab" :to="item.href" class="font-weight-regular text-subtitle-1 ">
+                    <v-tabs v-model="tab" color="primary" class="profiletab bg-lightprimary">
+                        <v-tab v-for="item in items" :key="item.tab" :to="item.href" class="font-weight-regular text-subtitle-1">
                             <component :is="item.icon" size="18" stroke-width="1.5" class="mr-2"></component>
                             {{ item.tab }}
                         </v-tab>
