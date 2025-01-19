@@ -9,6 +9,9 @@ const userId = authStore.userId;
 
 // Getting email of the user
 const email = ref('');
+const profileLocation = ref('');
+const profileUniversity = ref('');
+const profilePhone = ref('');
 
 const fetchUserData = async () => {
     try {
@@ -20,6 +23,18 @@ const fetchUserData = async () => {
     }
 };
 
+const fetchProfileData = async () => {
+    try {
+        const response = await axios.get(`http://localhost:3000/profiles/${userId}`);
+        const profileData = response.data;
+        profileLocation.value = profileData.location;
+        profileUniversity.value = profileData.university;
+        profilePhone.value = profileData.phone;
+    } catch (error) {
+        console.error('Error fetching profile data:', error);
+    }
+};
+
 const description = ref('None');
 const valid = ref(true);
 const dialog = ref(false);
@@ -27,6 +42,7 @@ const checkbox1 = ref(true);
 
 onMounted(() => {
     fetchUserData();
+    fetchProfileData();
 });
 
 function close() {
@@ -63,6 +79,7 @@ function save() {
                                             <v-col cols="12" lg="12">
                                                 <v-label class="mb-2 font-weight-medium">Educacion Universitaria</v-label>
                                                 <v-text-field
+                                                    v-model="profileUniversity"
                                                     hint="We'll never share your email with anyone else."
                                                     persistent-hint
                                                     variant="outlined"
@@ -71,22 +88,25 @@ function save() {
                                                 ></v-text-field>
                                                 <v-label class="mb-2 font-weight-medium mt-5">Email</v-label>
                                                 <v-text-field
+                                                    v-model="email"
                                                     persistent-hint
                                                     variant="outlined"
                                                     hide-details
                                                     placeholder="Escribe tu correo electronico"
                                                     color="primary"
                                                 ></v-text-field>
-                                                <v-label class="mb-2 font-weight-medium mt-5">Sitio Web</v-label>
+                                                <v-label class="mb-2 font-weight-medium mt-5">Telefono</v-label>
                                                 <v-text-field
+                                                    v-model="profilePhone"
                                                     persistent-hint
                                                     variant="outlined"
                                                     hide-details
-                                                    placeholder="Escribe tu correo electronico"
+                                                    placeholder="Escribe tu telefono"
                                                     color="primary"
                                                 ></v-text-field>
                                                 <v-label class="mb-2 font-weight-medium mt-5">Ubicacion</v-label>
                                                 <v-text-field
+                                                    v-model="profileLocation"
                                                     persistent-hint
                                                     variant="outlined"
                                                     hide-details
@@ -122,19 +142,19 @@ function save() {
                     </p>
                     <div class="d-flex gap-3 mb-5">
                         <BriefcaseIcon size="21" />
-                        <span class="text-h6">Sir, P P Institute Of Science</span>
+                        <span class="text-h6">{{ profileUniversity || 'Aun no agregado' }}</span>
                     </div>
                     <div class="d-flex gap-3 mb-5">
                         <MailIcon size="21" />
-                        <span class="text-h6">{{ email }}</span>
+                        <span class="text-h6">{{ email || 'Aun no agregado' }}</span>
                     </div>
                     <div class="d-flex gap-3 mb-5">
                         <DeviceDesktopIcon size="21" />
-                        <span class="text-h6">www.xyz.com</span>
+                        <span class="text-h6">{{ profilePhone || 'Aun no agregado' }}</span>
                     </div>
                     <div class="d-flex gap-3 mb-5">
                         <MapPinIcon size="21" />
-                        <span class="text-h6">Newyork, USA - 100001</span>
+                        <span class="text-h6">{{ profileLocation || 'Aun no agregado' }}</span>
                     </div>
                 </v-card-item>
             </v-card>
