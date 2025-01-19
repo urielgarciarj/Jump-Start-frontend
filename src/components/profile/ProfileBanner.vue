@@ -45,6 +45,34 @@ const fetchProfileData = async () => {
     }
 };
 
+const onFileChange = async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target && target.files) {
+        const file = target.files[0];
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post(`http://localhost:3000/profiles/upload-profile-picture/${userId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            profilePicture.value = response.data.fileUrl; // Actualiza la imagen mostrada
+            console.log('Image uploaded:', profilePicture.value);
+        } catch (error) {
+            console.error('Error uploading image:', error);
+        }
+    }
+}};
+
+const fileInput = ref<HTMLInputElement | null>(null);
+
+const triggerFileInput = () => {
+    fileInput.value?.click();
+};
+
 onMounted(() => {
     fetchUserData();
     fetchProfileData();
@@ -89,8 +117,9 @@ onMounted(() => {
                     <div class="text-center top-spacer">
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
-                                <img :src="profilePicture || UserImage" alt="Mathew" width="100" />
+                                <img :src="profilePicture || UserImage" alt="Mathew" width="100" @click="triggerFileInput" />
                             </v-avatar>
+                            <input type="file" ref="fileInput" @change="onFileChange" style="display: none" />
                         </div>
                         <h5 class="text-h5 mt-3">{{ fullName }}</h5>
                         <span class="textSecondary font-weight-regular">{{ role }}</span>
