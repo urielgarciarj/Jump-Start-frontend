@@ -3,6 +3,7 @@ import { ref, shallowRef, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
+import { PhoneIcon } from 'vue-tabler-icons';
 
 const authStore = useAuthStore();
 const userId = authStore.userId;
@@ -33,6 +34,22 @@ const fetchProfileData = async () => {
     } catch (error) {
         console.error('Error fetching profile data:', error);
     }
+};
+
+const saveChanges = async () => {
+  try {
+    console.log(profileUniversity.value); 
+    await axios.patch(`http://localhost:3000/profiles/upsert/${userId}`, {
+      university: profileUniversity.value,
+      email: email.value,
+      phone: profilePhone.value,
+      location: profileLocation.value,
+    });
+    alert('Cambiosd guardados exitosamente!');
+    dialog.value = false; // Close the dialog after saving
+  } catch (error) {
+    console.error('Error saving changes:', error);
+  }
 };
 
 const description = ref('None');
@@ -122,7 +139,6 @@ function save() {
                                                         label="Check Me Out!"
                                                     ></v-checkbox>
                                                 </div>
-                                                <v-btn color="primary" flat>Submit</v-btn>
                                             </v-col>
                                         </v-row>
                                     </v-form>
@@ -131,7 +147,7 @@ function save() {
                                 <v-card-actions class="pa-4">
                                     <v-spacer></v-spacer>
                                     <v-btn color="error" variant="flat" @click="close">Cancel</v-btn>
-                                    <v-btn color="primary" variant="flat" @click="save">Save</v-btn>
+                                    <v-btn color="primary" variant="flat" @click="saveChanges">Save</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
@@ -149,7 +165,7 @@ function save() {
                         <span class="text-h6">{{ email || 'Aun no agregado' }}</span>
                     </div>
                     <div class="d-flex gap-3 mb-5">
-                        <DeviceDesktopIcon size="21" />
+                        <PhoneIcon size="21" />
                         <span class="text-h6">{{ profilePhone || 'Aun no agregado' }}</span>
                     </div>
                     <div class="d-flex gap-3 mb-5">
