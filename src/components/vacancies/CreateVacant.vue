@@ -48,7 +48,7 @@ const submitVacant = async () => {
             vacant.value.description = editor.value ? editor.value.getHTML() : '';
             if (vacant.value.description && vacant.value.description != '' && vacant.value.description != '<p></p>') {
                 const response = await axios.post('http://localhost:3000/vacancies/create', vacant.value);
-                console.log('vacant created:', response.data);
+                //console.log('vacant created:', response.data);
                 router.push('/vacancies/list-all');
             }
             else {

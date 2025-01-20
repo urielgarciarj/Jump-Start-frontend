@@ -41,7 +41,7 @@ const tab = ref(null);
 const showEditForm = ref(false);
 const showConfirmation = ref(false);
 
-/*Header Data*/
+/*Header Data [Table headers and sorting]*/
 const sortBy:any  = ref([
     { key: 'name', order: 'desc' }
 ]);
@@ -102,6 +102,26 @@ onMounted(async () => {
 //     }
 // };
 
+// Función para editar el post
+const editPost = () => {
+  showEditForm.value = true;
+};
+// Función para cancelar la edición
+const cancelEdit = () => {
+  showEditForm.value = false;
+};
+// Función para manejar la actualización de la vacante
+// const handleUpdateVacant = (updatedPost: { title: any; description: any; category: any; mediaUrl: any; }) => {
+//     console.log('handleUpdatePost', updatedPost)
+//     if (props.post) {
+//         props.post.title = updatedPost.title;
+//         props.post.description = updatedPost.description;
+//         props.post.category = updatedPost.category;
+//         props.post.mediaUrl = updatedPost.mediaUrl;
+//     }
+//   showEditForm.value = false;
+// };
+
 //Funcion para manejar eliminar una vacante
 const handleDeleteVacant = () => {
     //postIdToDelete.value = props.post ? props.post.id : ''; 
@@ -110,8 +130,9 @@ const handleDeleteVacant = () => {
 
 const confirmDelete = async () => {
     try {
-        // await axios.delete(`http://localhost:3000/posts/delete/${postIdToDelete.value}`);
-        // emit('deletePost', postIdToDelete.value);
+        await axios.delete(`http://localhost:3000/vacancies/delete/${vacantId}`);
+        router.push('/vacancies/list-all');
+        //emit('deletePost', postIdToDelete.value);
     } catch (err) {
         console.log('Error', err);
     }
