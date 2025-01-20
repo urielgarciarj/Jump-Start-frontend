@@ -92,7 +92,7 @@ const submitVacant = async () => {
                         </v-col>
                         <v-col cols="12" md="4">
                             <v-label class="font-weight-semibold pb-2">Modalidad</v-label>
-                            <v-select v-model="vacant.modality" :items="modalityOps" required />
+                            <v-select v-model="vacant.modality" :items="modalityOps" :rules="rules" required />
                         </v-col>
 
                         <v-col cols="12" md="4">

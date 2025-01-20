@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { useEditor, EditorContent } from '@tiptap/vue-3';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import EditorMenubar from '@/components/plugins/editor/EditorMenubar.vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
-import StarterKit from '@tiptap/starter-kit';
+import UpdateVacantForm from './UpdateVacant.vue';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
@@ -25,15 +23,6 @@ const breadcrumbs = ref([
 
 const vacantDetail = ref<any | null>(null);
 const applicationsList = ref<any | null>(null);
-
-const editor = useEditor({
-    extensions: [StarterKit]
-});
-
-const valid = ref(false);
-const modalityOps = ['Presencial', 'Remoto', 'Hibrido'];
-const salaryPeriodOps = ['Semanal', 'Quincenal', 'Mensual'];
-const rules = [(v: any) => !!v || 'Es obligatorio llenar este campo.'];
 
 const error = ref<string | null>(null);
 const tab = ref(null);
@@ -79,52 +68,30 @@ onMounted(async () => {
     }
 });
 
-// const submitVacant = async () => {
-//     if (valid.value) {
-//         try {
-//             vacant.value.description = editor.value ? editor.value.getHTML() : '';
-//             if (vacant.value.description && vacant.value.description != '' && vacant.value.description != '<p></p>') {
-//                 const response = await axios.post('http://localhost:3000/vacancies/create', vacant.value);
-//                 console.log('vacant created:', response.data);
-//                 router.push('/vacancies/list-all');
-//             }
-//             else {
-//                 error.value = 'Es obligatorio agregar una descripción.';
-//             }
-//         } catch (err) {
-//             console.error('Error:', err);
-//             const errorAxios = err as AxiosError;
-//             // Manejar el error en función del código de estado
-//             if (errorAxios.response) {
-//                 error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
-//             }
-//         }
-//     }
-// };
-
 // Función para editar el post
 const editPost = () => {
   showEditForm.value = true;
 };
+
 // Función para cancelar la edición
 const cancelEdit = () => {
   showEditForm.value = false;
 };
+
 // Función para manejar la actualización de la vacante
-// const handleUpdateVacant = (updatedPost: { title: any; description: any; category: any; mediaUrl: any; }) => {
-//     console.log('handleUpdatePost', updatedPost)
-//     if (props.post) {
-//         props.post.title = updatedPost.title;
-//         props.post.description = updatedPost.description;
-//         props.post.category = updatedPost.category;
-//         props.post.mediaUrl = updatedPost.mediaUrl;
-//     }
-//   showEditForm.value = false;
-// };
+const handleUpdateVacant = (updatedPost: { title: any; description: any; category: any; mediaUrl: any; }) => {
+    // console.log('handleUpdatePost', updatedPost)
+    // if (props.post) {
+    //     props.post.title = updatedPost.title;
+    //     props.post.description = updatedPost.description;
+    //     props.post.category = updatedPost.category;
+    //     props.post.mediaUrl = updatedPost.mediaUrl;
+    // }
+  showEditForm.value = false;
+};
 
 //Funcion para manejar eliminar una vacante
-const handleDeleteVacant = () => {
-    //postIdToDelete.value = props.post ? props.post.id : ''; 
+const handleDeleteVacant = () => { 
     showConfirmation.value = true; 
 };
 
@@ -136,7 +103,6 @@ const confirmDelete = async () => {
     } catch (err) {
         console.log('Error', err);
     }
-    //postIdToDelete.value = undefined; 
     showConfirmation.value = false;
 };
 
@@ -144,7 +110,7 @@ const formatDateTime = (date: string) => {
   if (!date) return '';
   return new Date(date).toLocaleString('es-ES', {
     day: 'numeric',    // Día
-    month: 'numeric',     // Mes
+    month: 'numeric',  // Mes
     year: 'numeric',   // Año
   });
 };
@@ -156,7 +122,7 @@ const formatDateTime = (date: string) => {
         <!-- Tabs para detalle - solicitudes -->
         <v-card-item>
             <v-tabs v-model="tab" color="primary" class="border-bottom">
-                <v-tab value="one">Description</v-tab>
+                <v-tab value="one">General</v-tab>
                 <v-tab value="two">Solicitudes</v-tab>
             </v-tabs>
             <div class="mt-5">
@@ -241,23 +207,18 @@ const formatDateTime = (date: string) => {
                             <v-btn @click.stop="handleDeleteVacant()" color="error" flat >
                                 Eliminar
                             </v-btn>
-                            <v-btn to="/apps/invoice" color="primary" flat
+                            <v-btn  @click.stop="editPost()" color="primary" flat
                                 >Editar</v-btn
                             >
                         </div>
 
                         <!-- Editing form -->
-                        <div v-if="showEditForm" class="bg-light mt-6 pa-6 rounded-md">
-
-                        </div>
-                        <!-- Save/Update changes  -->
-                        <div v-if="showEditForm" class="d-flex ga-3 justify-end mt-6">
-                            <v-btn :to="`/apps/invoice/edit/`" flat>
-                                Cancelar
-                            </v-btn>
-                            <v-btn to="/apps/invoice" color="primary" flat>
-                                Guardar
-                            </v-btn>
+                        <div v-if="showEditForm">
+                            <UpdateVacantForm
+                                :vacant="vacantDetail"
+                                @updateVacant="handleUpdateVacant"
+                                @cancelEdit="cancelEdit()"
+                            />
                         </div>
                     </v-window-item>
                     <v-window-item value="two">

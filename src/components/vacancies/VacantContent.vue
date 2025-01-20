@@ -36,11 +36,6 @@ const formatDateTime = (date: string) => {
                         {{ vacant?.user.name }} {{ vacant?.user.lastName }}
                     </span>
                     <br /><br />
-                    <!-- <div class="d-flex gap-3 mb-5" v-if="vacant?.company">
-                        <BriefcaseIcon size="21" />
-                        <span class="text-h6">{{ vacant?.company }}</span>
-                    </div> -->
-
                     <div class="d-flex gap-3 mb-5" v-if="vacant?.location">
                         <MapPinIcon size="21" />
                         <span class="text-h6">{{ vacant?.location }}</span>
