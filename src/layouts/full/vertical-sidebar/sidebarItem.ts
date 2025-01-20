@@ -34,7 +34,7 @@ const sidebarItem: menu[] = [
             {
                 title: 'Ofertas Laborales',
                 icon: 'card-search-line-duotone',
-                to: '/vacancies'
+                to: '/vacancies/list-all'
             }
         ]
     },
