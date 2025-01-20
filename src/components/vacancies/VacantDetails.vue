@@ -79,14 +79,20 @@ const cancelEdit = () => {
 };
 
 // Función para manejar la actualización de la vacante
-const handleUpdateVacant = (updatedPost: { title: any; description: any; category: any; mediaUrl: any; }) => {
-    // console.log('handleUpdatePost', updatedPost)
-    // if (props.post) {
-    //     props.post.title = updatedPost.title;
-    //     props.post.description = updatedPost.description;
-    //     props.post.category = updatedPost.category;
-    //     props.post.mediaUrl = updatedPost.mediaUrl;
-    // }
+const handleUpdateVacant = (updatedVacant: 
+    { name: any; description: any; status: any; location: any; category: any; modality: any; level: any; salary: any; salaryPeriod: any; }) => {
+    if (vacantDetail.value) {
+        console.log('entro al if')
+        vacantDetail.value.name = updatedVacant.name;
+        vacantDetail.value.description = updatedVacant.description;
+        vacantDetail.value.status = updatedVacant.status;
+        vacantDetail.value.location = updatedVacant.location;
+        vacantDetail.value.category = updatedVacant.category;
+        vacantDetail.value.modality = updatedVacant.modality;
+        vacantDetail.value.level = updatedVacant.level;
+        vacantDetail.value.salary = updatedVacant.salary;
+        vacantDetail.value.salaryPeriod = updatedVacant.salaryPeriod;
+    }
   showEditForm.value = false;
 };
 
@@ -150,7 +156,7 @@ const formatDateTime = (date: string) => {
                                     <h3>Título</h3>
                                     <span class="text-subtitle-1 opacity-50">
                                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ vacantDetail?.user.name }} {{ vacantDetail?.user.lastName }}
+                                        {{ vacantDetail?.name }}
                                     </span>
                                 </v-col>
                                 <v-col cols="12" md="3">

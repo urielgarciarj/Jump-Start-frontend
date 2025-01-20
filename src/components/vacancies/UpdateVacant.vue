@@ -11,19 +11,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['updateVacant', 'cancelEdit']); // Emitir eventos para actualizar o cancelar la edición
 
-const vacantData = {
-    name: props.vacant?.name || '',
-    description: props.vacant?.description || '',
-    status: props.vacant?.status || '',
-    location: props.vacant?.location || '',
-    category: props.vacant?.category || '',
-    modality: props.vacant?.modality || '',
-    level: props.vacant?.level || '',
-    salary: props.vacant?.salary || '',
-    salaryPeriod: props.vacant?.salaryPeriod || ''
-}
 const updateName = ref(props.vacant?.name || '');
-const updateDescription = ref(props.vacant?.description || '');
 const updateStatus = ref(props.vacant?.status || '');
 const updateLocation = ref(props.vacant?.location || '');
 const updateCategory = ref(props.vacant?.category || '');
@@ -36,7 +24,8 @@ const modalityOps = ['Presencial', 'Remoto', 'Hibrido'];
 const salaryPeriodOps = ['Semanal', 'Quincenal', 'Mensual'];
 const statusOps = ['activo', 'inactivo'];
 const editor = useEditor({
-    extensions: [StarterKit]
+    extensions: [StarterKit],
+    content: props.vacant?.description
 });
 
 const valid = ref(false);
@@ -53,15 +42,27 @@ const cancelEdit = () => {
 const submitVacant = async () => {
     if (valid.value) {
         try {
-            // vacant.value.description = editor.value ? editor.value.getHTML() : '';
-            // if (vacant.value.description && vacant.value.description != '' && vacant.value.description != '<p></p>') {
-            //     const response = await axios.post('http://localhost:3000/vacancies/create', vacant.value);
-            //     console.log('vacant created:', response.data);
-            //     router.push('/vacancies/list-all');
-            // }
-            // else {
-            //     error.value = 'Es obligatorio agregar una descripción.';
-            // }
+            if (editor.value && editor.value.getHTML() != '' && editor.value.getHTML() != '<p></p>') {
+
+                const vacantData = {
+                    name: updateName.value,
+                    description: editor.value.getHTML(),
+                    status: updateStatus.value,
+                    location: updateLocation.value,
+                    category: updateCategory.value,
+                    modality: updateModality.value,
+                    level: updateLevel.value,
+                    salary: updateSalary.value,
+                    salaryPeriod: updateSalaryPeriod.value
+                }
+                const response = await axios.put(`http://localhost:3000/vacancies/update/${props.vacant?.id}`, vacantData);
+                //console.log('vacant updated:', response.data);
+                // Emitir evento para actualizar el post en el componente principal
+                emit('updateVacant', {...props.vacant,...response.data,});
+            }
+            else {
+                error.value = 'Es obligatorio agregar una descripción.';
+            }
         } catch (err) {
             console.error('Error:', err);
             const errorAxios = err as AxiosError;
@@ -76,6 +77,11 @@ const submitVacant = async () => {
 </script>
 
 <template>
+     <v-col cols="12">
+        <v-alert v-if="error" type="error" variant="tonal" dismissible>
+            {{ error }}
+        </v-alert>
+    </v-col>
     <v-form v-model="valid">
         <div class="bg-light mt-6 pa-6 rounded-md">
             <v-row>

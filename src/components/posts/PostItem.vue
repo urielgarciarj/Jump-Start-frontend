@@ -83,7 +83,7 @@ const editPost = () => {
 };
 // Función para manejar la actualización del post
 const handleUpdatePost = (updatedPost: { title: any; description: any; category: any; mediaUrl: any; }) => {
-    console.log('handleUpdatePost', updatedPost)
+    //console.log('handleUpdatePost', updatedPost)
     if (props.post) {
         props.post.title = updatedPost.title;
         props.post.description = updatedPost.description;
