@@ -94,13 +94,13 @@ function save() {
                                     <v-form ref="form" v-model="valid" lazy-validation>
                                         <v-row>
                                             <v-col cols="12" lg="12">
-                                                <v-label class="mb-2 font-weight-medium">Educacion Universitaria</v-label>
+                                                <v-label class="mb-2 font-weight-medium mt-5">Educacion Universitaria</v-label>
                                                 <v-text-field
                                                     v-model="profileUniversity"
-                                                    hint="We'll never share your email with anyone else."
                                                     persistent-hint
                                                     variant="outlined"
-                                                    placeholder="Escribe tu institucion educativa"
+                                                    hide-details
+                                                    placeholder="Escribe tu correo electronico"
                                                     color="primary"
                                                 ></v-text-field>
                                                 <v-label class="mb-2 font-weight-medium mt-5">Email</v-label>

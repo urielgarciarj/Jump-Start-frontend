@@ -5,6 +5,7 @@ import profileBg from '@/assets/images/backgrounds/profilebg.jpg';
 import UserImage from '@/assets/images/profile/user-5.jpg';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
+import { Icon } from '@iconify/vue';
 
 const authStore = useAuthStore();
 const userId = authStore.userId;
@@ -49,23 +50,24 @@ const onFileChange = async (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target && target.files) {
         const file = target.files[0];
-    if (file) {
-        const formData = new FormData();
-        formData.append('file', file);
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
 
-        try {
-            const response = await axios.post(`http://localhost:3000/profiles/upload-profile-picture/${userId}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            profilePicture.value = response.data.fileUrl; // Actualiza la imagen mostrada
-            console.log('Image uploaded:', profilePicture.value);
-        } catch (error) {
-            console.error('Error uploading image:', error);
+            try {
+                const response = await axios.post(`http://localhost:3000/profiles/upload-profile-picture/${userId}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                profilePicture.value = response.data.fileUrl; // Actualiza la imagen mostrada
+                console.log('Image uploaded:', profilePicture.value);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+            }
         }
     }
-}};
+};
 
 const fileInput = ref<HTMLInputElement | null>(null);
 
@@ -118,6 +120,7 @@ onMounted(() => {
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
                                 <img :src="profilePicture || UserImage" alt="Mathew" width="100" @click="triggerFileInput" />
+                                <Icon icon="solar:pen-linear" class="edit-icon" height="25" />
                             </v-avatar>
                             <input type="file" ref="fileInput" @change="onFileChange" style="display: none" />
                         </div>
@@ -163,9 +166,28 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    .userImage {
-        border: 4px solid rgb(255, 255, 255);
-    }
+    position: relative; /* Asegúrate de que el contenedor tenga position: relative */
+}
+
+.userImage {
+    border: 4px solid rgb(255, 255, 255);
+    position: relative; /* Asegúrate de que el contenedor tenga position: relative */
+}
+
+.edit-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 5px;
+    display: none;
+}
+
+.avatar-border:hover .edit-icon {
+    display: block;
 }
 
 .top-spacer {
