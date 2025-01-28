@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import sendApply from '@/components/vacancies/sendApplication.vue';
 import { useAuthStore } from '@/stores/auth';
 import { ref, onMounted, computed } from 'vue';
 import { Icon } from "@iconify/vue";
 
 const authStore = useAuthStore();
 const userId = authStore.userId;
+const userRole = authStore.userRole;
 
 const props = defineProps({
     vacant: Object
@@ -61,10 +63,16 @@ const formatDateTime = (date: string) => {
                         <span class="text-h6">{{ vacant?.salary }} - {{ vacant?.salaryPeriod }}</span>
                         <v-tooltip activator="parent" location="start"> Sueldo </v-tooltip>
                     </div>
-                    <div>
+                    <div class="d-flex gap-3 mb-5">
+                        <span class="text-h6">Estado:</span>
                         <v-chip color="success" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
                             {{ vacant?.status.charAt(0).toUpperCase() + vacant?.status.slice(1) }}
                         </v-chip>
+                    </div>
+                    <div >
+                        <v-col color="secondary" class="font-weight-bold d-flex" sm="6" rounded="sm"> 
+                            <sendApply :vacant="vacant?.id"/>
+                        </v-col>
                     </div>
                 </v-card-item>
             </div>
@@ -79,12 +87,10 @@ const formatDateTime = (date: string) => {
                                 <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
                                 {{ formatDateTime(vacant?.createdAt) }}
                             </span>
-                            <!-- <div v-if="vacant?.user.id === userId" class="align-center"> -->
-                                <v-btn v-if="vacant?.user.id === userId" :to="`/details/job-opportunity/${vacant?.id}`" icon flat size="32">
-                                    <Icon icon="solar:eye-linear" class="text-primary" height="18" />
-                                    <v-tooltip activator="parent" location="bottom">Ver Detalles</v-tooltip>
-                                </v-btn>
-                            <!-- </div> -->
+                            <v-btn v-if="vacant?.user.id === userId" :to="`/details/job-opportunity/${vacant?.id}`" icon flat size="32">
+                                <Icon icon="solar:eye-linear" class="text-primary" height="18" />
+                                <v-tooltip activator="parent" location="bottom">Ver Detalles</v-tooltip>
+                            </v-btn>
                         </div>
                         <v-divider></v-divider>
                         <div v-html="vacant?.description"></div>

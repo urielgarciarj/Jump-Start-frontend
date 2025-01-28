@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import VacantContentet from '@/components/vacancies/VacantContent.vue';
+import VacantContent from '@/components/vacancies/VacantContent.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
@@ -64,7 +64,7 @@ const filteredVacants = computed(() => {
     </v-row>
     <v-row>
         <v-col v-for="vacant in filteredVacants" :key="vacant.id" cols="12" md="12">
-            <VacantContentet :vacant="vacant"/>
+            <VacantContent :vacant="vacant"/>
         </v-col>
     </v-row>
 </template>
