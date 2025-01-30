@@ -26,6 +26,16 @@ const MainRoutes = {
             path: '/profile',
             component: () => import('@/views/Profilepage.vue')
         },
+        {
+            name: 'my Cv',
+            path: '/cv',
+            component: () => import('@/views/Cvpage.vue')
+        },
+        {
+            name: 'My projects',
+            path: '/myprojects',
+            component: () => import('@/views/Myprojectspage.vue')
+        },
     ]
 };
 

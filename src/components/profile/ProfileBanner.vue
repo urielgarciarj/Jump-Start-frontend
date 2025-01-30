@@ -12,10 +12,9 @@ const userId = authStore.userId;
 
 const tab = ref(null);
 const items = shallowRef([
-    { tab: 'Profile', icon: UserCircleIcon, href: '/apps/user/profile' },
-    { tab: 'Followers', icon: HeartIcon, href: '/apps/user/profile/followers' },
-    { tab: 'Friends', icon: UsersIcon, href: '/apps/user/profile/friends' },
-    { tab: 'Gallery', icon: PhotoIcon, href: '/apps/user/profile/gallery' }
+    { tab: 'Profile', icon: UserCircleIcon, href: '/profile' },
+    { tab: 'Mi CV', icon: HeartIcon, href: '/cv' },
+    { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects' },
 ]);
 
 // Getting full name of the user
