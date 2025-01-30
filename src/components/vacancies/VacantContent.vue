@@ -12,6 +12,14 @@ const props = defineProps({
     vacant: Object
 });
 
+const showAlert = ref(false); // Controlar la visibilidad del snackbar
+const snackbarMessage = ref(''); // Mensaje para mostrar en el snackbar
+const applicationSent = (success: boolean) => {
+  snackbarMessage.value = '¡Tu solicitud fue enviada con éxito!';
+  showAlert.value = true;
+  setTimeout(() => { showAlert.value = false; }, 5000);
+};
+
 const formatDateTime = (date: string) => {
   if (!date) return '';
   return new Date(date).toLocaleString('es-ES', {
@@ -26,6 +34,12 @@ const formatDateTime = (date: string) => {
 </script>
 
 <template>
+    <v-alert v-if="showAlert" type="success" variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
+        <template v-slot:prepend>
+        <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
+        </template>
+        <div>{{ snackbarMessage }}</div>
+    </v-alert>
      <v-card variant="outlined">
         <div class="d-flex mainbox">
             <!---left side for genral info -->
@@ -71,7 +85,7 @@ const formatDateTime = (date: string) => {
                     </div>
                     <div >
                         <v-col color="secondary" class="font-weight-bold d-flex" sm="6" rounded="sm"> 
-                            <sendApply :vacant="vacant?.id"/>
+                            <sendApply :vacant="vacant?.id" @applySaved="applicationSent"/>
                         </v-col>
                     </div>
                 </v-card-item>

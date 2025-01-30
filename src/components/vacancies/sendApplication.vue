@@ -18,12 +18,12 @@ const application = ref({
     interested: '',
     proficiency: '',
     dateCreated: new Date().toISOString(),
-    vacantId: '',
+    vacantId: props.vacant,
     userId: userId
 });
 
 const emit = defineEmits<{
-  (e: 'applySaved', newPost: any): void;
+  (e: 'applySaved', success: boolean): void;
 }>();
 const isActive = ref(false);
 const error = ref<string | null>(null);
@@ -33,6 +33,9 @@ const valid = ref(false);
 const notEmptyRule = [
   (value: string) => !!value || 'Es obligatorio llenar este campo.'
 ];
+const phoneTenDigitsRule = [
+    (v: string | any[]) => !v || (v && v.length === 10) || 'El número de celular debe tener 10 dígitos'
+]
 
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
@@ -41,7 +44,7 @@ onMounted(async () => {
     currUser.value = response.data;
     //console.log('currUser.value', currUser.value)
     if (currUser.value) {
-        application.value.name = `${currUser.value.name} ${currUser.value.lastName}`;
+        application.value.name = `${currUser.value.name} ${currUser.value.lastName}`.toUpperCase();
         application.value.email = currUser.value.email;
     }
   } catch (error) {
@@ -52,16 +55,25 @@ onMounted(async () => {
 const saveApplication = async () => {
     if (valid.value) {
         try {
-            console.log('application prev', application.value)
             const response = await axios.post('http://localhost:3000/applications/apply', application.value);
-            console.log('send application', response.data);
+            const isSuccess = response.status == 201 ? true : false;
+            emit('applySaved', isSuccess);
+            isActive.value = false; // Close dialog
+            // Cleanup form
+            application.value = {
+                name: '', email: '', phoneNumber: '',
+                interested: '', proficiency: '', dateCreated: '',
+                vacantId: '', userId: ''
+            }
         } catch (err) {
             console.error('Error:', err);
             // Tipar el error como AxiosError
             const errorAxios = err as AxiosError;
-            // Manejar el error en función del código de estado
-            if (errorAxios.response) {
-                error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
+           // Manejar el error en función del código de estado
+           if (errorAxios.response && errorAxios.response.status === 409) {
+            error.value = 'Ya has enviado una solicitud para esta vacante.';
+            } else {
+            error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
             }
         }
     }
@@ -86,13 +98,13 @@ const saveApplication = async () => {
                                 </v-alert>
                             </v-col>
                             <v-col cols="12">
-                                <span class="h4">{{ currUser?.name }} {{ currUser?.lastName }}</span>
+                                <span class="h4">{{ currUser?.name.toUpperCase() }} {{ currUser?.lastName.toUpperCase() }}</span>
                             </v-col>
                             <v-col cols="12">
                                 <v-text-field v-model="application.email" :rules="notEmptyRule" label="Correo" required></v-text-field>
                             </v-col>
                             <v-col cols="12">
-                                <v-text-field v-model="application.phoneNumber" :rules="notEmptyRule" label="Número Celular" required></v-text-field>
+                                <v-text-field v-model="application.phoneNumber" :rules="phoneTenDigitsRule" label="Número Celular" required></v-text-field>
                             </v-col>
                             <v-col cols="12">
                                 <v-textarea v-model="application.interested" :rules="notEmptyRule" label="¿Por qué me interesa?" required></v-textarea>
