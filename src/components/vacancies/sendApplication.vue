@@ -52,6 +52,7 @@ onMounted(async () => {
         hasSubmitted.value = true;
         application.value = response.data;
         applicationId.value = response.data.id; // Saves the ID of the application
+        //console.log('application', application.value)
     }
     else {
         hasSubmitted.value = false;
@@ -79,10 +80,8 @@ const saveApplication = async () => {
             const isSuccess = response.status == 201 ? true : false;
             hasSubmitted.value = true;
             isActive.value = false; // Close dialog
-            application.value = { // Cleanup form
-                name: '', email: '', phoneNumber: '', interested: '', proficiency: '', dateCreated: '',
-                vacantId: 0, userId: ''
-            }
+            application.value = response.data;
+            applicationId.value = response.data.id;
             emit('applySaved', isSuccess);
         } catch (err) {
             console.error('Error:', err);
@@ -112,6 +111,19 @@ const confirmDelete = async () => {
             showConfirmation.value = false;
             hasSubmitted.value = false;
             isActive.value = false; // Close dialog
+            application.value.phoneNumber = '';
+            application.value.interested = '';
+            application.value.proficiency = '';
+            application.value.dateCreated = new Date().toISOString();
+            application.value.userId = userId;
+            application.value.vacantId = props.vacant;
+            // Aquí debes obtener nuevamente el nombre del usuario
+            const userResponse = await axios.get(`http://localhost:3000/users/user/${userId}`);
+            currUser.value = userResponse.data;
+            if (currUser.value) {
+                application.value.name = `${currUser.value.name} ${currUser.value.lastName}`.toUpperCase();
+                application.value.email = currUser.value.email;
+            }
             emit('applyDeleted', isSuccess);
         } else {
             console.error('No se puede eliminar, la solicitud no tiene ID');
@@ -145,7 +157,7 @@ const confirmDelete = async () => {
                             </v-col>
                             <v-col cols="12">
                                 <span v-if="!hasSubmitted" class="h4">{{ currUser?.name.toUpperCase() }} {{ currUser?.lastName.toUpperCase() }}</span>
-                                <span v-else class="v-text">{{ application.name }}</span>
+                                <span v-else class="font-weight-semibold">{{ application.name }}</span>
                             </v-col>
                             <v-col cols="12">
                                 <v-text-field v-if="!hasSubmitted" v-model="application.email" :rules="notEmptyRule" label="Correo Electrónico" required></v-text-field>
