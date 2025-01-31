@@ -13,11 +13,29 @@ const props = defineProps({
 });
 
 const showAlert = ref(false); // Controlar la visibilidad del snackbar
+const alertType = ref('success');
 const snackbarMessage = ref(''); // Mensaje para mostrar en el snackbar
 const applicationSent = (success: boolean) => {
-  snackbarMessage.value = '¡Tu solicitud fue enviada con éxito!';
-  showAlert.value = true;
-  setTimeout(() => { showAlert.value = false; }, 5000);
+    if (success) {
+        snackbarMessage.value = '¡Tu solicitud fue enviada con éxito!';
+        alertType.value = 'success';
+    } else {
+        snackbarMessage.value = 'Hubo un error al enviar la solicitud. Intenta nuevamente.';
+        alertType.value = 'error';
+    }
+    showAlert.value = true;
+    setTimeout(() => { showAlert.value = false; }, 5000);
+};
+const applicationDeleted = (success: boolean) => {
+    if (success) {
+        snackbarMessage.value = '¡Tu solicitud fue eliminada!';
+        alertType.value = 'success';
+    } else {
+        snackbarMessage.value = 'Hubo un error al eliminar la solicitud. Intenta nuevamente.';
+        alertType.value = 'error';
+    }
+    showAlert.value = true;
+    setTimeout(() => { showAlert.value = false; }, 5000);
 };
 
 const formatDateTime = (date: string) => {
@@ -34,7 +52,7 @@ const formatDateTime = (date: string) => {
 </script>
 
 <template>
-    <v-alert v-if="showAlert" type="success" variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
+    <v-alert v-if="showAlert" :type="alertType"  variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
         <template v-slot:prepend>
         <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
         </template>
@@ -83,9 +101,9 @@ const formatDateTime = (date: string) => {
                             {{ vacant?.status.charAt(0).toUpperCase() + vacant?.status.slice(1) }}
                         </v-chip>
                     </div>
-                    <div >
+                    <div v-if="userRole === 'estudiante'">
                         <v-col color="secondary" class="font-weight-bold d-flex" sm="6" rounded="sm"> 
-                            <sendApply :vacant="vacant?.id" @applySaved="applicationSent"/>
+                            <sendApply :vacant="vacant?.id" @applySaved="applicationSent" @applyDeleted="applicationDeleted"/>
                         </v-col>
                     </div>
                 </v-card-item>
@@ -93,7 +111,7 @@ const formatDateTime = (date: string) => {
 
             <!---right side for description -->
             <div class="right-part">
-                <card-item>
+                <v-card-item>
                     <v-card-text>
                         <div class="d-block d-sm-flex gap-3">
                             <h3>Descripción completa del empleo</h3>
@@ -109,7 +127,7 @@ const formatDateTime = (date: string) => {
                         <v-divider></v-divider>
                         <div v-html="vacant?.description"></div>
                     </v-card-text>
-                </card-item>
+                </v-card-item>
             </div>
         </div>
      </v-card>
