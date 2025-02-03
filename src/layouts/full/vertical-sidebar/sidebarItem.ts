@@ -23,12 +23,18 @@ const sidebarItem: menu[] = [
             {
                 title: 'Mi Cuenta',
                 icon: 'shield-user-line-duotone',
-                to: '/myaccount'
+                to: '/profile'
             },
             {
                 title: 'Publicaciones',
                 icon: 'widget-add-line-duotone',
                 to: '/'
+            }
+            ,
+            {
+                title: 'Ofertas Laborales',
+                icon: 'card-search-line-duotone',
+                to: '/vacancies/list-all'
             }
         ]
     },
