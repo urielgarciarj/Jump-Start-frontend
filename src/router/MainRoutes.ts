@@ -36,6 +36,11 @@ const MainRoutes = {
             path: '/myprojects',
             component: () => import('@/views/Myprojectspage.vue')
         },
+        {
+            name: 'User Applications',
+            path: '/userapplications',
+            component: () => import('@/views/ProfileApplicationsPage.vue')
+        },
     ]
 };
 
