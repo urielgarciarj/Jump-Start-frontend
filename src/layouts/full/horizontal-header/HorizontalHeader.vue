@@ -40,13 +40,6 @@ watch(priority, (newPriority) => {
             <!-- ------------------------------------------------>
             <Searchbar />
 
-            <!-- ------------------------------------------------>
-            <!-- Mega menu -->
-            <!-- ------------------------------------------------>
-            <div class="hidden-sm-and-down">
-                <Navigations />
-            </div>
-
             <v-spacer class="hidden-sm-and-down" />
             <div class="hidden-md-and-up">
                 <Logo />
