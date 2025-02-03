@@ -82,7 +82,6 @@ const cancelEdit = () => {
 const handleUpdateVacant = (updatedVacant: 
     { name: any; description: any; status: any; location: any; category: any; modality: any; level: any; salary: any; salaryPeriod: any; }) => {
     if (vacantDetail.value) {
-        console.log('entro al if')
         vacantDetail.value.name = updatedVacant.name;
         vacantDetail.value.description = updatedVacant.description;
         vacantDetail.value.status = updatedVacant.status;

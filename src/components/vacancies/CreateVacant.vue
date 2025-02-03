@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
@@ -26,7 +26,7 @@ const vacant = ref({
     category: '',
     modality: '',
     level: '',
-    company: 'Caramelos de la Rosa',
+    company: '',
     salary: '',
     salaryPeriod: '',
     dateCreated: new Date().toISOString(),
@@ -41,6 +41,21 @@ const modalityOps = ['Presencial', 'Remoto', 'Hibrido'];
 const salaryPeriodOps = ['Semanal', 'Quincenal', 'Mensual'];
 const rules = [(v: any) => !!v || 'Es obligatorio llenar este campo.'];
 const error = ref<string | null>(null);
+
+// Hacer la petición HTTP cuando el componente se monte
+onMounted(async () => {
+  try {
+    const userResponse = await axios.get(`http://localhost:3000/users/user/${userId}`);
+    //console.log('userResponse', userResponse.data)
+    vacant.value.company = userResponse.data.profile.jobCompany;
+  } catch (err) {
+    console.error('Error al obtener los posts:', err);
+    const errorAxios = err as AxiosError;
+    if (errorAxios.response) {
+        error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
+    }
+  }
+});
 
 const submitVacant = async () => {
     if (valid.value) {
@@ -72,7 +87,7 @@ const submitVacant = async () => {
     <v-card elevation="10">
         <v-card-item>
             <h5 class="text-20 mb-7">Crear nueva oferta laboral</h5>
-            <p class="textSecondary">Empresa: La empresa en mi perfil ovio</p>
+            <p class="textSecondary">Empresa: {{ vacant.company }}</p>
             <!-- Display the current date -->
             <v-col cols="12">
                 <v-alert v-if="error" type="error" variant="tonal" dismissible>

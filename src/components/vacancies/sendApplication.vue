@@ -58,7 +58,6 @@ onMounted(async () => {
         hasSubmitted.value = false;
         const userResponse = await axios.get(`http://localhost:3000/users/user/${userId}`);
         currUser.value = userResponse.data;
-        //console.log('currUser.value', currUser.value)
         if (currUser.value) {
             application.value.name = `${currUser.value.name} ${currUser.value.lastName}`.toUpperCase();
             application.value.email = currUser.value.email;
