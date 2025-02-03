@@ -21,6 +21,26 @@ const MainRoutes = {
             path: '/photos',
             component: () => import('@/views/Photospage.vue')
         },
+        {
+            name: 'my Profile',
+            path: '/profile',
+            component: () => import('@/views/Profilepage.vue')
+        },
+        {
+            name: 'my Cv',
+            path: '/cv',
+            component: () => import('@/views/Cvpage.vue')
+        },
+        {
+            name: 'My projects',
+            path: '/myprojects',
+            component: () => import('@/views/Myprojectspage.vue')
+        },
+        {
+            name: 'User Applications',
+            path: '/userapplications',
+            component: () => import('@/views/ProfileApplicationsPage.vue')
+        },
     ]
 };
 

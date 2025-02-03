@@ -23,7 +23,7 @@ const sidebarItem: menu[] = [
             {
                 title: 'Mi Cuenta',
                 icon: 'shield-user-line-duotone',
-                to: '/myaccount'
+                to: '/profile'
             },
             {
                 title: 'Publicaciones',
