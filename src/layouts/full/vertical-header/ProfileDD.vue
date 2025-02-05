@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import UserImage from '@/assets/images/profile/user-5.jpg';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -15,6 +16,19 @@ const user = ref({
     email: '',
 });
 
+// Getting profile picture from profile of the user
+const profilePicture = ref('');
+
+const fetchProfileData = async () => {
+    try {
+        const response = await axios.get(`http://localhost:3000/profiles/${userId}`);
+        const profileData = response.data;
+        profilePicture.value = profileData.picture;
+    } catch (error) {
+        console.error('Error fetching profile data:', error);
+    }
+};
+
 onMounted(async () => {
   try {
     const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
@@ -22,6 +36,7 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error al obtener los posts:', error);
   }
+  fetchProfileData();
 });
 
 const logOut = async () => {
@@ -36,13 +51,18 @@ const logOut = async () => {
     <v-menu open-on-hover open-on-click >
         <template v-slot:activator="{ props }">
             <v-btn variant="text" class="custom-hover-primary" color="primary" v-bind="props" icon>
-                <v-avatar size="40" color="error" variant="flat" class="text-h5 font-weight-medium"> C </v-avatar>
+                <v-avatar size="40" class="text-h5 font-weight-medium">
+                    <img :src="profilePicture || UserImage" alt="Mathew" width="50" />
+                 </v-avatar>
             </v-btn>
         </template>
         <v-sheet rounded="md" width="280" elevation="10">
             <div class="pa-6">
                 <div class="d-flex align-center pb-6">
-                    <v-avatar size="55" color="error" variant="flat" class="text-h5 font-weight-medium"> C </v-avatar>
+                    <!-- <v-avatar size="55" color="error" variant="flat" class="text-h5 font-weight-medium"> C </v-avatar> -->
+                    <v-avatar size="55" class="text-h5 font-weight-medium">
+                    <img :src="profilePicture || UserImage" alt="Mathew" width="50" />
+                 </v-avatar>
                     <div class="ml-3">
                         <h6 class="text-subtitle-1 mb-n1">{{ user.name }} {{ user.lastName }}</h6>
                         <span class="text-subtitle-1 text-textSecondary">{{ user.email }}</span>
