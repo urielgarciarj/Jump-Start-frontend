@@ -38,12 +38,6 @@ const filteredVacants = computed(() => {
 
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
-    <!-- <v-alert v-if="showAlert" type="success" variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
-        <template v-slot:prepend>
-        <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
-        </template>
-        <div>{{ snackbarMessage }}</div>
-    </v-alert> -->
     <v-row class="d-flex align-center" no-gutters>
         <v-col cols="12" sm="6" class="d-flex justify-start">
             <v-text-field
@@ -56,7 +50,7 @@ const filteredVacants = computed(() => {
                 color="primary"
             ></v-text-field>
         </v-col>
-        <v-col v-if="userRole == 'reclutador'" cols="12" sm="6" class="d-flex justify-end">
+        <v-col v-if="userRole.toLowerCase() === 'reclutador'" cols="12" sm="6" class="d-flex justify-end">
             <v-btn color="primary" flat to="/new/job-opportunity">
                 Nueva Oferta Laboral
             </v-btn>
