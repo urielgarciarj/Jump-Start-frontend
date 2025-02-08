@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, onMounted } from 'vue';
-import { HeartIcon, PhotoIcon, UserCircleIcon, UsersIcon } from 'vue-tabler-icons';
+import { HeartIcon, UserCircleIcon, UsersIcon, ArchiveIcon } from 'vue-tabler-icons';
 import profileBg from '@/assets/images/backgrounds/profilebg.jpg';
 import UserImage from '@/assets/images/profile/user-5.jpg';
 import axios from 'axios';
@@ -15,7 +15,7 @@ const items = shallowRef([
     { tab: 'Profile', icon: UserCircleIcon, href: '/profile' },
     { tab: 'Mi CV', icon: HeartIcon, href: '/cv' },
     { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects' },
-    { tab: 'Mis Solicitudes', icon: UsersIcon, href: '/userapplications' },
+    { tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId },
 ]);
 
 // Getting full name of the user
