@@ -33,7 +33,7 @@ const breadcrumbs = ref([
 onMounted(async () => {
     try {
         const response = await axios.get('http://localhost:3000/posts/list/user/' + userId);
-        console.log(response.data);
+        //console.log(response.data);
         posts.value = response.data;
     } catch (error) {
         console.error('Error al obtener los posts:', error);

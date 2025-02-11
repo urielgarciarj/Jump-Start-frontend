@@ -67,7 +67,7 @@ const MainRoutes = {
         },
         {
             name: 'User Applications',
-            path: '/userapplications',
+            path: '/userapplications/:id',
             component: () => import('@/views/ProfileApplicationsPage.vue')
         },
     ]

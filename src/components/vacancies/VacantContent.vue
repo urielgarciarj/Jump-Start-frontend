@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const showAlert = ref(false); // Controlar la visibilidad del snackbar
-const alertType = ref('success');
+const alertType = ref<'success' | 'error' | 'info' | 'warning'>('success');
 const snackbarMessage = ref(''); // Mensaje para mostrar en el snackbar
 const applicationSent = (success: boolean) => {
     if (success) {
@@ -101,7 +101,7 @@ const formatDateTime = (date: string) => {
                             {{ vacant?.status.charAt(0).toUpperCase() + vacant?.status.slice(1) }}
                         </v-chip>
                     </div>
-                    <div v-if="userRole === 'estudiante'">
+                    <div v-if="userRole.toLowerCase() === 'estudiante' && vacant?.status.toLowerCase() === 'activo'">
                         <v-col color="secondary" class="font-weight-bold d-flex" sm="6" rounded="sm"> 
                             <sendApply :vacant="vacant?.id" @applySaved="applicationSent" @applyDeleted="applicationDeleted"/>
                         </v-col>

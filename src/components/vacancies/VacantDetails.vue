@@ -22,7 +22,7 @@ const breadcrumbs = ref([
 ]);
 
 const vacantDetail = ref<any | null>(null);
-const applicationsList = ref<any | null>(null);
+const applicationsList = ref<any[]>([]);
 
 const error = ref<string | null>(null);
 const tab = ref(null);
@@ -35,9 +35,10 @@ const sortBy:any  = ref([
     { key: 'name', order: 'desc' }
 ]);
 const headers : any = ref([
+    { title: '', align: 'start', key: 'picture', sortable: false },
     { title: 'Nombre', align: 'start', key: 'name' },
     { title: 'Correo', align: 'start', key: 'email' },
-    { title: 'Número Cel.', align: 'start', key: 'phoneNumber' },
+    { title: 'Teléfono', align: 'start', key: 'phoneNumber', sortable: false },
     { title: 'Fecha', align: 'start', key: 'dateCreated' },
     { title: 'Interes', align: 'start', key: 'interested', sortable: false },
     { title: 'Habilidades', align: 'start', key: 'proficiency', sortable: false },
@@ -46,7 +47,6 @@ const headers : any = ref([
 onMounted(async () => {
     try {
         const response = await axios.get(`http://localhost:3000/vacancies/vacant/detail/${vacantId}`);
-        console.log('response data', response.data);
         // If no response data or the rcd belongs to other user, throw error
         if (!response.data || response.data.user.id != userId) {
             error.value = 'Oferta laboral no encontrada.';
@@ -150,7 +150,6 @@ const formatDateTime = (date: string) => {
                                         {{ vacantDetail?.user.name }} {{ vacantDetail?.user.lastName }}
                                     </span>
                                 </v-col>
-                                <divider></divider>
                                 <v-col cols="12" md="3">
                                     <h3>Título</h3>
                                     <span class="text-subtitle-1 opacity-50">
@@ -234,6 +233,16 @@ const formatDateTime = (date: string) => {
                                     v-model:sort-by="sortBy" class="border rounded-md datatabels">
                                     <template v-slot:item="{ item }">
                                         <tr>
+                                        <td>
+                                            <v-avatar size="32" class="text-h5 font-weight-medium"> 
+                                                <template v-if="item.user.profile?.picture">
+                                                    <img :src="item.user.profile?.picture" alt="icon" height="32" />
+                                                </template>
+                                                <template v-else>
+                                                    {{ item.name.charAt(0).toUpperCase() }}
+                                                </template>
+                                            </v-avatar>
+                                        </td>
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.email }}</td>
                                         <td>{{ item.phoneNumber }}</td>
