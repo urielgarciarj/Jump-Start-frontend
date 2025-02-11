@@ -133,7 +133,7 @@ const formatDateTime = (date: string) => {
 
 <style scoped>
 .adjusted-image {
-  max-width: 90%; /* La imagen no puede exceder el tamaño del contenedor */
+  max-width: 70%; /* La imagen no puede exceder el tamaño del contenedor */
   max-height: 80%; /* Limita la altura máxima de la imagen */
   object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
 }
