@@ -29,12 +29,16 @@ const sidebarItem: menu[] = [
                 title: 'Publicaciones',
                 icon: 'widget-add-line-duotone',
                 to: '/'
-            }
-            ,
+            },
             {
                 title: 'Ofertas Laborales',
                 icon: 'card-search-line-duotone',
                 to: '/vacancies/list-all'
+            },
+            {
+                title: 'Proyectos',
+                icon: 'card-search-line-duotone',
+                to: '/projects/list-all'
             }
         ]
     },

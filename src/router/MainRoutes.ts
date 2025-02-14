@@ -70,6 +70,11 @@ const MainRoutes = {
             path: '/userapplications/:id',
             component: () => import('@/views/ProfileApplicationsPage.vue')
         },
+        {
+            name: 'All-Projects',
+            path: '/projects/list-all',
+            component: () => import('@/views/Projects.vue')
+        },
     ]
 };
   
