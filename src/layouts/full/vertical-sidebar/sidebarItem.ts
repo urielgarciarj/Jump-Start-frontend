@@ -37,8 +37,13 @@ const sidebarItem: menu[] = [
             },
             {
                 title: 'Proyectos',
-                icon: 'card-search-line-duotone',
+                icon: 'passport-line-duotone',
                 to: '/projects/list-all'
+            },
+            {
+                title: 'Kanban',
+                icon: 'airbuds-case-minimalistic-line-duotone',
+                to: '/projects/kanban-board'
             }
         ]
     },

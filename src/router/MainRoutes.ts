@@ -75,6 +75,16 @@ const MainRoutes = {
             path: '/projects/list-all',
             component: () => import('@/views/Projects.vue')
         },
+        {
+            name: 'Projects-Kanban',
+            path: '/projects/kanban-board',
+            component: () => import('@/views/Kanban.vue')
+        },
+        {
+            name: 'Proyecto-Detalle',
+            path: '/project/details/:id',
+            component: () => import('@/components/projects/ProjectDetails.vue')
+        },
     ]
 };
   

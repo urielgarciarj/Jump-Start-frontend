@@ -1,0 +1,115 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import axios, { AxiosError } from 'axios';
+import { defineProps, defineEmits } from 'vue';
+
+const props = defineProps({
+    project: Object, // Recibe la vacante que se va a editar
+});
+const emit = defineEmits(['updateProject', 'cancelEdit']); // Emitir eventos para actualizar o cancelar la edición
+
+const updateName = ref(props.project?.name || '');
+const updateStatus = ref(props.project?.status || '');
+const updateCategory = ref(props.project?.category || '');
+const updateDescription = ref(props.project?.description || '');
+const updateRequirements = ref(props.project?.requirements || '');
+const updateStartDate = ref(props.project?.startDate || '');
+const updateEndDate = ref(props.project?.endDate || '');
+
+const statusesOptions = ["pendiente", "progreso", "terminado", "cancelado"];
+const categoryOptions = [
+    "Proyectos de Investigación", "Proyectos de Creación", "Proyectos de Innovación",
+    "Proyectos de Comunicación",  "Proyectos de Servicio a la Comunidad", "Proyectos de Emprendimiento",
+    "Proyectos de Expresión Artística", "Proyectos de Tecnología y Programación", "Proyectos de Sostenibilidad y Medio Ambiente",
+    "Proyectos de Educación y Mentoría", "Proyectos de Competencias y Desafíos", "Proyectos de Salud y Bienestar",
+    "Proyectos de Historia y Cultura", "Proyectos de Ingeniería y Construcción", "Proyectos Recreativos"
+];
+
+const valid = ref(false);
+const error = ref<string | null>(null);
+const notEmptyRule = [
+  (value: string) => !!value || 'Este campo es obligatorio.'
+];
+
+// Función para cancelar la edición
+const cancelEdit = () => {
+  emit('cancelEdit');
+};
+
+const submitVacant = async () => {
+    if (valid.value) {
+        try {
+            const projectData = {
+                name: updateName.value,
+                category: updateCategory.value,
+                status: updateStatus.value,
+                description: updateDescription.value,
+                requirements: updateRequirements.value,
+                startDate: updateStartDate.value,
+                endDate: updateEndDate.value
+            }
+            const response = await axios.put(`http://localhost:3000/projects/updateFields/${props.project?.id}`, projectData);
+            console.log('project updated:', response.data);
+            // Emitir evento para actualizar el proyecto en el componente principal
+            emit('updateProject', {...props.project,...response.data,});
+            
+        } catch (err) {
+            console.error('Error:', err);
+            const errorAxios = err as AxiosError;
+            // Manejar el error en función del código de estado
+            if (errorAxios.response) {
+                error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
+            }
+        }
+    }
+};
+</script>
+
+<template>
+     <v-col cols="12">
+        <v-alert v-if="error" type="error" variant="tonal" dismissible>
+            {{ error }}
+        </v-alert>
+    </v-col>
+    <v-form v-model="valid">
+        <div class="bg-light mt-6 pa-6 rounded-md">
+            <v-row>
+                <v-col cols="12" md="12">
+                    <v-label class="font-weight-semibold pb-2">Nombre del proyecto</v-label>
+                    <v-text-field v-model="updateName" :rules="notEmptyRule" required />
+                </v-col>
+
+                <v-col cols="12" md="3">
+                    <v-label class="font-weight-semibold pb-2">Fecha de Inicio</v-label>
+                    <v-text-field v-model="updateStartDate" type="date" :rules="notEmptyRule" required />
+                </v-col>
+                <v-col cols="12" md="3">
+                    <v-label class="font-weight-semibold pb-2">Fecha Fin</v-label>
+                    <v-text-field v-model="updateEndDate" type="date" />
+                </v-col>
+                <v-col cols="12" md="3">
+                    <v-label class="font-weight-semibold pb-2">Categoría</v-label>
+                    <v-select v-model="updateCategory" :items="categoryOptions" :rules="notEmptyRule" required />
+                </v-col>
+                <v-col cols="12" md="3">
+                    <v-label class="font-weight-semibold pb-2">Estado</v-label>
+                    <v-select v-model="updateStatus" :items="statusesOptions" :rules="notEmptyRule" required />
+                </v-col>
+                
+                <v-col cols="12">
+                    <v-label class="font-weight-semibold pb-2">Descripción</v-label>
+                    <v-textarea v-model="updateDescription" :rules="notEmptyRule" required />
+                </v-col>
+                <v-col cols="12">
+                    <v-label class="font-weight-semibold pb-2">Requerimientos</v-label>
+                    <v-textarea v-model="updateRequirements"  :rules="notEmptyRule" required />
+                </v-col>
+            </v-row>
+        </div>
+
+        <div class="d-flex align-center justify-end ga-3">
+            <v-btn @click="cancelEdit" flat variant="tonal" class="mt-6">Cancelar</v-btn>
+            <v-btn @click="submitVacant" :disabled="!valid" flat color="primary" class="mt-6">Guardar</v-btn>
+        </div>
+    </v-form>
+</template>

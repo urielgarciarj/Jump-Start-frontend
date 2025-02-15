@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import VacantContent from '@/components/vacancies/VacantContent.vue';
+import ProjectContent from '@/components/projects/ProjectContent.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
@@ -21,7 +21,6 @@ onMounted(async () => {
   try {
     const response = await axios.get('http://localhost:3000/projects/list');
     projects.value = response.data;
-    console.log('response data', response.data);
   } catch (error) {
     console.error('Error al obtener el listado de proyectos:', error);
   }
@@ -52,16 +51,8 @@ const filteredProjects = computed(() => {
         </v-col>
     </v-row>
     <v-row>
-        <!-- <v-col v-for="vacant in filteredProjects" :key="vacant.id" cols="12" md="12">
-            <VacantContent :vacant="vacant"/>
-        </v-col> -->
+        <template v-for="(project, i) in filteredProjects" :key="project.id">
+            <ProjectContent :project="project"/>
+        </template>
     </v-row>
 </template>
-
-<style scoped lang="scss">
-@media (max-width: 1279px) {
-    .v-card {
-        position: unset;
-    }
-}
-</style>
