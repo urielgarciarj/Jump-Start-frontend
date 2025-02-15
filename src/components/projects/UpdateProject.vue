@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import axios, { AxiosError } from 'axios';
 import { defineProps, defineEmits } from 'vue';
 
@@ -49,7 +49,6 @@ const submitVacant = async () => {
                 endDate: updateEndDate.value
             }
             const response = await axios.put(`http://localhost:3000/projects/updateFields/${props.project?.id}`, projectData);
-            console.log('project updated:', response.data);
             // Emitir evento para actualizar el proyecto en el componente principal
             emit('updateProject', {...props.project,...response.data,});
             
@@ -63,6 +62,24 @@ const submitVacant = async () => {
         }
     }
 };
+
+// Formatear fecha a 'YYYY-MM-DD'
+const formatDefaultDate = (date: string) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1);
+    const day = d.getDate();
+    // Aseguramos que mes y día siempre tengan 2 dígitos
+    const formattedMonth = month < 10 ? '0' + month : month;
+    const formattedDay = day < 10 ? '0' + day : day;
+    
+    return `${year}-${formattedMonth}-${formattedDay}`;
+};
+// Computada para obtener el valor formateado de la fecha de inicio
+const formattedStartDate = computed(() => formatDefaultDate(updateStartDate.value));
+const formattedEndDate = computed(() => formatDefaultDate(updateEndDate.value));
+
 </script>
 
 <template>
@@ -81,11 +98,11 @@ const submitVacant = async () => {
 
                 <v-col cols="12" md="3">
                     <v-label class="font-weight-semibold pb-2">Fecha de Inicio</v-label>
-                    <v-text-field v-model="updateStartDate" type="date" :rules="notEmptyRule" required />
+                    <v-text-field v-model="updateStartDate" :value="formattedStartDate" type="date" :rules="notEmptyRule" required />
                 </v-col>
                 <v-col cols="12" md="3">
                     <v-label class="font-weight-semibold pb-2">Fecha Fin</v-label>
-                    <v-text-field v-model="updateEndDate" type="date" />
+                    <v-text-field v-model="updateEndDate" :value="formattedEndDate" type="date" />
                 </v-col>
                 <v-col cols="12" md="3">
                     <v-label class="font-weight-semibold pb-2">Categoría</v-label>

@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth';
 import axios, { AxiosError } from 'axios';
 import { router } from '@/router';
 import UpdateProjectForm from './UpdateProject.vue';
+import EnrollForm from './enrolls/CreateEnrollForm.vue';
 
 const page = ref({ title: 'Detalles del Proyecto' });
 const breadcrumbs = ref([
@@ -16,9 +17,9 @@ const breadcrumbs = ref([
 const route = useRoute();
 const authStore = useAuthStore();
 const userId = authStore.userId;
+const userRole = authStore.userRole;
 
 const projectId = route.params.id;
-console.log('projectId', projectId)
 
 const projectDetail = ref<any | null>(null);
 const enrollsList = ref<any[]>([]);
@@ -31,7 +32,7 @@ const tab = ref(null);
 onMounted(async () => {
     try {
         const response = await axios.get(`http://localhost:3000/projects/project/detail/${projectId}`);
-        console.log('response data', response.data)
+        //console.log('response data', response.data)
         
         if (!response.data) { // If no response data, throw error
             error.value = 'Oferta laboral no encontrada.';
@@ -63,19 +64,17 @@ const cancelEdit = () => {
 };
 
 // Función para manejar la actualización del proyecto
-const handleUpdateProject = (updatedVacant: 
-    { name: any; description: any; status: any; location: any; category: any; modality: any; level: any; salary: any; salaryPeriod: any; }) => {
-    // if (vacantDetail.value) {
-    //     vacantDetail.value.name = updatedVacant.name;
-    //     vacantDetail.value.description = updatedVacant.description;
-    //     vacantDetail.value.status = updatedVacant.status;
-    //     vacantDetail.value.location = updatedVacant.location;
-    //     vacantDetail.value.category = updatedVacant.category;
-    //     vacantDetail.value.modality = updatedVacant.modality;
-    //     vacantDetail.value.level = updatedVacant.level;
-    //     vacantDetail.value.salary = updatedVacant.salary;
-    //     vacantDetail.value.salaryPeriod = updatedVacant.salaryPeriod;
-    // }
+const handleUpdateProject = (updatedProject: 
+    { name: any; status: any; category: any; description: any; requirements: any; startDate: any; endDate: any; }) => {
+    if (projectDetail.value) {
+        projectDetail.value.name = updatedProject.name;
+        projectDetail.value.status = updatedProject.status;
+        projectDetail.value.category = updatedProject.category;
+        projectDetail.value.description = updatedProject.description;
+        projectDetail.value.requirements = updatedProject.requirements;
+        projectDetail.value.startDate = updatedProject.startDate;
+        projectDetail.value.endDate = updatedProject.endDate;
+    }
   showEditForm.value = false;
 };
 
@@ -94,6 +93,7 @@ const confirmDelete = async () => {
     }
     showConfirmation.value = false;
 };
+
 
 const formatDateTime = (date: string) => {
   if (!date) return 'Indefinido';
@@ -186,6 +186,10 @@ const formatDateTime = (date: string) => {
                             <v-btn  @click.stop="editProject()" color="primary" flat
                                 >Editar</v-btn
                             >
+                        </div>
+                        <!-- Boton para enviar solicitud *solo estudiantes -->
+                        <div v-if="!showEditForm && userRole.toLowerCase() === 'estudiante'" class="d-flex ga-3 justify-end mt-6">
+                            <EnrollForm />
                         </div>
 
                         <!-- Editing form -->

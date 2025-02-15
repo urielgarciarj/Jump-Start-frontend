@@ -38,7 +38,7 @@ const MainRoutes = {
             component: () => import('@/components/vacancies/VacantDetails.vue'),
             beforeEnter: (to, from, next) => {
                 const authStore = useAuthStore();
-                if (authStore.userRole === 'reclutador') {
+                if (authStore.userRole.toLowerCase() === 'reclutador') {
                     next();  // Permite la navegación si el rol es 'reclutador'
                 } else {
                     next({ name: 'Vacancies' });  // Redirige si no es 'reclutador'
@@ -84,6 +84,19 @@ const MainRoutes = {
             name: 'Proyecto-Detalle',
             path: '/project/details/:id',
             component: () => import('@/components/projects/ProjectDetails.vue')
+        },
+        {
+            name: 'Nuevo Proyecto',
+            path: '/projects/create-project',
+            component: () => import('@/components/projects/CreateProject.vue'),
+            beforeEnter: (to, from, next) => {
+                const authStore = useAuthStore();
+                if (authStore.userRole.toLowerCase() === 'docente') {
+                    next();  // Permite la navegación si el rol es 'docente'
+                } else {
+                    next({ name: 'All-Projects' });  // Redirige si no es 'docente'
+                }
+            }
         },
     ]
 };
