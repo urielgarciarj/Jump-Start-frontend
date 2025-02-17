@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import sendApply from '@/components/vacancies/sendApplication.vue';
 import { useAuthStore } from '@/stores/auth';
 import { ref, onMounted, computed } from 'vue';
-import { Icon } from "@iconify/vue";
 import UserImage from '@/assets/images/profile/user-5.jpg';
 
 const authStore = useAuthStore();
@@ -93,6 +91,11 @@ const formatDate = (date: string) => {
         year: 'numeric',   // Año
     });
 };
+
+const capitalizeFirstLetter = (str: string) => {
+    if(!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
 </script>
 
 <template>
@@ -140,7 +143,11 @@ const formatDate = (date: string) => {
                     </v-expansion-panels>
                     <div class="d-flex align-center justify-space-between">
                         <div>
-                             <v-chip class="font-weight-bold d-flex bg-light" :color="getStatusColor(project?.status)" size="small" rounded="sm" v-text="project?.status"></v-chip>
+                             <v-chip class="font-weight-bold d-flex bg-light" 
+                                    :color="getStatusColor(project?.status)" 
+                                    size="small" rounded="sm" 
+                                    v-text="capitalizeFirstLetter(project?.status || '')">
+                             </v-chip>
                         </div>
                         <div>
                             <v-avatar size="10">

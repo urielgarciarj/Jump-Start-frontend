@@ -28,6 +28,12 @@ const showEditForm = ref(false);
 const showConfirmation = ref(false);
 const error = ref<string | null>(null);
 const tab = ref(null);
+const statusColors = {
+  "pendiente": "info",
+  "progreso": "primary",
+  "terminado": "success",
+  "cancelado": "error"
+};
 
 onMounted(async () => {
     try {
@@ -95,6 +101,10 @@ const confirmDelete = async () => {
 };
 
 
+const getStatusColor = (status: string) => {
+    return statusColors[status as keyof typeof statusColors] || '';  
+};
+
 const formatDateTime = (date: string) => {
   if (!date) return 'Indefinido';
   return new Date(date).toLocaleString('es-ES', {
@@ -102,6 +112,10 @@ const formatDateTime = (date: string) => {
     month: 'numeric',  // Mes
     year: 'numeric',   // Año
   });
+};
+const capitalizeFirstLetter = (str: string) => {
+    if(!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 </script>
 
@@ -113,7 +127,7 @@ const formatDateTime = (date: string) => {
             <v-tabs v-model="tab" color="primary" class="border-bottom">
                 <v-tab value="one">General</v-tab>
                 <v-tab value="two">Participantes</v-tab>
-                <v-tab value="three">Solicitudes</v-tab>
+                <v-tab value="three" v-if="projectDetail?.professor.id === userId">Solicitudes</v-tab>
             </v-tabs>
             <div class="mt-5">
                 <v-row v-if="error">
@@ -158,10 +172,9 @@ const formatDateTime = (date: string) => {
                                 </v-col>
                                 <v-col cols="12" md="3">
                                     <h3>Estado</h3>
-                                    <span class="text-subtitle-1 opacity-50">
-                                        <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ projectDetail?.status }}
-                                    </span>
+                                    <v-chip class="font-weight-bold bg-light" :color="getStatusColor(projectDetail?.status)" size="small" rounded="sm">
+                                        {{ capitalizeFirstLetter(projectDetail?.status || '') }}
+                                    </v-chip>
                                 </v-col>
 
                                 <v-col cols="12" md="12">
@@ -189,7 +202,7 @@ const formatDateTime = (date: string) => {
                         </div>
                         <!-- Boton para enviar solicitud *solo estudiantes -->
                         <div v-if="!showEditForm && userRole.toLowerCase() === 'estudiante'" class="d-flex ga-3 justify-end mt-6">
-                            <EnrollForm />
+                            <EnrollForm :project="projectDetail?.id"/>
                         </div>
 
                         <!-- Editing form -->
@@ -231,7 +244,7 @@ const formatDateTime = (date: string) => {
                             </UiParentCard>
                          </v-col> -->
                     </v-window-item>
-                    <v-window-item value="three">
+                    <v-window-item value="three" v-if="projectDetail?.professor.id === userId">
 
                     </v-window-item>
                 </v-window>

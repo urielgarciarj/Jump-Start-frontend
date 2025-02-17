@@ -119,6 +119,11 @@ const formatDateTime = (date: string) => {
     year: 'numeric',   // Año
   });
 };
+
+const capitalizeFirstLetter = (str: string) => {
+    if(!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
 </script>
 
 <template>
@@ -173,10 +178,9 @@ const formatDateTime = (date: string) => {
                                 </v-col>
                                 <v-col cols="12" md="3">
                                     <h3>Estado</h3>
-                                    <span class="text-subtitle-1 opacity-50">
-                                        <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ vacantDetail?.status }}
-                                    </span>
+                                    <v-chip class="font-weight-bold bg-light" color="success" size="small" rounded="sm">
+                                        {{ capitalizeFirstLetter(vacantDetail?.status || '') }}
+                                    </v-chip>
                                 </v-col>
 
                                 <v-col cols="12" md="4">
