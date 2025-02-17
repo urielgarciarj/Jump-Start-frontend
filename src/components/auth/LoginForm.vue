@@ -13,6 +13,9 @@ const user = ref({
 });
 const valid = ref(false);
 
+// Variable reactiva para el tipo de campo de contraseña
+const showPassword = ref(false);
+
 // Reglas de validación
 const emailRules = [
   (value: string) => !!value || 'El correo electrónico es obligatorio.',
@@ -64,9 +67,19 @@ const authUser = async () => {
                 <v-text-field v-model="user.email" :rules="emailRules"  variant="outlined" density="compact" type="email" color="primary" required></v-text-field>
             </v-col>
             <v-col cols="12">
-                <v-label class="font-weight-bold mb-1">Contraseña</v-label>
-                <v-text-field v-model="user.password" :rules="passwordRules" variant="outlined"  density="compact" type="password" color="primary" required></v-text-field>
-            </v-col>
+            <v-label class="font-weight-bold mb-1">Contraseña</v-label>
+            <v-text-field
+                v-model="user.password"
+                :rules="passwordRules"
+                :type="showPassword ? 'text' : 'password'"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                required
+                :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append="showPassword = !showPassword"
+            ></v-text-field>
+        </v-col>
             <v-col cols="12" class="pt-0">
                 <v-btn :disabled="!valid" @click="authUser" color="primary" size="large" block   flat>Iniciar Sesión</v-btn>
             </v-col>
