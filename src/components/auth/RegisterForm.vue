@@ -16,6 +16,9 @@ const user = ref({
 // Variables reactivas para los campos del formulario
 const valid = ref(false);
 
+// Variable reactiva para el tipo de campo de contraseña
+const showPassword = ref(false);
+
 // Reglas de validación
 const nameRules = [
   (value: string) => !!value || 'El nombre es obligatorio.'
@@ -90,7 +93,17 @@ const registerNewUser = async () => {
         </v-col>
         <v-col cols="12">
             <v-label class="font-weight-bold mb-1">Contraseña</v-label>
-            <v-text-field v-model="user.password" :rules="passwordRules" variant="outlined" type="password" density="compact"  color="primary" required></v-text-field>
+            <v-text-field
+                v-model="user.password"
+                :rules="passwordRules"
+                :type="showPassword ? 'text' : 'password'"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                required
+                :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append="showPassword = !showPassword"
+            ></v-text-field>
         </v-col>
         <v-col cols="12">
             <v-label class="font-weight-bold mb-1">Ocupación</v-label>
