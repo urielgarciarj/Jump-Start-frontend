@@ -19,8 +19,9 @@ const emit = defineEmits<{
 const enroll = ref({
     name: '',
     comments: '',
-    status: '',
+    status: 'Pendiente',
     dateCreated: new Date().toISOString(),
+    projectId: props.project,
     userId: userId
 });
 const isActive = ref(false);
@@ -33,17 +34,17 @@ const notEmptyRule = [ // Reglas de validación
 ];
 
 // usamos watch en lugar de onMounted para esperar los props
-watch(() => props.project, async (project_id) => {
+watch([() => authStore.userId, () => props.project], async ([userId, project_id]) => {
   try {
     const response = await axios.get(`http://localhost:3000/enrolls/find-by/user-project/${userId}/${project_id}`);
-    console.log('response', response)
     if (response.data) { 
         hasSubmitted.value = true;
-        enroll.value = response.data;
+        enroll.value = { ...enroll.value, ...response.data };
         enrollID.value = response.data.id; // Saves the ID of the enroll
     }
     else {
         hasSubmitted.value = false;
+        enroll.value.projectId = project_id;
         const userResponse = await axios.get(`http://localhost:3000/users/user/${userId}`);
         currUser.value = userResponse.data;
         if (currUser.value) {
@@ -51,7 +52,7 @@ watch(() => props.project, async (project_id) => {
         }
     }
   } catch (err) {
-    console.error('Error al obtener los posts:', err);
+    console.error('Error al obtener los proyecto-usuario:', err);
     const errorAxios = err as AxiosError;
     if (errorAxios.response) {
         error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
@@ -62,36 +63,13 @@ watch(() => props.project, async (project_id) => {
 const submitEnroll = async () => {
     if (valid.value) {
         try {
-            // const formData = new FormData();
-            // formData.append('title', post.value.title);
-            // formData.append('description', post.value.description);
-            // formData.append('category', post.value.category);
-            // formData.append('dateCreated', post.value.dateCreated);
-            // formData.append('userId', post.value.userId);
-            
-            // // Si hay una imagen seleccionada, agregarla al FormData
-            // if (file.value) {
-            //     formData.append('file', file.value);
-            // }
-            // const response = await axios.post('http://localhost:3000/posts/create', formData, {
-            //     headers: {
-            //         'Content-Type': 'multipart/form-data',
-            //     },
-            // });
-            // //console.log('Post created:', response.data);
-            
-            // // Emitir el evento con el nuevo post
-            // const newPost = response.data;
-            // emit('postCreated', newPost);
-            // isActive.value = false; // Close dialog
-            // // Limpiar el formulario
-            // post.value = {
-            //     title: '',
-            //     description: '',
-            //     category: '',
-            //     dateCreated: '',
-            //     userId: ''
-            // };
+            const response = await axios.post('http://localhost:3000/enrolls/enroll', enroll.value);
+            const isSuccess = response.status == 201 ? true : false;
+            hasSubmitted.value = true;
+            isActive.value = false; // Close dialog
+            enroll.value = response.data;
+            enrollID.value = response.data.id;
+            emit('enrollSaved', isSuccess);
         } catch (err) {
             console.error('Error:', err);
             // Tipar el error como AxiosError
@@ -106,11 +84,10 @@ const submitEnroll = async () => {
 // Formatting Functions
 const getStatusColor = (status: string) => {
     const statusColors: { [key: string]: string } = {
-    'aceptado': 'success',
-    'rechazado': 'error'
-  };
-
-  return statusColors[status] || '#9AA6B2';
+    'Aceptado': 'success',
+    'Rechazado': 'error'
+    };
+    return statusColors[status] || 'info';
 };
 const formatDateTime = (date: string) => {
   if (!date) return 'Indefinido';
@@ -150,10 +127,10 @@ const capitalizeFirstLetter = (str: string) => {
                                 <span v-else class="font-weight-semibold">{{ enroll.name }}</span>
                             </v-col>
 
-                            <v-col cols="12" v-if="hasSubmitted">
+                            <v-col cols="12" md="6" v-if="hasSubmitted">
                                 <span class="font-weight-semibold">Fecha: {{ formatDateTime(enroll.dateCreated) }}</span>
                             </v-col>
-                            <v-col cols="12" v-if="hasSubmitted">
+                            <v-col cols="12" md="6" v-if="hasSubmitted">
                                 <span class="font-weight-semibold">Estado:</span>
                                 <v-chip class="font-weight-bold bg-light" :color="getStatusColor(enroll.status)" size="small" rounded="sm">
                                     {{ capitalizeFirstLetter(enroll?.status || '') }}
@@ -169,8 +146,11 @@ const capitalizeFirstLetter = (str: string) => {
                         </v-row>
                     </v-card-text>
                     <v-card-actions class="justify-end">
-                        <v-btn variant="tonal" @click="isActive.value = false" flat>Cancelar</v-btn>
-                        <v-btn :disabled="!valid" color="primary" variant="tonal" @click="submitEnroll" flat>Guardar</v-btn>
+                        <v-btn variant="tonal" @click="isActive.value = false" flat>{{ hasSubmitted ? 'Cerrar' : 'Cancelar' }}</v-btn>
+                        <v-btn v-if="!hasSubmitted" :disabled="!valid" color="primary" variant="tonal" @click="submitEnroll" flat>Guardar</v-btn> 
+                        <v-btn v-if="hasSubmitted" color="error" variant="tonal" @click="" flat>
+                            Eliminar Solicitud
+                        </v-btn>
                     </v-card-actions>
                 </v-card>
             </template>

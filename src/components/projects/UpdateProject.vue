@@ -16,7 +16,7 @@ const updateRequirements = ref(props.project?.requirements || '');
 const updateStartDate = ref(props.project?.startDate || '');
 const updateEndDate = ref(props.project?.endDate || '');
 
-const statusesOptions = ["pendiente", "progreso", "terminado", "cancelado"];
+const statusesOptions = ["abierto", "progreso", "completado", "cancelado"];
 const categoryOptions = [
     "Proyectos de Investigación", "Proyectos de Creación", "Proyectos de Innovación",
     "Proyectos de Comunicación",  "Proyectos de Servicio a la Comunidad", "Proyectos de Emprendimiento",

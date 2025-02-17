@@ -28,7 +28,7 @@ const project = ref({
     idTeacher: userId
 });
 
-const statusesOptions = ["pendiente", "progreso", "terminado", "cancelado"];
+const statusesOptions = ["abierto", "progreso", "completado", "cancelado"];
 const categoryOptions = [
     "Proyectos de Investigación", "Proyectos de Creación", "Proyectos de Innovación",
     "Proyectos de Comunicación",  "Proyectos de Servicio a la Comunidad", "Proyectos de Emprendimiento",

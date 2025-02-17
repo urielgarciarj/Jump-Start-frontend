@@ -22,18 +22,30 @@ const userRole = authStore.userRole;
 const projectId = route.params.id;
 
 const projectDetail = ref<any | null>(null);
-const enrollsList = ref<any[]>([]);
+const aceptedEnrollsList = ref<any[]>([]);
+const pendingEnrollsList = ref<any[]>([]);
 
 const showEditForm = ref(false);
 const showConfirmation = ref(false);
 const error = ref<string | null>(null);
 const tab = ref(null);
 const statusColors = {
-  "pendiente": "info",
+  "abierto": "info",
   "progreso": "primary",
-  "terminado": "success",
+  "completado": "success",
   "cancelado": "error"
 };
+/*Header Data [Table headers and sorting]*/
+const sortBy:any  = ref([
+    { key: 'name', order: 'desc' }
+]);
+const headers : any = ref([
+    { title: '', align: 'start', key: 'picture', sortable: false },
+    { title: 'Nombre', align: 'start', key: 'name' },
+    { title: 'Fecha', align: 'start', key: 'dateCreated' },
+    { title: 'Comentarios', align: 'start', key: 'comments', sortable: false },
+    { title: 'Acciones', align: 'start', key: '', sortable: false }
+]);
 
 onMounted(async () => {
     try {
@@ -44,10 +56,11 @@ onMounted(async () => {
             error.value = 'Oferta laboral no encontrada.';
         } else { // The vacant belong to the currUser, proceed to get applications 
             projectDetail.value = response.data;
-            // Get applications related
-            // const _response = await axios.get(`http://localhost:3000/applications/list-by/vancant/${vacantId}`);
-            // console.log('Get appl list', _response.data);
-            // applicationsList.value = _response.data;
+            // Get enrolls related
+            const _response = await axios.get(`http://localhost:3000/enrolls/list-by/project/${projectId}`);
+            pendingEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Pendiente');
+            aceptedEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Aceptado');
+            //applicationsList.value = _response.data;
         }
     } catch (err) {
         console.error('Error:', err);
@@ -63,12 +76,10 @@ onMounted(async () => {
 const editProject = () => {
   showEditForm.value = true;
 };
-
 // Función para cancelar la edición
 const cancelEdit = () => {
   showEditForm.value = false;
 };
-
 // Función para manejar la actualización del proyecto
 const handleUpdateProject = (updatedProject: 
     { name: any; status: any; category: any; description: any; requirements: any; startDate: any; endDate: any; }) => {
@@ -83,12 +94,10 @@ const handleUpdateProject = (updatedProject:
     }
   showEditForm.value = false;
 };
-
 //Funcion para manejar eliminar un proyecto
 const handleDeleteProject = () => { 
     showConfirmation.value = true; 
 };
-
 const confirmDelete = async () => {
     try {
         console.log('se confirmo que se elimina este proyecto');
@@ -100,11 +109,62 @@ const confirmDelete = async () => {
     showConfirmation.value = false;
 };
 
+// Funciones para notificar sobre enrolls
+const showAlert = ref(false); // Controlar la visibilidad del snackbar
+const alertType = ref<'success' | 'error' | 'info' | 'warning'>('success');
+const snackbarMessage = ref(''); // Mensaje para mostrar en el snackbar
+const handleEnrollSaved = (success: boolean) => {
+    if (success) {
+        snackbarMessage.value = '¡Tu solicitud fue enviada con éxito!';
+        alertType.value = 'success';
+    } else {
+        snackbarMessage.value = 'Hubo un error al enviar la solicitud. Intenta nuevamente.';
+        alertType.value = 'error';
+    }
+    showAlert.value = true;
+    setTimeout(() => { showAlert.value = false; }, 5000);
+};
+const handleEnrollDeleted = (success: boolean) => {
+    if (success) {
+        snackbarMessage.value = '¡Tu solicitud fue eliminada!';
+        alertType.value = 'success';
+    } else {
+        snackbarMessage.value = 'Hubo un error al eliminar la solicitud. Intenta nuevamente.';
+        alertType.value = 'error';
+    }
+    showAlert.value = true;
+    setTimeout(() => { showAlert.value = false; }, 5000);
+};
 
+const aceptOrRejectStudent = (enrollId: string, status: string) => {
+    try {
+        if (!enrollId || !status) return;
+        // Actualizar desde backend y db
+        const response = axios.put(`http://localhost:3000/enrolls/update-status/${enrollId}/${status}`);
+        // Update component
+        if (status === 'Aceptado') {
+            // Buscar el estudiante en la lista de pendientes
+            const studentIndex = pendingEnrollsList.value.findIndex(enroll => enroll.id === enrollId);
+            if (studentIndex !== -1) { // Mover el estudiante a la lista de aceptados
+                const [student] = pendingEnrollsList.value.splice(studentIndex, 1);
+                aceptedEnrollsList.value.push(student);
+            }
+        } else if (status === 'Rechazado') {
+            // Eliminar el estudiante de la lista de pendientes
+            pendingEnrollsList.value = pendingEnrollsList.value.filter(enroll => enroll.id !== enrollId);
+        }
+    } catch(err) {
+        console.error('Error:', err);
+        const errorAxios = err as AxiosError;
+        // Manejar el error en función del código de estado
+        if (errorAxios.response) {
+            error.value = 'Ocurrió un error inesperado. Intenta nuevamente.';
+        }
+    }
+};
 const getStatusColor = (status: string) => {
     return statusColors[status as keyof typeof statusColors] || '';  
 };
-
 const formatDateTime = (date: string) => {
   if (!date) return 'Indefinido';
   return new Date(date).toLocaleString('es-ES', {
@@ -121,6 +181,12 @@ const capitalizeFirstLetter = (str: string) => {
 
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+    <v-alert v-if="showAlert" :type="alertType"  variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
+        <template v-slot:prepend>
+        <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
+        </template>
+        <div>{{ snackbarMessage }}</div>
+    </v-alert>
     <v-card elevation="10">
         <!-- Tabs para detalle - solicitudes -->
         <v-card-item>
@@ -138,6 +204,7 @@ const capitalizeFirstLetter = (str: string) => {
                     </v-col>
                 </v-row>
                 <v-window v-model="tab" v-if="!error">
+                    <!-- Main information of the project -->
                     <v-window-item value="one">
                         <!-- Only view -->
                         <div v-if="!showEditForm" class="bg-light mt-6 pa-6 rounded-md">
@@ -202,7 +269,7 @@ const capitalizeFirstLetter = (str: string) => {
                         </div>
                         <!-- Boton para enviar solicitud *solo estudiantes -->
                         <div v-if="!showEditForm && userRole.toLowerCase() === 'estudiante'" class="d-flex ga-3 justify-end mt-6">
-                            <EnrollForm :project="projectDetail?.id"/>
+                            <EnrollForm :project="projectDetail?.id" @enrollSaved="handleEnrollSaved" @enrollDeleted="handleEnrollDeleted"/>
                         </div>
 
                         <!-- Editing form -->
@@ -214,14 +281,13 @@ const capitalizeFirstLetter = (str: string) => {
                             />
                         </div>
                     </v-window-item>
+                    <!-- Data table with the ACEPTED students  -->
                     <v-window-item value="two">
-                        <!-- <ProductReview /> -->
-                         <!-- <v-col cols="12">
-                            <UiParentCard title="Solicitudes recibidas">
-                                <v-data-table items-per-page="5" :headers="headers" :items="applicationsList" item-value="name"
-                                    v-model:sort-by="sortBy" class="border rounded-md datatabels">
-                                    <template v-slot:item="{ item }">
-                                        <tr>
+                        <v-col cols="12">
+                            <v-data-table items-per-page="5" :headers="headers" :items="aceptedEnrollsList" item-value="name"
+                                v-model:sort-by="sortBy" class="border rounded-md datatabels">
+                                <template v-slot:item="{ item }">
+                                    <tr>
                                         <td>
                                             <v-avatar size="32" class="text-h5 font-weight-medium"> 
                                                 <template v-if="item.user.profile?.picture">
@@ -233,19 +299,73 @@ const capitalizeFirstLetter = (str: string) => {
                                             </v-avatar>
                                         </td>
                                         <td>{{ item.name }}</td>
-                                        <td>{{ item.email }}</td>
-                                        <td>{{ item.phoneNumber }}</td>
                                         <td>{{ formatDateTime(item.dateCreated) }}</td>
-                                        <td>{{ item.interested }}</td>
-                                        <td>{{ item.proficiency }}</td>
-                                        </tr>
-                                    </template>
-                                </v-data-table>
-                            </UiParentCard>
-                         </v-col> -->
+                                        <td>{{ item.comments }}</td>
+                                        <td>
+                                            <!-- <div class="d-flex align-center">
+                                                <v-tooltip text="Aceptar">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn icon flat class="mx-2" color="success" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Aceptado')" v-bind="props">
+                                                            <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                                <v-tooltip text="Rechazar">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn icon flat class="mx-2" color="error" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Rechazado')" v-bind="props">
+                                                            <v-icon class="text-24">mdi-close</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                            </div> -->
+                                        </td>
+                                    </tr>
+                                </template>
+                            </v-data-table>
+                         </v-col>
                     </v-window-item>
+                    <!-- Data table with the PENDING students  -->
                     <v-window-item value="three" v-if="projectDetail?.professor.id === userId">
-
+                        <v-col cols="12">
+                            <v-data-table items-per-page="5" :headers="headers" :items="pendingEnrollsList" item-value="name"
+                                v-model:sort-by="sortBy" class="border rounded-md datatabels">
+                                <template v-slot:item="{ item }">
+                                    <tr>
+                                        <td>
+                                            <v-avatar size="32" class="text-h5 font-weight-medium"> 
+                                                <template v-if="item.user.profile?.picture">
+                                                    <img :src="item.user.profile?.picture" alt="icon" height="32" />
+                                                </template>
+                                                <template v-else>
+                                                    {{ item.name.charAt(0).toUpperCase() }}
+                                                </template>
+                                            </v-avatar>
+                                        </td>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ formatDateTime(item.dateCreated) }}</td>
+                                        <td>{{ item.comments }}</td>
+                                        <td>
+                                            <div class="d-flex align-center">
+                                                <v-tooltip text="Aceptar">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn icon flat class="mx-2" color="success" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Aceptado')" v-bind="props">
+                                                            <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                                <v-tooltip text="Rechazar">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn icon flat class="mx-2" color="error" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Rechazado')" v-bind="props">
+                                                            <v-icon class="text-24">mdi-close</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </v-data-table>
+                         </v-col>
                     </v-window-item>
                 </v-window>
             </div>

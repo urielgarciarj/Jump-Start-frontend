@@ -55,7 +55,6 @@ onMounted(async () => {
             vacantDetail.value = response.data;
             // Get applications related
             const _response = await axios.get(`http://localhost:3000/applications/list-by/vancant/${vacantId}`);
-            console.log('Get appl list', _response.data);
             applicationsList.value = _response.data;
         }
     } catch (err) {

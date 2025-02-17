@@ -1,20 +1,15 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
-import { ref, onMounted, computed } from 'vue';
+import { ref } from 'vue';
 import UserImage from '@/assets/images/profile/user-5.jpg';
-
-const authStore = useAuthStore();
-const userId = authStore.userId;
-const userRole = authStore.userRole;
 
 const props = defineProps({
     project: Object
 });
 
 const statusColors = {
-  "pendiente": "info",
+  "abierto": "info",
   "progreso": "primary",
-  "terminado": "success",
+  "completado": "success",
   "cancelado": "error"
 };
 
@@ -39,29 +34,6 @@ const categoryColors = {
 const showAlert = ref(false); // Controlar la visibilidad del snackbar
 const alertType = ref<'success' | 'error' | 'info' | 'warning'>('success');
 const snackbarMessage = ref(''); // Mensaje para mostrar en el snackbar
-
-// const applicationSent = (success: boolean) => {
-//     if (success) {
-//         snackbarMessage.value = '¡Tu solicitud fue enviada con éxito!';
-//         alertType.value = 'success';
-//     } else {
-//         snackbarMessage.value = 'Hubo un error al enviar la solicitud. Intenta nuevamente.';
-//         alertType.value = 'error';
-//     }
-//     showAlert.value = true;
-//     setTimeout(() => { showAlert.value = false; }, 5000);
-// };
-// const applicationDeleted = (success: boolean) => {
-//     if (success) {
-//         snackbarMessage.value = '¡Tu solicitud fue eliminada!';
-//         alertType.value = 'success';
-//     } else {
-//         snackbarMessage.value = 'Hubo un error al eliminar la solicitud. Intenta nuevamente.';
-//         alertType.value = 'error';
-//     }
-//     showAlert.value = true;
-//     setTimeout(() => { showAlert.value = false; }, 5000);
-// };
 
 const getStatusColor = (status: string) => {
     return statusColors[status as keyof typeof statusColors] || '';  
