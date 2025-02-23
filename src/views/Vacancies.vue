@@ -21,7 +21,6 @@ onMounted(async () => {
   try {
     const response = await axios.get('http://localhost:3000/vacancies/sorted/active');
     vacants.value = response.data;
-    //console.log('response data', response.data);
   } catch (error) {
     console.error('Error al obtener el listado de vacantes:', error);
   }

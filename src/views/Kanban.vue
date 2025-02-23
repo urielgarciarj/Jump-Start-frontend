@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import TaskCard from "@/components/projects/kanban/TaskCard.vue";
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 const userRole = authStore.userRole;
 
-const page = ref({ title: 'Sample Page' });
+const page = ref({ title: 'Kanban' });
 const breadcrumbs = ref([
     { text: 'Dashboard', disabled: false, href: '#' },
     { text: 'Kanban', disabled: true, href: '#' }
@@ -22,5 +23,6 @@ const breadcrumbs = ref([
             </v-btn>
         </v-col>
     </v-row>
+    <TaskCard />
 </template>
 

@@ -1,0 +1,56 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const props = defineProps({
+    column: Object,
+});
+console.log('column received', props.column)
+// common components
+const dialog = ref(false);
+//const store = useTaskStore();
+const title = ref('');
+const subtitle = ref('');
+const category = ref('Mobile');
+const categorybg = ref('primary')
+const columnId = ref(props.column?.id)
+
+function addItemAndClear() {
+    
+    title.value = '',
+    subtitle.value = '',
+    category.value = 'Mobile',
+    categorybg.value = 'primary'
+}
+
+const capitalizeFirstLetter = (str: string) => {
+    if(!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+</script>
+
+<template>
+    <v-card elevation="10" :class="'bg-' + column?.cardbg">
+        <div class="pa-5">
+            <div class="d-flex align-center justify-space-between">
+                <h6 class="text-h6 font-weight-semibold">{{ capitalizeFirstLetter(column?.status) }}</h6>
+            </div>
+            <div v-for="project in column?.projects" :key="project.id" :project="project" class="mt-3 cursor-move">
+                <v-card elevation="10" class="mb-5">
+                    <div class="d-flex align-center justify-space-between px-4 py-2 pr-3">
+                        <h6 class="text-h6 my-2 custom-text-primary">
+                            <RouterLink class="text-decoration-none color-inherits custom-title" 
+                                        :to="`/project/details/${project?.id}`" >
+                                        {{ project?.name }}
+                            </RouterLink>
+                        </h6>
+                    </div>
+                    <div class="d-flex align-center justify-space-between px-4 py-2">
+                        <v-text>
+                            {{ project?.category }}
+                        </v-text>
+                    </div>
+                </v-card>
+            </div>
+        </div>
+    </v-card>
+</template>
