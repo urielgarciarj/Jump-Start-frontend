@@ -20,6 +20,7 @@ const searchQuery = ref();
 onMounted(async () => {
   try {
     const response = await axios.get('http://localhost:3000/projects/list');
+    console.log('response', response.data)
     projects.value = response.data;
   } catch (error) {
     console.error('Error al obtener el listado de proyectos:', error);
@@ -51,7 +52,7 @@ const filteredProjects = computed(() => {
         </v-col>
     </v-row>
     <v-row>
-        <template v-for="(project, i) in filteredProjects" :key="project.id">
+        <template v-for="project in filteredProjects" :key="project.id">
             <ProjectContent :project="project"/>
         </template>
     </v-row>

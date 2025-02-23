@@ -28,7 +28,12 @@ const project = ref({
     idTeacher: userId
 });
 
-const statusesOptions = ["abierto", "progreso", "completado", "cancelado"];
+const statusesOptions = [
+  { text: 'Abierto', value: 'abierto' },
+  { text: 'Progreso', value: 'progreso' },
+  { text: 'Completado', value: 'completado' },
+  { text: 'Cancelado', value: 'cancelado' }
+];
 const categoryOptions = [
     "Proyectos de Investigación", "Proyectos de Creación", "Proyectos de Innovación",
     "Proyectos de Comunicación",  "Proyectos de Servicio a la Comunidad", "Proyectos de Emprendimiento",
@@ -93,7 +98,7 @@ const submitProject = async () => {
                         </v-col>
                         <v-col cols="12" md="3">
                             <v-label class="font-weight-semibold pb-2">Estado</v-label>
-                            <v-select v-model="project.status" :items="statusesOptions" :rules="notEmptyRule" required />
+                            <v-select v-model="project.status" :items="statusesOptions" item-title="text" item-value="value" :rules="notEmptyRule" required />
                         </v-col>
                         
                         <v-col cols="12">

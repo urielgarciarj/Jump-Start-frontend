@@ -87,12 +87,12 @@ const capitalizeFirstLetter = (str: string) => {
                 </div>
                 <div class="d-flex align-center">
                     <v-avatar size="40" color="secondary" class="mx-6">
-                        <img :src="project?.professor.profile.picture || UserImage" alt="icon" height="40" />
+                        <img :src="project?.professor.profile?.picture || UserImage" alt="icon" height="40" />
                     </v-avatar>
                     <div>
                         <span class="text-subtitle ml-2">{{ project?.professor.name }} {{ project?.professor.lastName }}</span>
                         <br />
-                        <span class="text-subtitle-2 ml-2 textSecondary">{{ project?.professor.profile.university }}</span>
+                        <span class="text-subtitle-2 ml-2 textSecondary">{{ project?.professor.profile?.university }}</span>
                     </div>
                 </div>
                 <v-card-item class="px-6 pt-4">
