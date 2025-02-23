@@ -50,8 +50,6 @@ const headers : any = ref([
 onMounted(async () => {
     try {
         const response = await axios.get(`http://localhost:3000/projects/project/detail/${projectId}`);
-        //console.log('response data', response.data)
-        
         if (!response.data) { // If no response data, throw error
             error.value = 'Oferta laboral no encontrada.';
         } else { // The vacant belong to the currUser, proceed to get applications 
@@ -60,7 +58,6 @@ onMounted(async () => {
             const _response = await axios.get(`http://localhost:3000/enrolls/list-by/project/${projectId}`);
             pendingEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Pendiente');
             aceptedEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Aceptado');
-            //applicationsList.value = _response.data;
         }
     } catch (err) {
         console.error('Error:', err);
@@ -100,9 +97,8 @@ const handleDeleteProject = () => {
 };
 const confirmDelete = async () => {
     try {
-        console.log('se confirmo que se elimina este proyecto');
-        // await axios.delete(`http://localhost:3000/vacancies/delete/${vacantId}`);
-        // router.push('/vacancies/list-all');
+        await axios.delete(`http://localhost:3000/projects/delete/${projectId}`);
+        router.push('/projects/list-all');
     } catch (err) {
         console.log('Error', err);
     }
