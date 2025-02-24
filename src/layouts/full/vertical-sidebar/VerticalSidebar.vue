@@ -11,6 +11,8 @@ import { useRoute, useRouter } from 'vue-router';
 // MiniSidebar Icons
 import MiniSideIcons from './MinIconItems';
 
+import LogoImage from '@/assets/images/logos/JumpStart.png';
+
 const route = useRoute();
 
 const findTitleByPath = (items: any, path: any) => {
@@ -98,7 +100,8 @@ const sidebarMenu = shallowRef(sidebarItems);
     >
         <!---Logo part -->
         <div class="pa-4 pb-0">
-            <Logo />
+            <!-- <Logo /> -->
+            <img :src="LogoImage" width="180" height="50" />
         </div>
 
         <!-- ---------------------------------------------- -->
