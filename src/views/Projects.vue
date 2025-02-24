@@ -1,37 +1,38 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import VacantContent from '@/components/vacancies/VacantContent.vue';
+import ProjectContent from '@/components/projects/ProjectContent.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 const userRole = authStore.userRole;
 
-const page = ref({ title: 'Ofertas Laborales' });
+const page = ref({ title: 'Proyectos Académicos' });
 const breadcrumbs = ref([
     { text: 'Dashboard', disabled: false, href: '#' },
-    { text: 'Vacantes', disabled: true, href: '#' }
+    { text: 'Proyectos', disabled: true, href: '#' }
 ]);
 
-const vacants = ref<any[]>([]);
+const projects = ref<any[]>([]);
 const searchQuery = ref();
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:3000/vacancies/sorted/active');
-    vacants.value = response.data;
+    const response = await axios.get('http://localhost:3000/projects/list');
+    console.log('response', response.data)
+    projects.value = response.data;
   } catch (error) {
-    console.error('Error al obtener el listado de vacantes:', error);
+    console.error('Error al obtener el listado de proyectos:', error);
   }
 });
 
-const filteredVacants = computed(() => {
+const filteredProjects = computed(() => {
   if (!searchQuery.value) {
-    return vacants.value;
+    return projects.value;
   }
   const query = searchQuery.value.toLowerCase();
-  return vacants.value.filter(vacant => vacant.name.toLowerCase().includes(query) || vacant.company.toLowerCase().includes(query));
+  return projects.value.filter(project => project.name.toLowerCase().includes(query) || project.category.toLowerCase().includes(query));
 });
 </script>
 
@@ -49,23 +50,10 @@ const filteredVacants = computed(() => {
                 color="primary"
             ></v-text-field>
         </v-col>
-        <v-col v-if="userRole.toLowerCase() === 'reclutador'" cols="12" sm="6" class="d-flex justify-end">
-            <v-btn color="primary" flat to="/new/job-opportunity">
-                Nueva Oferta Laboral
-            </v-btn>
-        </v-col>
     </v-row>
     <v-row>
-        <v-col v-for="vacant in filteredVacants" :key="vacant.id" cols="12" md="12">
-            <VacantContent :vacant="vacant"/>
-        </v-col>
+        <template v-for="project in filteredProjects" :key="project.id">
+            <ProjectContent :project="project"/>
+        </template>
     </v-row>
 </template>
-
-<style scoped lang="scss">
-@media (max-width: 1279px) {
-    .v-card {
-        position: unset;
-    }
-}
-</style>
