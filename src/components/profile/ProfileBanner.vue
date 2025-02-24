@@ -96,23 +96,6 @@ onMounted(() => {
             <v-row class="mt-1">
                 <v-col cols="12" lg="4" sm="12" class="order-sm-second">
                     <div class="px-4 py-1">
-                        <v-row class="justify-center">
-                            <v-col cols="4" class="text-center">
-                                <FileDescriptionIcon size="20" />
-                                <h4 class="text-h4">938</h4>
-                                <h6 class="text-h6 font-weight-regular">Posts</h6>
-                            </v-col>
-                            <v-col cols="4" class="text-center">
-                                <UserCircleIcon size="20" />
-                                <h4 class="text-h4">3,586</h4>
-                                <h6 class="text-h6 font-weight-regular">Seguidores</h6>
-                            </v-col>
-                            <v-col cols="4" class="text-center">
-                                <UserCheckIcon size="20" />
-                                <h4 class="text-h4">2,659</h4>
-                                <h6 class="text-h6 font-weight-regular">Siguiendo</h6>
-                            </v-col>
-                        </v-row>
                     </div>
                 </v-col>
                 <v-col cols="12" lg="4" sm="12" class="d-flex justify-center order-sml-first">

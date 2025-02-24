@@ -9,11 +9,6 @@ const MiniSideIcons: minisidebar[] = [
         icon: 'layers-line-duotone',
         tooltip:'Dashboards',
         id: 1
-    },
-    {
-        icon:'mirror-left-line-duotone',
-        tooltip:'Others',
-        id: 2
     }
 ]
 
