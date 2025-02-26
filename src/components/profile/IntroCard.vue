@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, shallowRef, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import axios from 'axios';
-import { useAuthStore } from '@/stores/auth';
 import { PhoneIcon } from 'vue-tabler-icons';
+import { useAuthStore } from '@/stores/auth';
 
+const route = useRoute();
 const authStore = useAuthStore();
-const userId = authStore.userId;
+const loggedInUserId = authStore.userId;
+const userId = route.params.userId || loggedInUserId;
 
 // Getting email of the user
 const email = ref('');
@@ -37,19 +40,19 @@ const fetchProfileData = async () => {
 };
 
 const saveChanges = async () => {
-  try {
-    console.log(profileUniversity.value); 
-    await axios.patch(`http://localhost:3000/profiles/upsert/${userId}`, {
-      university: profileUniversity.value,
-      email: email.value,
-      phone: profilePhone.value,
-      location: profileLocation.value,
-    });
-    alert('Cambiosd guardados exitosamente!');
-    dialog.value = false; // Close the dialog after saving
-  } catch (error) {
-    console.error('Error saving changes:', error);
-  }
+    try {
+        console.log(profileUniversity.value);
+        await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId}`, {
+            university: profileUniversity.value,
+            email: email.value,
+            phone: profilePhone.value,
+            location: profileLocation.value,
+        });
+        alert('Cambios guardados exitosamente!');
+        dialog.value = false; // Close the dialog after saving
+    } catch (error) {
+        console.error('Error saving changes:', error);
+    }
 };
 
 const description = ref('None');
