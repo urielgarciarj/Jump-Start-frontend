@@ -16,12 +16,15 @@ const email = ref('');
 const profileLocation = ref('');
 const profileUniversity = ref('');
 const profilePhone = ref('');
+const profileId = ref('');
 
 const fetchUserData = async () => {
     try {
         const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
         const userData = response.data;
         email.value = userData.email;
+        profileId.value = userData.profile.id;
+        await fetchProfileData(); // Fetch profile data after fetching user data
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
@@ -29,7 +32,7 @@ const fetchUserData = async () => {
 
 const fetchProfileData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/profiles/${userId}`);
+        const response = await axios.get(`http://localhost:3000/profiles/${profileId.value}`);
         const profileData = response.data;
         profileLocation.value = profileData.location;
         profileUniversity.value = profileData.university;
@@ -41,7 +44,6 @@ const fetchProfileData = async () => {
 
 const saveChanges = async () => {
     try {
-        console.log(profileUniversity.value);
         await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId}`, {
             university: profileUniversity.value,
             email: email.value,
@@ -60,9 +62,8 @@ const valid = ref(true);
 const dialog = ref(false);
 const checkbox1 = ref(true);
 
-onMounted(() => {
-    fetchUserData();
-    fetchProfileData();
+onMounted(async () => {
+    await fetchUserData(); // Fetch user data when the component is mounted
 });
 
 function close() {
