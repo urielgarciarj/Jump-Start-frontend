@@ -136,7 +136,7 @@ const aceptOrRejectStudent = (enrollId: string, status: string) => {
     try {
         if (!enrollId || !status) return;
         // Actualizar desde backend y db
-        const response = axios.put(`http://localhost:3000/enrolls/update-status/${enrollId}/${status}`);
+        axios.put(`http://localhost:3000/enrolls/update-status/${enrollId}/${status}`);
         // Update component
         if (status === 'Aceptado') {
             // Buscar el estudiante en la lista de pendientes
@@ -264,7 +264,7 @@ const capitalizeFirstLetter = (str: string) => {
                             >
                         </div>
                         <!-- Boton para enviar solicitud *solo estudiantes -->
-                        <div v-if="!showEditForm && userRole.toLowerCase() === 'estudiante'" class="d-flex ga-3 justify-end mt-6">
+                        <div v-if="!showEditForm && userRole.toLowerCase() === 'estudiante' && projectDetail?.status === 'abierto'" class="d-flex ga-3 justify-end mt-6">
                             <EnrollForm :project="projectDetail?.id" @enrollSaved="handleEnrollSaved" @enrollDeleted="handleEnrollDeleted"/>
                         </div>
 
@@ -298,14 +298,7 @@ const capitalizeFirstLetter = (str: string) => {
                                         <td>{{ formatDateTime(item.dateCreated) }}</td>
                                         <td>{{ item.comments }}</td>
                                         <td>
-                                            <!-- <div class="d-flex align-center">
-                                                <v-tooltip text="Aceptar">
-                                                    <template v-slot:activator="{ props }">
-                                                        <v-btn icon flat class="mx-2" color="success" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Aceptado')" v-bind="props">
-                                                            <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
-                                                        </v-btn>
-                                                    </template>
-                                                </v-tooltip>
+                                            <div class="d-flex align-center">
                                                 <v-tooltip text="Rechazar">
                                                     <template v-slot:activator="{ props }">
                                                         <v-btn icon flat class="mx-2" color="error" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Rechazado')" v-bind="props">
@@ -313,7 +306,7 @@ const capitalizeFirstLetter = (str: string) => {
                                                         </v-btn>
                                                     </template>
                                                 </v-tooltip>
-                                            </div> -->
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>

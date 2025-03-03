@@ -1,11 +1,17 @@
 <script setup>
 import { Icon } from '@iconify/vue';
+import { useAuthStore } from '@/stores/auth';
+
 const props = defineProps({ item: Object, level: Number });
+
+const authStore = useAuthStore();
+const userRole = authStore.userRole;
 </script>
 
 <template>
     <!---Single Item-->
-    <v-list-item
+    <v-list-item 
+        v-if="userRole.toLowerCase() === item.rolesAllowed || !item.rolesAllowed"
         :to="item.type === 'external' ? '' : item.to"
         :href="item.type === 'external' ? item.to : ''"
         rounded
