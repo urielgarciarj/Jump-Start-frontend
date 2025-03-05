@@ -98,9 +98,9 @@ onMounted(() => {
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
                                 <img :src="profilePicture || UserImage" alt="Mathew" width="100" @click="triggerFileInput" />
-                                <Icon icon="solar:pen-linear" class="edit-icon" height="25" />
+                                <Icon v-if="loggedInUserId === userId" icon="solar:pen-linear" class="edit-icon" height="25" />
                             </v-avatar>
-                            <input type="file" ref="fileInput" @change="onFileChange" style="display: none" />
+                            <input v-if="loggedInUserId === userId" type="file" ref="fileInput" @change="onFileChange" style="display: none" />
                         </div>
                         <h5 class="text-h5 mt-3">{{ fullName }}</h5>
                         <span class="textSecondary font-weight-regular">{{ role }}</span>

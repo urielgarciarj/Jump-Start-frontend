@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import axios from 'axios';
@@ -8,8 +8,8 @@ import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
 const authStore = useAuthStore();
-const loggedInUserId = authStore.userId;
-const userId = route.params.userId || loggedInUserId;
+const loggedInUserId = ref(authStore.userId);
+const userId = ref(route.params.userId || loggedInUserId.value);
 
 // Getting email of the user
 const email = ref('');
@@ -20,7 +20,7 @@ const profileId = ref('');
 
 const fetchUserData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/user/${userId.value}`);
         const userData = response.data;
         email.value = userData.email;
         profileId.value = userData.profile.id;
@@ -44,7 +44,7 @@ const fetchProfileData = async () => {
 
 const saveChanges = async () => {
     try {
-        await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId}`, {
+        await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId.value}`, {
             university: profileUniversity.value,
             email: email.value,
             phone: profilePhone.value,
@@ -66,6 +66,11 @@ onMounted(async () => {
     await fetchUserData(); // Fetch user data when the component is mounted
 });
 
+watch(() => route.params.userId, async (newUserId) => {
+    userId.value = newUserId || loggedInUserId.value;
+    await fetchUserData();
+});
+
 function close() {
     dialog.value = false;
 }
@@ -84,7 +89,7 @@ function save() {
                         <h4 class="text-h4">Introduction</h4>
                         <v-dialog v-model="dialog" max-width="500">
                             <template v-slot:activator="{ props }">
-                                <v-btn color="lightsuccess" v-bind="props" size="29">
+                                <v-btn v-if="loggedInUserId === userId" color="lightsuccess" v-bind="props" size="29">
                                     <Icon icon="solar:pen-linear" class="text-success" height="15" />
                                     <v-tooltip location="bottom">Editar</v-tooltip>
                                 </v-btn>
