@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { HeartIcon, UserCircleIcon, UsersIcon, ArchiveIcon } from 'vue-tabler-icons';
 import profileBg from '@/assets/images/backgrounds/profilebg.jpg';
 import UserImage from '@/assets/images/profile/user-5.jpg';
@@ -7,12 +8,14 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import { Icon } from '@iconify/vue';
 
+const route = useRoute();
 const authStore = useAuthStore();
-const userId = authStore.userId;
+const loggedInUserId = authStore.userId;
+const userId = route.params.userId || loggedInUserId;
 
 const tab = ref(null);
 const items = shallowRef([
-    { tab: 'Profile', icon: UserCircleIcon, href: '/profile' },
+    { tab: 'Profile', icon: UserCircleIcon, href: `/profile/${userId}` },
     { tab: 'Mi CV', icon: HeartIcon, href: '/cv' },
     { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects/' + userId },
     { tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId },
@@ -55,7 +58,7 @@ const onFileChange = async (event: Event) => {
             formData.append('file', file);
 
             try {
-                const response = await axios.post(`http://localhost:3000/profiles/upload-profile-picture/${userId}`, formData, {
+                const response = await axios.post(`http://localhost:3000/profiles/upload-profile-picture/${loggedInUserId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -81,14 +84,6 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.adjusted-image {
-    max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
-    max-height: 100%; /* Limita la altura máxima de la imagen */
-    object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
-}
-</style>
-
 <template>
     <v-card elevation="10" class="overflow-hidden">
         <img :src="profileBg" alt="profile" class="w-100" height="160px" />
@@ -103,9 +98,9 @@ onMounted(() => {
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
                                 <img :src="profilePicture || UserImage" alt="Mathew" width="100" @click="triggerFileInput" />
-                                <Icon icon="solar:pen-linear" class="edit-icon" height="25" />
+                                <Icon v-if="loggedInUserId === userId" icon="solar:pen-linear" class="edit-icon" height="25" />
                             </v-avatar>
-                            <input type="file" ref="fileInput" @change="onFileChange" style="display: none" />
+                            <input v-if="loggedInUserId === userId" type="file" ref="fileInput" @change="onFileChange" style="display: none" />
                         </div>
                         <h5 class="text-h5 mt-3">{{ fullName }}</h5>
                         <span class="textSecondary font-weight-regular">{{ role }}</span>
@@ -139,7 +134,8 @@ onMounted(() => {
         </div>
     </v-card>
 </template>
-<style lang="scss">
+
+<style scoped>
 .avatar-border {
     background-image: linear-gradient(rgb(80, 178, 252), rgb(244, 76, 102));
     border-radius: 50%;

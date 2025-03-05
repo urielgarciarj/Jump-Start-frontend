@@ -52,7 +52,7 @@ const MainRoutes = {
         },
         {
             name: 'my Profile',
-            path: '/profile',
+            path: '/profile/:userId?',
             component: () => import('@/views/Profilepage.vue')
         },
         {

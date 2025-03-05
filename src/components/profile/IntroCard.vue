@@ -1,24 +1,30 @@
 <script setup lang="ts">
-import { ref, shallowRef, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import axios from 'axios';
-import { useAuthStore } from '@/stores/auth';
 import { PhoneIcon } from 'vue-tabler-icons';
+import { useAuthStore } from '@/stores/auth';
 
+const route = useRoute();
 const authStore = useAuthStore();
-const userId = authStore.userId;
+const loggedInUserId = ref(authStore.userId);
+const userId = ref(route.params.userId || loggedInUserId.value);
 
 // Getting email of the user
 const email = ref('');
 const profileLocation = ref('');
 const profileUniversity = ref('');
 const profilePhone = ref('');
+const profileId = ref('');
 
 const fetchUserData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/user/${userId.value}`);
         const userData = response.data;
         email.value = userData.email;
+        profileId.value = userData.profile.id;
+        await fetchProfileData(); // Fetch profile data after fetching user data
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
@@ -26,7 +32,7 @@ const fetchUserData = async () => {
 
 const fetchProfileData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/profiles/${userId}`);
+        const response = await axios.get(`http://localhost:3000/profiles/${profileId.value}`);
         const profileData = response.data;
         profileLocation.value = profileData.location;
         profileUniversity.value = profileData.university;
@@ -37,19 +43,18 @@ const fetchProfileData = async () => {
 };
 
 const saveChanges = async () => {
-  try {
-    console.log(profileUniversity.value); 
-    await axios.patch(`http://localhost:3000/profiles/upsert/${userId}`, {
-      university: profileUniversity.value,
-      email: email.value,
-      phone: profilePhone.value,
-      location: profileLocation.value,
-    });
-    alert('Cambiosd guardados exitosamente!');
-    dialog.value = false; // Close the dialog after saving
-  } catch (error) {
-    console.error('Error saving changes:', error);
-  }
+    try {
+        await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId.value}`, {
+            university: profileUniversity.value,
+            email: email.value,
+            phone: profilePhone.value,
+            location: profileLocation.value,
+        });
+        alert('Cambios guardados exitosamente!');
+        dialog.value = false; // Close the dialog after saving
+    } catch (error) {
+        console.error('Error saving changes:', error);
+    }
 };
 
 const description = ref('None');
@@ -57,9 +62,13 @@ const valid = ref(true);
 const dialog = ref(false);
 const checkbox1 = ref(true);
 
-onMounted(() => {
-    fetchUserData();
-    fetchProfileData();
+onMounted(async () => {
+    await fetchUserData(); // Fetch user data when the component is mounted
+});
+
+watch(() => route.params.userId, async (newUserId) => {
+    userId.value = newUserId || loggedInUserId.value;
+    await fetchUserData();
 });
 
 function close() {
@@ -80,7 +89,7 @@ function save() {
                         <h4 class="text-h4">Introduction</h4>
                         <v-dialog v-model="dialog" max-width="500">
                             <template v-slot:activator="{ props }">
-                                <v-btn color="lightsuccess" v-bind="props" size="29">
+                                <v-btn v-if="loggedInUserId === userId" color="lightsuccess" v-bind="props" size="29">
                                     <Icon icon="solar:pen-linear" class="text-success" height="15" />
                                     <v-tooltip location="bottom">Editar</v-tooltip>
                                 </v-btn>

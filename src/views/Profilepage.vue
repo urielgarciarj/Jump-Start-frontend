@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import { useAuthStore } from '@/stores/auth';
 import PostItem from '@/components/posts/PostItem.vue';
 import axios from 'axios';
 
+const route = useRoute();
 const authStore = useAuthStore();
-const userId = authStore.userId;
+const loggedInUserId = authStore.userId;
+const userId = route.params.userId || loggedInUserId;
 
 // components
 import ProfileBanner from '@/components/profile/ProfileBanner.vue';
@@ -31,6 +34,8 @@ const breadcrumbs = ref([
 
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
+    console.log('userId:', userId);
+    console.log('loggedInUserId:', loggedInUserId);
     try {
         const response = await axios.get('http://localhost:3000/posts/list/user/' + userId);
         //console.log(response.data);
