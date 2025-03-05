@@ -9,6 +9,7 @@ const userId = authStore.userId;
 const props = defineProps({
   project: Number, // ID Proyecto solicitado
 });
+
 const currUser = ref<any>(undefined);
 const enrollID = ref<any>(undefined); // save enroll ID if exists
 const emit = defineEmits<{
