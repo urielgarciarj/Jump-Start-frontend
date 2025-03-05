@@ -1,53 +1,79 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import ProfileBanner from '@/components/profile/ProfileBanner.vue';
+import ProjectContent from '@/components/projects/ProjectContent.vue';
 import { useAuthStore } from '@/stores/auth';
-import PostItem from '@/components/posts/PostItem.vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 
 const authStore = useAuthStore();
 const userId = authStore.userId;
 
-// components
-import ProfileBanner from '@/components/profile/ProfileBanner.vue';
-import IntroCard from '@/components/profile/IntroCard.vue';
-
+const route = useRoute();
+const usuarioId = route.params.id;
 // Definir la referencia para los posts
-const posts = ref<any[]>([]);
-
+const projectsArray = ref<any[]>([]);
+const searchQuery = ref();
+const statusesOptions = [
+  { text: 'Abierto', value: 'abierto' },
+  { text: 'Progreso', value: 'progreso' },
+  { text: 'Completado', value: 'completado' },
+  { text: 'Cancelado', value: 'cancelado' }
+];
 const page = ref({ title: 'Perfil de usuario' });
 const breadcrumbs = ref([
-    {
-        text: 'Dashboard',
-        disabled: false,
-        href: '/'
-    },
-    {
-        text: 'Perfil de Usuario',
-        disabled: true,
-        href: '#'
-    }
+    { text: 'Dashboard', disabled: false, href: '/' },
+    { text: 'Perfil de Usuario', disabled: true, href: '#' }
 ]);
 
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:3000/posts/list/user/' + userId);
-    console.log(response.data);
-    posts.value = response.data;
+    const getUser = await axios.get('http://localhost:3000/users/user/' + usuarioId);
+    console.log('getUser', getUser.data)
+    if (getUser.data && getUser.data.role.toLowerCase() === 'estudiante') {
+      const response = await axios.get('http://localhost:3000/enrolls/list-projects/by-user-enrolled/' + usuarioId);
+      projectsArray.value = response.data;     
+    }
+    if (getUser.data && getUser.data.role.toLowerCase() === 'docente') {
+      const response = await axios.get('http://localhost:3000/projects/list/' + usuarioId);
+      console.log('docente', response)
+      projectsArray.value = response.data;  
+    }
   } catch (error) {
-    console.error('Error al obtener los posts:', error);
+    console.error('Error al obtener vacantes:', error);
   }
 });
 
-// Elimina el post del array filtrando el que se ha eliminado
-const handlePostDelete = (deletedPostId: string) => {
-  posts.value = posts.value.filter(post => post.id !== deletedPostId);
-};
+const filteredProjects = computed(() => {
+  if (!searchQuery.value) {
+    return projectsArray.value;
+  }
+  const query = searchQuery.value.toLowerCase();
+  return projectsArray.value.filter(project => project.status.toLowerCase().includes(query));
+});
 
 </script>
 
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
     <ProfileBanner />
+    <v-row class="d-flex my-5 justify-end">
+        <v-col cols="12" sm="6" class="d-flex justify-end">
+          <v-select
+            v-model="searchQuery"
+            :items="['Abierto', 'Progreso', 'Completado', 'Cancelado']"
+            label="Filtrar por estado"
+            variant="outlined"
+            density="compact"
+            color="primary"
+          ></v-select>
+        </v-col>
+    </v-row>
+    <v-row>
+        <template v-for="project in filteredProjects" :key="project.id">
+            <ProjectContent :project="project"/>
+        </template>
+    </v-row>
 </template>

@@ -17,8 +17,8 @@ const tab = ref(null);
 const items = shallowRef([
     { tab: 'Profile', icon: UserCircleIcon, href: `/profile/${userId}` },
     { tab: 'Mi CV', icon: HeartIcon, href: '/cv' },
-    { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects' },
-    { tab: 'Ofertas laborales', icon: ArchiveIcon, href: `/userapplications/${userId}` },
+    { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects/' + userId },
+    { tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId },
 ]);
 
 // Getting full name of the user

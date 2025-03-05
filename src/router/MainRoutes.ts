@@ -62,7 +62,7 @@ const MainRoutes = {
         },
         {
             name: 'My projects',
-            path: '/myprojects',
+            path: '/myprojects/:id',
             component: () => import('@/views/Myprojectspage.vue')
         },
         {
