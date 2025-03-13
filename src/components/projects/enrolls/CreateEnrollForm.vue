@@ -35,9 +35,9 @@ const notEmptyRule = [ // Reglas de validación
 ];
 
 // usamos watch en lugar de onMounted para esperar los props
-watch([() => authStore.userId, () => props.project], async ([userId, project_id]) => {
+onMounted(async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/enrolls/find-by/user-project/${userId}/${project_id}`);
+    const response = await axios.get(`http://localhost:3000/enrolls/find-by/user-project/${userId}/${props.project}`);
     if (response.data) { 
         hasSubmitted.value = true;
         enroll.value = { ...enroll.value, ...response.data };
@@ -45,7 +45,6 @@ watch([() => authStore.userId, () => props.project], async ([userId, project_id]
     }
     else {
         hasSubmitted.value = false;
-        enroll.value.projectId = project_id;
         const userResponse = await axios.get(`http://localhost:3000/users/user/${userId}`);
         currUser.value = userResponse.data;
         if (currUser.value) {
