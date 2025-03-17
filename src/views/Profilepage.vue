@@ -9,6 +9,7 @@ import axios from 'axios';
 // Components
 import ProfileBanner from '@/components/profile/ProfileBanner.vue';
 import IntroCard from '@/components/profile/IntroCard.vue';
+import SkillsCard from '@/components/profile/SkillsCard.vue';
 
 // Composables y stores
 const route = useRoute();
@@ -104,11 +105,21 @@ onMounted(async () => {
     <v-row class="mt-4">
         <!-- Columna lateral con información de perfil -->
         <v-col cols="12" lg="4" md="4">
+            <!-- Organizamos IntroCard y SkillsCard verticalmente en la misma columna -->
             <IntroCard 
                 :isOwnProfile="isOwnProfile" 
                 :canEdit="canEdit"
                 :isEditing="isEditing"
                 @cancelEdit="isEditing = false"
+                class="mb-4"
+            />
+            
+            <SkillsCard 
+                :isOwnProfile="isOwnProfile" 
+                :canEdit="canEdit"
+                :isEditing="isEditing"
+                @cancelEdit="isEditing = false"
+                class="mb-4"
             />
         </v-col>
         
