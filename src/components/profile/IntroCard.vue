@@ -13,6 +13,7 @@ const userId = ref(route.params.userId || loggedInUserId.value);
 
 // Getting email of the user
 const email = ref('');
+const profileIntroduction = ref('');
 const profileLocation = ref('');
 const profileUniversity = ref('');
 const profilePhone = ref('');
@@ -34,6 +35,7 @@ const fetchProfileData = async () => {
     try {
         const response = await axios.get(`http://localhost:3000/profiles/${profileId.value}`);
         const profileData = response.data;
+        profileIntroduction.value = profileData.aboutMe;
         profileLocation.value = profileData.location;
         profileUniversity.value = profileData.university;
         profilePhone.value = profileData.phone;
@@ -45,6 +47,7 @@ const fetchProfileData = async () => {
 const saveChanges = async () => {
     try {
         await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId.value}`, {
+            aboutMe: profileIntroduction.value,
             university: profileUniversity.value,
             email: email.value,
             phone: profilePhone.value,
@@ -86,7 +89,7 @@ function save() {
             <v-card variant="outlined">
                 <v-card-item class="d-flex justify-space-between align-center">
                     <div class="d-flex gap-3 mb-3">
-                        <h4 class="text-h4">Introduction</h4>
+                        <h4 class="text-h4">Información personal</h4>
                         <v-dialog v-model="dialog" max-width="500">
                             <template v-slot:activator="{ props }">
                                 <v-btn v-if="loggedInUserId === userId" color="lightsuccess" v-bind="props" size="29">
@@ -103,13 +106,15 @@ function save() {
                                     <v-form ref="form" v-model="valid" lazy-validation>
                                         <v-row>
                                             <v-col cols="12" lg="12">
+                                                <v-label class="mb-2 font-weight-medium mt-5">Mi introducción</v-label>
+                                                <v-textarea v-model="profileIntroduction" persistent-hint variant="outlined" hide-details placeholder="Escribe tu introducción" color="primary" required></v-textarea>
                                                 <v-label class="mb-2 font-weight-medium mt-5">Educacion Universitaria</v-label>
                                                 <v-text-field
                                                     v-model="profileUniversity"
                                                     persistent-hint
                                                     variant="outlined"
                                                     hide-details
-                                                    placeholder="Escribe tu correo electronico"
+                                                    placeholder="Escribe tu escuela universitaria"
                                                     color="primary"
                                                 ></v-text-field>
                                                 <v-label class="mb-2 font-weight-medium mt-5">Email</v-label>
@@ -139,15 +144,6 @@ function save() {
                                                     placeholder="Ubicacion"
                                                     color="primary"
                                                 ></v-text-field>
-                                                <div class="my-3">
-                                                    <v-checkbox
-                                                        density="compact"
-                                                        v-model="checkbox1"
-                                                        hide-details
-                                                        color="primary"
-                                                        label="Check Me Out!"
-                                                    ></v-checkbox>
-                                                </div>
                                             </v-col>
                                         </v-row>
                                     </v-form>
@@ -162,8 +158,7 @@ function save() {
                         </v-dialog>
                     </div>
                     <p class="my-3 text-subtitle-1 lh-md textSecondary mb-6">
-                        Hello, I am David McMichael. I love making websites and graphics. Lorem ipsum dolor sit amet, consectetur adipiscing
-                        elit.
+                        {{ profileIntroduction || 'Aun no agregado' }}
                     </p>
                     <div class="d-flex gap-3 mb-5">
                         <BriefcaseIcon size="21" />
