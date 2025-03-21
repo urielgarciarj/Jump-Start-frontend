@@ -216,7 +216,7 @@ onMounted(async () => {
             <v-card variant="outlined">
                 <v-card-item>
                     <div class="d-flex justify-space-between align-center mb-4">
-                        <h4 class="text-h4">Skills</h4>
+                        <h4 class="text-h4">Habilidades</h4>
                         <v-dialog v-model="dialog" max-width="600">
                             <template v-slot:activator="{ props }">
                                 <v-btn v-if="loggedInUserId === userId" color="lightsuccess" v-bind="props" size="29">

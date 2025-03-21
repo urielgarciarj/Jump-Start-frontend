@@ -179,15 +179,6 @@ onMounted(async () => {
                     <p class="text-body-2 text-medium-emphasis">
                         {{ isOwnProfile ? 'Aún no has creado ninguna publicación.' : 'Este usuario aún no ha creado publicaciones.' }}
                     </p>
-                    <v-btn
-                        v-if="canEdit"
-                        color="primary"
-                        variant="tonal"
-                        to="/crear-publicacion"
-                        class="mt-2"
-                    >
-                        Crear mi primera publicación
-                    </v-btn>
                 </v-card>
                 
                 <!-- Grid de posts -->

@@ -89,7 +89,7 @@ function save() {
             <v-card variant="outlined">
                 <v-card-item class="d-flex justify-space-between align-center">
                     <div class="d-flex gap-3 mb-3">
-                        <h4 class="text-h4">Introduction</h4>
+                        <h4 class="text-h4">Información personal</h4>
                         <v-dialog v-model="dialog" max-width="500">
                             <template v-slot:activator="{ props }">
                                 <v-btn v-if="loggedInUserId === userId" color="lightsuccess" v-bind="props" size="29">
@@ -144,15 +144,6 @@ function save() {
                                                     placeholder="Ubicacion"
                                                     color="primary"
                                                 ></v-text-field>
-                                                <div class="my-3">
-                                                    <v-checkbox
-                                                        density="compact"
-                                                        v-model="checkbox1"
-                                                        hide-details
-                                                        color="primary"
-                                                        label="Check Me Out!"
-                                                    ></v-checkbox>
-                                                </div>
                                             </v-col>
                                         </v-row>
                                     </v-form>

@@ -15,7 +15,7 @@ const userId = route.params.userId || loggedInUserId;
 
 const tab = ref(null);
 const items = shallowRef([
-    { tab: 'Profile', icon: UserCircleIcon, href: `/profile/${userId}` },
+    { tab: 'Perfil', icon: UserCircleIcon, href: `/profile/${userId}` },
     { tab: 'Mi CV', icon: HeartIcon, href: '/cv' },
     { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects/' + userId },
     { tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId },
