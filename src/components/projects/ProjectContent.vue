@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import UserImage from '@/assets/images/profile/user-5.jpg';
 
 const props = defineProps({
@@ -68,6 +68,47 @@ const capitalizeFirstLetter = (str: string) => {
     if(!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
+
+// Determinar el status del proyecto basado en las fechas
+const getProjectStatus = computed(() => {
+    if (!props.project) return 'abierto';
+    
+    // Si el proyecto ya tiene un status definido, usarlo
+    if (props.project.status) return props.project.status;
+    
+    // Si no tiene status, determinarlo basado en las fechas
+    const now = new Date();
+    const startDate = props.project.startDate ? new Date(props.project.startDate) : null;
+    const endDate = props.project.endDate ? new Date(props.project.endDate) : null;
+    
+    if (startDate && now < startDate) {
+        return 'abierto';
+    } else if (endDate && now > endDate) {
+        return 'completado';
+    } else if (startDate && (!endDate || now <= endDate)) {
+        return 'progreso';
+    }
+    
+    return 'abierto'; // Default
+});
+
+// Determinar la fecha a mostrar, usando dateCreated, startDate o una alternativa
+const getDisplayDate = computed(() => {
+    if (!props.project) return '';
+    
+    // Primero intentar usar dateCreated si existe
+    if (props.project.dateCreated) {
+        return formatDateTime(props.project.dateCreated);
+    }
+    
+    // Si no hay dateCreated, usar startDate 
+    if (props.project.startDate) {
+        return `Fecha de inicio: ${formatDate(props.project.startDate)}`;
+    }
+    
+    // Última opción, devolver fecha actual
+    return `Agregado recientemente`;
+});
 </script>
 
 <template>
@@ -80,8 +121,13 @@ const capitalizeFirstLetter = (str: string) => {
     <v-col cols="12" md="4" sm="4">
         <v-card elevation="10"  rounded="md" class="card-hover">
             <div>
-                <div >
-                    <v-chip :color="getCategoryColor(project?.category)" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
+                <div class="d-flex align-center justify-space-between">
+                    <v-chip 
+                        :color="getCategoryColor(project?.category)" 
+                        class="font-weight-bold" 
+                        size="small" 
+                        rounded="sm"
+                    > 
                         {{ project?.category }}
                     </v-chip>
                 </div>
@@ -112,20 +158,57 @@ const capitalizeFirstLetter = (str: string) => {
                             <v-expansion-panel-text>{{ project?.requirements }}</v-expansion-panel-text>
                             <v-divider></v-divider>
                         </v-expansion-panel>
+                        <!-- Panel para habilidades coincidentes (solo en proyectos recomendados) -->
+                        <v-expansion-panel v-if="project?.matchingSkills" elevation="10">
+                            <v-expansion-panel-title class="text-h6">
+                                Habilidades Coincidentes
+                            </v-expansion-panel-title>
+                            <v-expansion-panel-text>
+                                <div v-if="project?.exactMatches && project.exactMatches.length > 0">
+                                    <div class="font-weight-bold mb-2">Coincidencias exactas:</div>
+                                    <v-chip-group>
+                                        <v-chip
+                                            v-for="skill in project.exactMatches"
+                                            :key="skill"
+                                            color="success"
+                                            variant="tonal"
+                                            class="ma-1"
+                                        >
+                                            {{ skill }}
+                                        </v-chip>
+                                    </v-chip-group>
+                                </div>
+                                <div v-if="project?.partialMatches && project.partialMatches.length > 0" class="mt-3">
+                                    <div class="font-weight-bold mb-2">Coincidencias parciales:</div>
+                                    <v-chip-group>
+                                        <v-chip
+                                            v-for="skill in project.partialMatches"
+                                            :key="skill"
+                                            color="info"
+                                            variant="tonal"
+                                            class="ma-1"
+                                        >
+                                            {{ skill }}
+                                        </v-chip>
+                                    </v-chip-group>
+                                </div>
+                            </v-expansion-panel-text>
+                            <v-divider></v-divider>
+                        </v-expansion-panel>
                     </v-expansion-panels>
                     <div class="d-flex align-center justify-space-between">
                         <div>
                              <v-chip class="font-weight-bold d-flex bg-light" 
-                                    :color="getStatusColor(project?.status)" 
+                                    :color="getStatusColor(getProjectStatus)" 
                                     size="small" rounded="sm" 
-                                    v-text="capitalizeFirstLetter(project?.status || '')">
+                                    v-text="capitalizeFirstLetter(getProjectStatus)">
                              </v-chip>
                         </div>
                         <div>
                             <v-avatar size="10">
                                 <CircleIcon size="10" class="text-textPrimary" />
                             </v-avatar>
-                            <span class="text-subtitle-2 ml-2 textSecondary" v-text="formatDateTime(project?.dateCreated)"></span>
+                            <span class="text-subtitle-2 ml-2 textSecondary">{{ getDisplayDate }}</span>
                         </div>
                     </div>
                 </v-card-item>
