@@ -36,10 +36,9 @@ const handleSearch = async () => {
             </v-btn>
         </template>
         <v-sheet width="360" elevation="10" rounded="md">
-            <div class="d-flex align-center justify-space-between pa-5">
+            <div class="d-block d-sm-flex gap-3 align-center mb-4 px-4 pt-4">
                 <!-- Usamos v-model para vincular el valor del campo de texto -->
-                <v-text-field 
-                    placeholder="Search" 
+                <v-text-field
                     color="primary" 
                     density="compact" 
                     variant="outlined" 
