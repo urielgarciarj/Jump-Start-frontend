@@ -168,38 +168,38 @@ const searchSugg: searchType[] = [
         title: 'Modern',
         href: '/dashboards/modern'
     },
-    {
-        title: 'eCommerce',
-        href: '/dashboards/ecommerce'
-    },
-    {
-        title: 'Contacts',
-        href: '/apps/contacts'
-    },
-    {
-        title: 'Shop',
-        href: '/ecommerce/shop'
-    },
-    {
-        title: 'Checkout',
-        href: '/ecommerce/checkout'
-    },
-    {
-        title: 'Chats',
-        href: '/apps/chats'
-    },
-    {
-        title: 'Notes',
-        href: '/apps/notes'
-    },
-    {
-        title: 'Pricing',
-        href: '/pages/pricing'
-    },
-    {
-        title: 'Account Setting',
-        href: '/pages/account-settings'
-    },
+    // {
+    //     title: 'eCommerce',
+    //     href: '/dashboards/ecommerce'
+    // },
+    // {
+    //     title: 'Contacts',
+    //     href: '/apps/contacts'
+    // },
+    // {
+    //     title: 'Shop',
+    //     href: '/ecommerce/shop'
+    // },
+    // {
+    //     title: 'Checkout',
+    //     href: '/ecommerce/checkout'
+    // },
+    // {
+    //     title: 'Chats',
+    //     href: '/apps/chats'
+    // },
+    // {
+    //     title: 'Notes',
+    //     href: '/apps/notes'
+    // },
+    // {
+    //     title: 'Pricing',
+    //     href: '/pages/pricing'
+    // },
+    // {
+    //     title: 'Account Setting',
+    //     href: '/pages/account-settings'
+    // },
 ];
 
 export { notifications, profileDD, languageDD, appsLink, searchSugg };
