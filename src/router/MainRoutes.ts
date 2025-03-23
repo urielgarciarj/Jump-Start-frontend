@@ -46,6 +46,11 @@ const MainRoutes = {
             }
         },
         {
+            name: 'Vacante-Search-Result',
+            path: '/vancants/searchresult/:id',
+            component: () => import('@/components/vacancies/VacantSearchResult.vue')
+        },
+        {
             name: 'Sample Page 3',
             path: '/photos',
             component: () => import('@/views/Photospage.vue')
