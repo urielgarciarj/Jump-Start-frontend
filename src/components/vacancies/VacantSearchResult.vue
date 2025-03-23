@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import VacantContent from '@/components/vacancies/VacantContent.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
+import { useRoute } from 'vue-router';
 
 const authStore = useAuthStore();
 const userRole = authStore.userRole;
+const route = useRoute();
 
 const page = ref({ title: 'Oferta Laboral' });
 const breadcrumbs = ref([
     { text: 'Dashboard', disabled: false, href: '#' },
-    { text: 'Vacantes', disabled: false, href: '#' },
     { text: 'Vacante', disabled: true, href: '#' }
 ]);
 
-const vacants = ref<any[]>([]);
+const vacantId = route.params.id;
+const vacant = ref<any>();
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:3000/vacancies/sorted/active');
-    vacants.value = response.data;
+    const response = await axios.get(`http://localhost:3000/vacancies/vacant/detail/${vacantId}`);
+    vacant.value = response.data;
   } catch (error) {
-    console.error('Error al obtener el listado de vacantes:', error);
+    console.error('Error al obtener vacante:', error);
   }
 });
 </script>
@@ -37,9 +39,7 @@ onMounted(async () => {
         </v-col>
     </v-row>
     <v-row>
-        <v-col v-for="vacant in filteredVacants" :key="vacant.id" cols="12" md="12">
-            <VacantContent :vacant="vacant"/>
-        </v-col>
+        <VacantContent :vacant="vacant"/>
     </v-row>
 </template>
 
