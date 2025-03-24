@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, shallowRef, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { HeartIcon, UserCircleIcon, UsersIcon, ArchiveIcon } from 'vue-tabler-icons';
+import { UserIcon, ArchiveIcon, FileStarIcon, FileCvIcon } from 'vue-tabler-icons';
 import profileBg from '@/assets/images/backgrounds/profilebg.jpg';
 import UserImage from '@/assets/images/profile/user-5.jpg';
 import axios from 'axios';
@@ -15,10 +15,7 @@ const userId = route.params.userId || loggedInUserId;
 
 const tab = ref(null);
 const items = shallowRef([
-    { tab: 'Perfil', icon: UserCircleIcon, href: `/profile/${userId}` },
-    { tab: 'Mi CV', icon: HeartIcon, href: '/cv' },
-    { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects/' + userId },
-    { tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId },
+    { tab: 'Perfil', icon: UserIcon, href: `/profile/${userId}` }
 ]);
 
 // Getting full name of the user
@@ -34,6 +31,22 @@ const fetchUserData = async () => {
         const userData = response.data;
         fullName.value = `${userData.name} ${userData.lastName}`;
         role.value = userData.role;
+
+        switch (userData.role.toLowerCase()) {
+            case 'docente':
+                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + userId });
+                break;
+            case 'reclutador':
+                items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId });
+                break;
+            case 'estudiante':
+                items.value.push({ tab: 'Mi CV', icon: FileCvIcon, href: '/cv' });
+                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + userId });
+                if (userId == loggedInUserId) {// Just the owner estudent can view the vacants where he send an apply
+                    items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId });
+                }
+                break;
+        }
     } catch (error) {
         console.error('Error fetching user data:', error);
     }

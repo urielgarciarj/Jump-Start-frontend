@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import PostForm from '@/components/posts/createPostForm.vue';
 import PostItem from '@/components/posts/PostItem.vue';
 import axios from 'axios';
 
@@ -42,6 +43,9 @@ const breadcrumbs = computed(() => [
         href: '#'
     }
 ]);
+// Manejo de notificaciones
+const showAlert = ref(false); // Controlar la visibilidad del snackbar
+const snackbarMessage = ref(''); // Mensaje para mostrar en el snackbar
 
 // Cargar posts del usuario
 const fetchUserPosts = async () => {
@@ -59,6 +63,16 @@ const fetchUserPosts = async () => {
     } finally {
         isLoadingPosts.value = false;
     }
+};
+
+// Función para actualizar la lista de posts cuando se crea un nuevo post
+const addNewPost = (newPost: any) => {
+  posts.value.unshift(newPost);
+  snackbarMessage.value = '¡Nueva publicación creada con éxito!';
+  showAlert.value = true;
+  setTimeout(() => {
+    showAlert.value = false;
+  }, 5000);
 };
 
 // Elimina el post del array filtrando el que se ha eliminado
@@ -126,19 +140,17 @@ onMounted(async () => {
         <!-- Columna principal con posts -->
         <v-col cols="12" md="8" lg="8">
             <!-- Botón para crear publicación (solo en perfil propio) -->
-            <v-card v-if="canEdit" class="mb-4 pa-4">
-                <v-card-text class="text-center">
-                    <v-btn
-                        color="primary"
-                        variant="tonal"
-                        prepend-icon="mdi-plus"
-                        to="/crear-publicacion"
-                    >
-                        Crear nueva publicación
-                    </v-btn>
-                </v-card-text>
-            </v-card>
+            <div v-if="canEdit" class="mb-4 pa-4">
+                <PostForm @postCreated="addNewPost"/>
+            </div>
             
+            <v-alert v-if="showAlert" type="success" variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
+                <template v-slot:prepend>
+                <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
+                </template>
+                <div>{{ snackbarMessage }}</div>
+            </v-alert>
+
             <!-- Loader mientras se cargan los posts -->
             <v-skeleton-loader
                 v-if="isLoadingPosts"
