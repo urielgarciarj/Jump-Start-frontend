@@ -76,19 +76,6 @@ const getProjectStatus = computed(() => {
     // Si el proyecto ya tiene un status definido, usarlo
     if (props.project.status) return props.project.status;
     
-    // Si no tiene status, determinarlo basado en las fechas
-    const now = new Date();
-    const startDate = props.project.startDate ? new Date(props.project.startDate) : null;
-    const endDate = props.project.endDate ? new Date(props.project.endDate) : null;
-    
-    if (startDate && now < startDate) {
-        return 'abierto';
-    } else if (endDate && now > endDate) {
-        return 'completado';
-    } else if (startDate && (!endDate || now <= endDate)) {
-        return 'progreso';
-    }
-    
     return 'abierto'; // Default
 });
 
