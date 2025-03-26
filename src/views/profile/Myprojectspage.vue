@@ -1,43 +1,41 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useRoute } from 'vue-router';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import ProfileBanner from '@/components/profile/ProfileBanner.vue';
 import ProjectContent from '@/components/projects/ProjectContent.vue';
-import { useAuthStore } from '@/stores/auth';
-import { useRoute } from 'vue-router';
 import axios from 'axios';
 
 const authStore = useAuthStore();
-const userId = authStore.userId;
-
 const route = useRoute();
-const usuarioId = route.params.id;
+// Valores computados para establecer al usuario
+const loggedInUserId = computed(() => authStore.userId || '');
+const userId = computed(() => {
+  return (route.params.id as string) || loggedInUserId.value;
+});
+
+const page = ref({ title: 'Perfil de usuario' });
+const breadcrumbs = ref([
+  { text: 'Dashboard', disabled: false, href: '/' },
+  { text: 'Perfil de Usuario', disabled: true, href: '#' }
+]);
+
 // Definir la referencia para los posts
 const projectsArray = ref<any[]>([]);
 const searchQuery = ref();
-const statusesOptions = [
-  { text: 'Abierto', value: 'abierto' },
-  { text: 'Progreso', value: 'progreso' },
-  { text: 'Completado', value: 'completado' },
-  { text: 'Cancelado', value: 'cancelado' }
-];
-const page = ref({ title: 'Perfil de usuario' });
-const breadcrumbs = ref([
-    { text: 'Dashboard', disabled: false, href: '/' },
-    { text: 'Perfil de Usuario', disabled: true, href: '#' }
-]);
 
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
   try {
-    const getUser = await axios.get('http://localhost:3000/users/user/' + usuarioId);
+    const getUser = await axios.get('http://localhost:3000/users/user/' + userId);
     console.log('getUser', getUser.data)
     if (getUser.data && getUser.data.role.toLowerCase() === 'estudiante') {
-      const response = await axios.get('http://localhost:3000/enrolls/list-projects/by-user-enrolled/' + usuarioId);
+      const response = await axios.get('http://localhost:3000/enrolls/list-projects/by-user-enrolled/' + userId);
       projectsArray.value = response.data;     
     }
     if (getUser.data && getUser.data.role.toLowerCase() === 'docente') {
-      const response = await axios.get('http://localhost:3000/projects/list/' + usuarioId);
+      const response = await axios.get('http://localhost:3000/projects/list/' + userId);
       console.log('docente', response)
       projectsArray.value = response.data;  
     }

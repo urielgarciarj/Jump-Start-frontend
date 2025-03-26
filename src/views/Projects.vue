@@ -3,10 +3,6 @@ import { computed, onMounted, ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import ProjectContent from '@/components/projects/ProjectContent.vue';
 import axios from 'axios';
-import { useAuthStore } from '@/stores/auth';
-
-const authStore = useAuthStore();
-const userRole = authStore.userRole;
 
 const page = ref({ title: 'Proyectos Académicos' });
 const breadcrumbs = ref([

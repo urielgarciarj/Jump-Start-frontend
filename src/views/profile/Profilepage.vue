@@ -17,20 +17,21 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
+// Valores computados
+const loggedInUserId = authStore.userId || undefined;
+const userId = ref<any | undefined>(undefined);
+userId.value = route.params.id || loggedInUserId;
+const isOwnProfile = userId.value === loggedInUserId;
+const canEdit = userId.value === loggedInUserId;
+
 // Estado
 const posts = ref<any[]>([]);
 const isLoadingPosts = ref(false);
 const errorPosts = ref<string | null>(null);
 const isEditing = ref(false);
 
-// Valores computados
-const loggedInUserId = computed(() => authStore.userId);
-const userId = computed(() => route.params.userId || loggedInUserId.value);
-const isOwnProfile = computed(() => userId.value === loggedInUserId.value);
-const canEdit = computed(() => isOwnProfile.value && authStore.isAuthenticated);
-
 // Información de página - usando refs normales, no computadas dentro de refs
-const pageTitle = computed(() => isOwnProfile.value ? 'Mi Perfil' : 'Perfil de Usuario');
+const pageTitle = computed(() => isOwnProfile ? 'Mi Perfil' : 'Perfil de Usuario');
 const breadcrumbs = computed(() => [
     {
         text: 'Dashboard',
@@ -38,7 +39,7 @@ const breadcrumbs = computed(() => [
         href: '/'
     },
     {
-        text: isOwnProfile.value ? 'Mi Perfil' : 'Perfil de Usuario',
+        text: isOwnProfile ? 'Mi Perfil' : 'Perfil de Usuario',
         disabled: true,
         href: '#'
     }
@@ -78,12 +79,12 @@ const addNewPost = (newPost: any) => {
 // Elimina el post del array filtrando el que se ha eliminado
 const handlePostDelete = (deletedPostId: string) => {
     // Verificar permisos antes de eliminar
-    if (!canEdit.value) {
-        console.error('No tienes permisos para eliminar publicaciones de este perfil');
-        return;
-    }
+    // if (!canEdit.value) {
+    //     console.error('No tienes permisos para eliminar publicaciones de este perfil');
+    //     return;
+    // }
     
-    posts.value = posts.value.filter((post) => post.id !== deletedPostId);
+    // posts.value = posts.value.filter((post) => post.id !== deletedPostId);
 };
 
 // Función para verificar acceso a la página
@@ -98,9 +99,6 @@ const checkAccess = () => {
 
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
-    console.log('userId:', userId.value);
-    console.log('loggedInUserId:', loggedInUserId.value);
-    
     // Verificar acceso
     if (!checkAccess()) return;
     
@@ -112,21 +110,14 @@ onMounted(async () => {
 <template>
     <BaseBreadcrumb :title="pageTitle" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
     <ProfileBanner 
-        :isOwnProfile="isOwnProfile"
-        :canEdit="canEdit"
+        :userId="userId"
     />
     
     <v-row class="mt-4">
         <!-- Columna lateral con información de perfil -->
         <v-col cols="12" lg="4" md="4">
             <!-- Organizamos IntroCard y SkillsCard verticalmente en la misma columna -->
-            <IntroCard 
-                :isOwnProfile="isOwnProfile" 
-                :canEdit="canEdit"
-                :isEditing="isEditing"
-                @cancelEdit="isEditing = false"
-                class="mb-4"
-            />
+            <IntroCard />
             
             <SkillsCard 
                 :isOwnProfile="isOwnProfile" 
@@ -197,8 +188,7 @@ onMounted(async () => {
                 <v-row v-else>
                     <v-col v-for="post in posts" :key="post.id" cols="12">
                         <PostItem 
-                            :post="post" 
-                            :canEdit="canEdit"
+                            :post="post"
                             @deletePost="handlePostDelete" 
                         />
                     </v-col>

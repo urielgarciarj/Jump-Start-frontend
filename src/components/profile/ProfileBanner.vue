@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import { ref, shallowRef, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, shallowRef, onMounted, watch } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 import { UserIcon, ArchiveIcon, FileStarIcon, FileCvIcon } from 'vue-tabler-icons';
+import { Icon } from '@iconify/vue';
+import axios from 'axios';
+// Components
 import profileBg from '@/assets/images/backgrounds/profilebg.jpg';
 import UserImage from '@/assets/images/profile/user-5.jpg';
-import axios from 'axios';
-import { useAuthStore } from '@/stores/auth';
-import { Icon } from '@iconify/vue';
 
-const route = useRoute();
+const props = defineProps({
+    userId: String
+});
 const authStore = useAuthStore();
 const loggedInUserId = authStore.userId;
-const userId = route.params.userId || loggedInUserId;
 
 const tab = ref(null);
 const items = shallowRef([
-    { tab: 'Perfil', icon: UserIcon, href: `/profile/${userId}` }
+    { tab: 'Perfil', icon: UserIcon, href: `/profile/${props.userId}` }
 ]);
 
 // Getting full name of the user
@@ -27,26 +28,12 @@ const profilePicture = ref('');
 
 const fetchUserData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/user/${props.userId}`);
         const userData = response.data;
         fullName.value = `${userData.name} ${userData.lastName}`;
         role.value = userData.role;
 
-        switch (userData.role.toLowerCase()) {
-            case 'docente':
-                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + userId });
-                break;
-            case 'reclutador':
-                items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId });
-                break;
-            case 'estudiante':
-                items.value.push({ tab: 'Mi CV', icon: FileCvIcon, href: '/cv' });
-                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + userId });
-                if (userId == loggedInUserId) {// Just the owner estudent can view the vacants where he send an apply
-                    items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + userId });
-                }
-                break;
-        }
+        updateTabs(userData.role);
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
@@ -54,7 +41,7 @@ const fetchUserData = async () => {
 
 const fetchProfileData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/profiles/${userId}`);
+        const response = await axios.get(`http://localhost:3000/profiles/${props.userId}`);
         const profileData = response.data;
         profilePicture.value = profileData.picture;
     } catch (error) {
@@ -77,7 +64,7 @@ const onFileChange = async (event: Event) => {
                     }
                 });
                 profilePicture.value = response.data.fileUrl; // Actualiza la imagen mostrada
-                console.log('Image uploaded:', profilePicture.value);
+                //console.log('Image uploaded:', profilePicture.value);
             } catch (error) {
                 console.error('Error uploading image:', error);
             }
@@ -95,6 +82,31 @@ onMounted(() => {
     fetchUserData();
     fetchProfileData();
 });
+
+// Updates available tabs based on user role
+const updateTabs = (role: String) => {
+    try {
+        console.log('updateTabs: ', role)
+        if (!role) return;
+        switch (role.toLowerCase()) {
+            case 'docente':
+                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + props.userId });
+                break;
+            case 'reclutador':
+                items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + props.userId });
+                break;
+            case 'estudiante':
+                items.value.push({ tab: 'CV', icon: FileCvIcon, href: '/cv/' + props.userId });
+                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + props.userId });
+                if (props.userId == loggedInUserId) {// Just the owner estudent can view the vacants where he send an apply
+                    items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + props.userId });
+                }
+                break;
+        }
+    } catch (error) {
+        console.error('Error fetching profile data:', error);
+    }
+};
 </script>
 
 <template>

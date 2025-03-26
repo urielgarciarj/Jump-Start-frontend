@@ -55,26 +55,28 @@ const MainRoutes = {
             path: '/photos',
             component: () => import('@/views/Photospage.vue')
         },
+        // START Profile routes **************************************************************
         {
             name: 'my Profile',
-            path: '/profile/:userId?',
-            component: () => import('@/views/Profilepage.vue')
+            path: '/profile/:id?',
+            component: () => import('@/views/profile/Profilepage.vue')
         },
         {
             name: 'my Cv',
-            path: '/cv',
-            component: () => import('@/views/Cvpage.vue')
+            path: '/cv/:id?',
+            component: () => import('@/views/profile/Cvpage.vue')
         },
         {
             name: 'My projects',
-            path: '/myprojects/:id',
-            component: () => import('@/views/Myprojectspage.vue')
+            path: '/myprojects/:id?',
+            component: () => import('@/views/profile/Myprojectspage.vue')
         },
         {
             name: 'User Applications',
-            path: '/userapplications/:id',
-            component: () => import('@/views/ProfileApplicationsPage.vue')
+            path: '/userapplications/:id?',
+            component: () => import('@/views/profile/ProfileApplicationsPage.vue')
         },
+        // END Profile routes **************************************************************
         {
             name: 'All-Projects',
             path: '/projects/list-all',
