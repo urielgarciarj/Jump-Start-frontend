@@ -9,11 +9,11 @@ import axios from 'axios';
 
 const authStore = useAuthStore();
 const route = useRoute();
+
 // Valores computados para establecer al usuario
-const loggedInUserId = computed(() => authStore.userId || '');
-const userId = computed(() => {
-  return (route.params.id as string) || loggedInUserId.value;
-});
+const loggedInUserId = authStore.userId || undefined;
+const userId = ref<any | undefined>(undefined);
+userId.value = route.params.id || loggedInUserId;
 
 const page = ref({ title: 'Perfil de usuario' });
 const breadcrumbs = ref([
@@ -29,14 +29,12 @@ const searchQuery = ref();
 onMounted(async () => {
   try {
     const getUser = await axios.get('http://localhost:3000/users/user/' + userId);
-    console.log('getUser', getUser.data)
     if (getUser.data && getUser.data.role.toLowerCase() === 'estudiante') {
       const response = await axios.get('http://localhost:3000/enrolls/list-projects/by-user-enrolled/' + userId);
       projectsArray.value = response.data;     
     }
     if (getUser.data && getUser.data.role.toLowerCase() === 'docente') {
       const response = await axios.get('http://localhost:3000/projects/list/' + userId);
-      console.log('docente', response)
       projectsArray.value = response.data;  
     }
   } catch (error) {
@@ -56,7 +54,9 @@ const filteredProjects = computed(() => {
 
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
-    <ProfileBanner />
+    <ProfileBanner 
+        :userId="userId"
+    />
     <v-row class="d-flex my-5 justify-end">
         <v-col cols="12" sm="6" class="d-flex justify-end">
           <v-select

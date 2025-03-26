@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute } from 'vue-router';
-import axios from 'axios';
 // components
 import ProfileBanner from '@/components/profile/ProfileBanner.vue';
 
 const authStore = useAuthStore();
 const route = useRoute();
 // Valores computados para establecer al usuario
-const loggedInUserId = computed(() => authStore.userId || '');
-const userId = computed(() => {
-  return (route.params.id as string) || loggedInUserId.value;
-});
+const loggedInUserId = authStore.userId || undefined;
+const userId = ref<any | undefined>(undefined);
+userId.value = route.params.id || loggedInUserId;
+
 const page = ref({ title: 'Perfil de usuario' });
 const breadcrumbs = ref([
     {

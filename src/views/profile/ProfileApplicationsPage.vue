@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
@@ -9,11 +9,12 @@ import ProfileBanner from '@/components/profile/ProfileBanner.vue';
 
 const authStore = useAuthStore();
 const route = useRoute();
+
 // Valores computados para establecer al usuario
-const loggedInUserId = computed(() => authStore.userId || '');
-const userId = computed(() => {
-  return (route.params.id as string) || loggedInUserId.value;
-});
+const loggedInUserId = authStore.userId || undefined;
+const userId = ref<any | undefined>(undefined);
+userId.value = route.params.id || loggedInUserId;
+
 // Definir la referencia para los posts
 const vacantsArray = ref<any[]>([]);
 const page = ref({ title: 'Perfil de usuario' });

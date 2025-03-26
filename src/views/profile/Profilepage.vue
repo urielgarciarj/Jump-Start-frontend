@@ -3,11 +3,10 @@ import { ref, computed, onMounted } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import axios from 'axios';
+// Components
 import PostForm from '@/components/posts/createPostForm.vue';
 import PostItem from '@/components/posts/PostItem.vue';
-import axios from 'axios';
-
-// Components
 import ProfileBanner from '@/components/profile/ProfileBanner.vue';
 import IntroCard from '@/components/profile/IntroCard.vue';
 import SkillsCard from '@/components/profile/SkillsCard.vue';
