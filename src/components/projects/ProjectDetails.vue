@@ -7,6 +7,7 @@ import axios, { AxiosError } from 'axios';
 import { router } from '@/router';
 import UpdateProjectForm from './UpdateProject.vue';
 import EnrollForm from './enrolls/CreateEnrollForm.vue';
+import UserImage from '@/assets/images/profile/user-5.jpg';
 
 const page = ref({ title: 'Detalles del Proyecto' });
 const breadcrumbs = ref([
@@ -24,6 +25,8 @@ const projectId = route.params.id;
 const projectDetail = ref<any | null>(null);
 const aceptedEnrollsList = ref<any[]>([]);
 const pendingEnrollsList = ref<any[]>([]);
+const recommendedUsers = ref<any[]>([]);
+const isLoadingRecommendations = ref(false);
 
 const showEditForm = ref(false);
 const showConfirmation = ref(false);
@@ -58,6 +61,11 @@ onMounted(async () => {
             const _response = await axios.get(`http://localhost:3000/enrolls/list-by/project/${projectId}`);
             pendingEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Pendiente');
             aceptedEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Aceptado');
+            
+            // Si el usuario es docente, cargar usuarios recomendados
+            if (userRole === 'Docente') {
+                await fetchRecommendedUsers();
+            }
         }
     } catch (err) {
         console.error('Error:', err);
@@ -68,6 +76,26 @@ onMounted(async () => {
         }
     }
 });
+
+// Función para obtener usuarios recomendados para el proyecto
+const fetchRecommendedUsers = async () => {
+    isLoadingRecommendations.value = true;
+    try {
+        const response = await axios.get(`http://localhost:3000/projects/recommend-users-for-project/${projectId}`);
+        recommendedUsers.value = response.data.recommendedUsers || [];
+        
+        // Ordenar por porcentaje de coincidencia (de mayor a menor)
+        recommendedUsers.value.sort((a, b) => b.matchPercentage - a.matchPercentage);
+        
+    } catch (err) {
+        console.error('Error al obtener usuarios recomendados:', err);
+        snackbarMessage.value = 'Error al cargar usuarios recomendados';
+        alertType.value = 'error';
+        showAlert.value = true;
+    } finally {
+        isLoadingRecommendations.value = false;
+    }
+};
 
 // Función para editar un proyecto
 const editProject = () => {
@@ -173,6 +201,14 @@ const capitalizeFirstLetter = (str: string) => {
     if(!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
+
+// Función para obtener color basado en el porcentaje de coincidencia
+const getMatchColor = (percentage: number) => {
+    if (percentage >= 90) return 'success';
+    if (percentage >= 70) return 'info';
+    if (percentage >= 50) return 'warning';
+    return 'error';
+};
 </script>
 
 <template>
@@ -183,7 +219,9 @@ const capitalizeFirstLetter = (str: string) => {
         </template>
         <div>{{ snackbarMessage }}</div>
     </v-alert>
-    <v-card elevation="10">
+    
+    <!-- Card principal con pestañas -->
+    <v-card elevation="10" class="mb-6">
         <!-- Tabs para detalle - solicitudes -->
         <v-card-item>
             <v-tabs v-model="tab" color="primary" class="border-bottom">
@@ -375,5 +413,135 @@ const capitalizeFirstLetter = (str: string) => {
             </v-card-actions>
         </v-card>
     </v-dialog>
+    
+    <!-- Sección de estudiantes recomendados -->
+    <v-card v-if="userRole === 'Docente'" elevation="10" class="mt-6">
+        <v-card-item>
+            <v-container>
+                <v-row>
+                    <v-col cols="12">
+                        <h2 class="text-h4 mb-3">Estudiantes Recomendados</h2>
+                        <p class="text-subtitle-1 mb-6">
+                            Estos estudiantes han sido recomendados basados en la coincidencia de sus habilidades 
+                            con los requerimientos del proyecto.
+                        </p>
+                    </v-col>
+                </v-row>
+                
+                <!-- Indicador de carga -->
+                <v-row v-if="isLoadingRecommendations">
+                    <v-col cols="12" class="d-flex justify-center">
+                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                    </v-col>
+                </v-row>
+                
+                <!-- Mensaje si no hay recomendaciones -->
+                <v-row v-else-if="recommendedUsers.length === 0">
+                    <v-col cols="12">
+                        <v-alert type="info" variant="tonal">
+                            No se encontraron estudiantes que coincidan con los requisitos del proyecto.
+                        </v-alert>
+                    </v-col>
+                </v-row>
+                
+                <!-- Cards de estudiantes recomendados -->
+                <v-row v-else>
+                    <!-- Estudiante con mejor match -->
+                    <v-col cols="12" v-if="recommendedUsers.length > 0">
+                        <v-alert color="success" icon="mdi-trophy" variant="tonal" class="mb-4">
+                            El estudiante <strong>{{ recommendedUsers[0].name }} {{ recommendedUsers[0].lastName }}</strong> 
+                            tiene la mejor coincidencia con un {{ recommendedUsers[0].matchPercentage }}% 
+                            de compatibilidad con los requisitos del proyecto.
+                        </v-alert>
+                    </v-col>
+                    
+                    <!-- Lista de estudiantes recomendados -->
+                    <v-col cols="12" md="4" sm="6" v-for="(user, index) in recommendedUsers" :key="user.userId">
+                        <v-card elevation="3" class="mb-4 recommended-student-card">
+                            <!-- Badge para el mejor match -->
+                            <v-badge
+                                v-if="index === 0"
+                                color="success"
+                                icon="mdi-star"
+                                location="top end"
+                            ></v-badge>
+                            
+                            <!-- Contenido de la card -->
+                            <v-card-item>
+                                <div class="d-flex align-center mb-4">
+                                    <v-avatar size="100" color="secondary" class="userImage">
+                                        <img :src="user.picture || UserImage" alt="Mathew" width="100" />
+                                    </v-avatar>
+                                    <div>
+                                        <v-card-title class="text-h5 mb-1 pa-0">
+                                            {{ user.name }} {{ user.lastName }}
+                                        </v-card-title>
+                                        <v-card-subtitle class="pa-0 text-medium-emphasis">
+                                            {{ user.email }}
+                                        </v-card-subtitle>
+                                        <v-card-subtitle v-if="user.university" class="pa-0 text-medium-emphasis">
+                                            {{ user.university }}
+                                        </v-card-subtitle>
+                                    </div>
+                                </div>
+                                
+                                <!-- Indicador de coincidencia -->
+                                <v-divider class="mb-3"></v-divider>
+                                <div class="d-flex align-center justify-space-between mb-4">
+                                    <span class="text-subtitle-1 font-weight-bold">Nivel de coincidencia:</span>
+                                    <v-chip
+                                        :color="getMatchColor(user.matchPercentage)"
+                                        class="font-weight-bold"
+                                    >
+                                        {{ user.matchPercentage }}%
+                                    </v-chip>
+                                </div>
+                                
+                                <!-- Habilidades coincidentes -->
+                                <div class="mb-2">
+                                    <span class="text-subtitle-2 font-weight-bold">Habilidades requeridas que posee:</span>
+                                    <v-chip-group class="mt-2">
+                                        <v-chip
+                                            v-for="(count, skill) in user.skillFrequency"
+                                            :key="skill"
+                                            color="primary"
+                                            variant="tonal"
+                                            size="small"
+                                            class="ma-1"
+                                        >
+                                            {{ skill }} 
+                                            <span v-if="count > 1" class="ml-1">({{ count }})</span>
+                                        </v-chip>
+                                    </v-chip-group>
+                                </div>
+                                
+                                <!-- Score de coincidencia -->
+                                <div class="text-subtitle-2 text-medium-emphasis mt-2">
+                                    Score de coincidencia: <strong>{{ user.matchScore }}</strong>
+                                </div>
+                            </v-card-item>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-card-item>
+    </v-card>
 </template>
+
+<style scoped>
+.recommended-student-card {
+  position: relative;
+  transition: transform 0.2s ease-in-out;
+}
+
+.userImage {
+    border: 4px solid rgb(255, 255, 255);
+    position: relative; /* Asegúrate de que el contenedor tenga position: relative */
+}
+
+.recommended-student-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+}
+</style>
 
