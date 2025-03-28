@@ -2,9 +2,8 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
-import axios from 'axios';
-import { PhoneIcon } from 'vue-tabler-icons';
 import { useAuthStore } from '@/stores/auth';
+import axios from 'axios';
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -44,7 +43,6 @@ const fetchProfileData = async () => {
     }
 };
 
-const valid = ref(true);
 const dialog = ref(false);
 
 onMounted(async () => {
@@ -58,10 +56,6 @@ watch(() => route.params.id, async (newUserId) => {
 
 function close() {
     dialog.value = false;
-}
-
-function save() {
-    close();
 }
 
 // Interfaces
@@ -158,7 +152,7 @@ const removeSkill = async (skillToRemove: Skill) => {
     
     // Actualizar lista local
     skills.value = updatedSkills;
-    console.log('Habilidad eliminada exitosamente');
+    //console.log('Habilidad eliminada exitosamente');
   } catch (error) {
     console.error('Error al eliminar skill:', error);
     alert('Error al eliminar la habilidad. Por favor, intenta nuevamente.');
