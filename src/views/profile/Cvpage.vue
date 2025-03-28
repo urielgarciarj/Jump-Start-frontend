@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute } from 'vue-router';
@@ -9,11 +9,12 @@ import ProfileBanner from '@/components/profile/ProfileBanner.vue';
 const authStore = useAuthStore();
 const route = useRoute();
 // Valores computados para establecer al usuario
-const loggedInUserId = authStore.userId || undefined;
+const loggedInUserId = authStore.userId?.toString() || undefined;
 const userId = ref<any | undefined>(undefined);
 userId.value = route.params.id || loggedInUserId;
+const isOwnProfile = userId.value === loggedInUserId;
 
-const page = ref({ title: 'Perfil de usuario' });
+const pageTitle = computed(() => isOwnProfile ? 'Mi Perfil' : 'Perfil de Usuario');
 const breadcrumbs = ref([
     {
         text: 'Dashboard',
@@ -38,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+    <BaseBreadcrumb :title="pageTitle" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
     <ProfileBanner 
         :userId="userId"
     />

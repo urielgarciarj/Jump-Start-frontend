@@ -3,18 +3,19 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import axios from 'axios';
-import { PhoneIcon } from 'vue-tabler-icons';
+import { PhoneIcon, SchoolIcon } from 'vue-tabler-icons';
 import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
 const authStore = useAuthStore();
 const loggedInUserId = ref(authStore.userId);
-const userId = ref(route.params.userId || loggedInUserId.value);
+const userId = ref(route.params.id || loggedInUserId.value);
 
 // Getting email of the user
 const email = ref('');
 const profileIntroduction = ref('');
 const profileLocation = ref('');
+const profileCompany = ref('');
 const profileUniversity = ref('');
 const profilePhone = ref('');
 const profileId = ref('');
@@ -37,6 +38,7 @@ const fetchProfileData = async () => {
         const profileData = response.data;
         profileIntroduction.value = profileData.aboutMe;
         profileLocation.value = profileData.location;
+        profileCompany.value = profileData.jobCompany;
         profileUniversity.value = profileData.university;
         profilePhone.value = profileData.phone;
     } catch (error) {
@@ -48,6 +50,7 @@ const saveChanges = async () => {
     try {
         await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId.value}`, {
             aboutMe: profileIntroduction.value,
+            jobCompany: profileCompany.value,
             university: profileUniversity.value,
             email: email.value,
             phone: profilePhone.value,
@@ -60,16 +63,14 @@ const saveChanges = async () => {
     }
 };
 
-const description = ref('None');
 const valid = ref(true);
 const dialog = ref(false);
-const checkbox1 = ref(true);
 
 onMounted(async () => {
     await fetchUserData(); // Fetch user data when the component is mounted
 });
 
-watch(() => route.params.userId, async (newUserId) => {
+watch(() => route.params.id, async (newUserId) => {
     userId.value = newUserId || loggedInUserId.value;
     await fetchUserData();
 });
@@ -78,9 +79,6 @@ function close() {
     dialog.value = false;
 }
 
-function save() {
-    close();
-}
 </script>
 
 <template>
@@ -108,6 +106,16 @@ function save() {
                                             <v-col cols="12" lg="12">
                                                 <v-label class="mb-2 font-weight-medium mt-5">Mi introducción</v-label>
                                                 <v-textarea v-model="profileIntroduction" persistent-hint variant="outlined" hide-details placeholder="Escribe tu introducción" color="primary" required></v-textarea>
+                                                <v-label class="mb-2 font-weight-medium mt-5">Empresa</v-label>
+                                                <v-text-field
+                                                    v-model="profileCompany"
+                                                    persistent-hint
+                                                    variant="outlined"
+                                                    hide-details
+                                                    placeholder="Escribe la empresa donde laboras"
+                                                    color="primary"
+                                                ></v-text-field>
+
                                                 <v-label class="mb-2 font-weight-medium mt-5">Educacion Universitaria</v-label>
                                                 <v-text-field
                                                     v-model="profileUniversity"
@@ -162,6 +170,10 @@ function save() {
                     </p>
                     <div class="d-flex gap-3 mb-5">
                         <BriefcaseIcon size="21" />
+                        <span class="text-h6">{{ profileCompany || 'Aun no agregado' }}</span>
+                    </div>
+                    <div class="d-flex gap-3 mb-5">
+                        <SchoolIcon size="21" />
                         <span class="text-h6">{{ profileUniversity || 'Aun no agregado' }}</span>
                     </div>
                     <div class="d-flex gap-3 mb-5">

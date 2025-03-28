@@ -11,11 +11,12 @@ const authStore = useAuthStore();
 const route = useRoute();
 
 // Valores computados para establecer al usuario
-const loggedInUserId = authStore.userId || undefined;
+const loggedInUserId = authStore.userId?.toString() || undefined;
 const userId = ref<any | undefined>(undefined);
 userId.value = route.params.id || loggedInUserId;
+const isOwnProfile = userId.value === loggedInUserId;
 
-const page = ref({ title: 'Perfil de usuario' });
+const pageTitle = computed(() => isOwnProfile ? 'Mi Perfil' : 'Perfil de Usuario');
 const breadcrumbs = ref([
   { text: 'Dashboard', disabled: false, href: '/' },
   { text: 'Perfil de Usuario', disabled: true, href: '#' }
@@ -53,11 +54,11 @@ const filteredProjects = computed(() => {
 </script>
 
 <template>
-    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+    <BaseBreadcrumb :title="pageTitle" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
     <ProfileBanner 
         :userId="userId"
     />
-    <v-row class="d-flex my-5 justify-end">
+    <v-row v-if="filteredProjects.length > 0" class="d-flex my-5 justify-end">
         <v-col cols="12" sm="6" class="d-flex justify-end">
           <v-select
             v-model="searchQuery"
@@ -70,6 +71,13 @@ const filteredProjects = computed(() => {
         </v-col>
     </v-row>
     <v-row>
+        <v-card v-if="filteredProjects.length === 0" class="pa-4 mb-4 my-5 text-center" variant="outlined" >
+        <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
+          <h3 class="text-h6 mb-2">No hay proyectos disponibles</h3>
+          <p class="text-body-2 text-medium-emphasis">
+              {{ isOwnProfile ? 'Aún no has creado ningún proyecto.' : 'Este usuario aún no tiene proyectos registrados.' }}
+          </p>
+      </v-card>
         <template v-for="project in filteredProjects" :key="project.id">
             <ProjectContent :project="project"/>
         </template>

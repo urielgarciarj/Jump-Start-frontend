@@ -86,7 +86,6 @@ onMounted(() => {
 // Updates available tabs based on user role
 const updateTabs = (role: String) => {
     try {
-        console.log('updateTabs: ', role)
         if (!role) return;
         switch (role.toLowerCase()) {
             case 'docente':

@@ -9,7 +9,7 @@ import { useAuthStore } from '@/stores/auth';
 const route = useRoute();
 const authStore = useAuthStore();
 const loggedInUserId = ref(authStore.userId);
-const userId = ref(route.params.userId || loggedInUserId.value);
+const userId = ref(route.params.id || loggedInUserId.value);
 
 // Getting email of the user
 const email = ref('');
@@ -51,7 +51,7 @@ onMounted(async () => {
     await fetchUserData(); // Fetch user data when the component is mounted
 });
 
-watch(() => route.params.userId, async (newUserId) => {
+watch(() => route.params.id, async (newUserId) => {
     userId.value = newUserId || loggedInUserId.value;
     await fetchUserData();
 });
