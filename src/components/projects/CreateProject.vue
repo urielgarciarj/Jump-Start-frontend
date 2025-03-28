@@ -19,7 +19,7 @@ const userId = authStore.userId;
 const project = ref({
     name: '',
     category: '',
-    status: '',
+    status: 'abierto',
     description: '',
     requirements: '',
     startDate: '',
@@ -56,7 +56,6 @@ const addSkill = (skillToAdd: string) => {
   if (skillToAdd && !skills.value.some(s => s.toLowerCase() === skillToAdd.toLowerCase())) {
     skills.value.push(skillToAdd);  // Añadir la habilidad al array
     newSkill.value = '';  // Limpiar el campo de entrada
-    console.log('Skill added:', skills.value);  // Depuración
   }
 };
 
@@ -74,7 +73,7 @@ const submitProject = async () => {
                 router.push('/projects/list-all');                
             } 
             else {
-                error.value = 'Es obligatorio agregar requerimientos/habilidades.';
+                error.value = 'Es obligatorio agregar habilidades requeridas.';
             }
             
         } catch (err) {
@@ -128,8 +127,7 @@ const submitProject = async () => {
                             <v-textarea v-model="project.description" :rules="notEmptyRule" required />
                         </v-col>
                         <v-col cols="12" md="4">
-                            <v-label class="font-weight-semibold pb-2">Requerimientos</v-label>
-                            <!-- <v-textarea v-model="project.requirements"  :rules="notEmptyRule" required /> -->
+                            <v-label class="font-weight-semibold pb-2">Habilidades Requeridas</v-label>
                             <v-text-field v-model="newSkill" label="Añadir nueva habilidad" placeholder="Ej: JavaScript, Diseño UX, Marketing Digital"
                                 variant="outlined" hide-details="auto" class="mb-4" @keyup.enter="addSkill(newSkill)"
                             >
