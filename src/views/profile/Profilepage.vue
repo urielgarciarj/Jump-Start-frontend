@@ -17,7 +17,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 // Valores computados
-const loggedInUserId = authStore.userId || undefined;
+const loggedInUserId = authStore.userId?.toString() || undefined;
 const userId = ref<any | undefined>(undefined);
 userId.value = route.params.id || loggedInUserId;
 const isOwnProfile = userId.value === loggedInUserId;
@@ -77,13 +77,7 @@ const addNewPost = (newPost: any) => {
 
 // Elimina el post del array filtrando el que se ha eliminado
 const handlePostDelete = (deletedPostId: string) => {
-    // Verificar permisos antes de eliminar
-    // if (!canEdit.value) {
-    //     console.error('No tienes permisos para eliminar publicaciones de este perfil');
-    //     return;
-    // }
-    
-    // posts.value = posts.value.filter((post) => post.id !== deletedPostId);
+    posts.value = posts.value.filter((post) => post.id !== deletedPostId);
 };
 
 // Función para verificar acceso a la página
@@ -129,10 +123,6 @@ onMounted(async () => {
         
         <!-- Columna principal con posts -->
         <v-col cols="12" md="8" lg="8">
-            <!-- Botón para crear publicación (solo en perfil propio) -->
-            <div v-if="canEdit" class="mb-4 pa-4">
-                <PostForm @postCreated="addNewPost"/>
-            </div>
             
             <v-alert v-if="showAlert" type="success" variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
                 <template v-slot:prepend>
@@ -181,6 +171,10 @@ onMounted(async () => {
                     <p class="text-body-2 text-medium-emphasis">
                         {{ isOwnProfile ? 'Aún no has creado ninguna publicación.' : 'Este usuario aún no ha creado publicaciones.' }}
                     </p>
+                    <!-- Botón para crear publicación (solo en perfil propio) -->
+                    <div v-if="canEdit" class="mb-2 pa-2">
+                        <PostForm @postCreated="addNewPost"/>
+                    </div>
                 </v-card>
                 
                 <!-- Grid de posts -->

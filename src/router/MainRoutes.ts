@@ -25,7 +25,7 @@ const MainRoutes = {
             component: () => import('@/components/vacancies/CreateVacant.vue'),
             beforeEnter: (to, from, next) => {
                 const authStore = useAuthStore();
-                if (authStore.userRole === 'reclutador') {
+                if (authStore.userRole.toLowerCase() === 'reclutador') {
                     next();  // Permite la navegación si el rol es 'reclutador'
                 } else {
                     next({ name: 'Vacancies' });  // Redirige si no es 'reclutador'
