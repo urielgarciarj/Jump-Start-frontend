@@ -82,7 +82,6 @@ const submitVacant = async () => {
             if (vacant.value.description && vacant.value.description != '' && vacant.value.description != '<p></p>') {
                 if (skills.value.length && skills.value.length > 0) {
                     vacant.value.requirements = skills.value.join(',');
-                    console.log('vacant value', vacant.value)
                     await axios.post('http://localhost:3000/vacancies/create', vacant.value);
                     router.push('/vacancies/list-all');
                 }

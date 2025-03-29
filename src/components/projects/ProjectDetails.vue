@@ -285,7 +285,7 @@ const getMatchColor = (percentage: number) => {
                                     </span>
                                 </v-col>
                                 <v-col cols="12" md="12">
-                                    <h3>Requerimientos</h3>
+                                    <h3>Habilidades Requeridas</h3>
                                     <span class="text-subtitle-1 opacity-50">
                                         {{ projectDetail?.requirements }}
                                     </span>

@@ -207,6 +207,12 @@ const capitalizeFirstLetter = (str: string) => {
                                     <h3>Descripción</h3>
                                     <div v-html="vacantDetail?.description"></div>
                                 </v-col>
+                                <v-col cols="12" md="12">
+                                    <h3>Habilidades Requeridas</h3>
+                                    <span class="text-subtitle-1 opacity-50">
+                                        {{ vacantDetail?.requirements }}
+                                    </span>
+                                </v-col>
                             </v-row>
                         </div>
                         <!-- Botones para editar - eliminar -->

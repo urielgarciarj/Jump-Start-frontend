@@ -114,7 +114,7 @@ const formatDateTime = (date: string) => {
                 <v-card-item>
                     <v-card-text>
                         <div class="d-block d-sm-flex gap-3">
-                            <h3>Descripción completa del empleo</h3>
+                            <h3>Descripción del empleo</h3>
                             <span class="text-subtitle-2 opacity-50">
                                 <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
                                 {{ formatDateTime(vacant?.createdAt) }}
@@ -126,6 +126,14 @@ const formatDateTime = (date: string) => {
                         </div>
                         <v-divider></v-divider>
                         <div v-html="vacant?.description"></div>
+                        <br />
+                        <v-divider></v-divider>
+                        <div class="d-block gap-3">
+                            <h4>Habilidades Requeridas</h4>
+                            <span class="text-body-1">
+                                {{ vacant?.requirements }}
+                            </span>
+                        </div>
                     </v-card-text>
                 </v-card-item>
             </div>
