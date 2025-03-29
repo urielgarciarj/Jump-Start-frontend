@@ -58,7 +58,7 @@ const addSkill = (skillToAdd: string) => {
     newSkill.value = '';  // Limpiar el campo de entrada
   }
 };
-
+// Remove skill
 const removeSkill = (skillIndex: number) => {
     skills.value.splice(skillIndex, 1);
     console.log('skill removed', skills.value)
@@ -137,7 +137,7 @@ const submitProject = async () => {
                             </v-text-field>
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-chip-group>
+                            <v-chip-group class="scrollable-chips">
                                 <v-chip
                                     v-for="(skill, index) in skills"
                                     :key="index"
@@ -161,4 +161,13 @@ const submitProject = async () => {
         </v-card-item>
     </v-card>
 </template>
+
+<style>
+.scrollable-chips {
+  max-height: 200px; /* Ajusta este valor según lo que necesites */
+  overflow-y: auto;  /* Permite el scroll vertical cuando sea necesario */
+  display: flex;
+  flex-wrap: wrap;
+}
+</style>
 

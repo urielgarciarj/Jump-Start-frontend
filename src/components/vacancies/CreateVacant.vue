@@ -22,16 +22,21 @@ const breadcrumbs = ref([
 const vacant = ref({
     name: '',
     description: '',
+    requirements: '',
     location: '',
     category: '',
     modality: '',
     level: '',
     company: '',
-    salary: '',
+    salary: 0,
     salaryPeriod: '',
     dateCreated: new Date().toISOString(),
     userId: userId
 });
+
+const skills = ref<string[]>([]);
+const newSkill = ref<string>('');
+
 const editor = useEditor({
     extensions: [StarterKit]
 });
@@ -41,6 +46,19 @@ const modalityOps = ['Presencial', 'Remoto', 'Hibrido'];
 const salaryPeriodOps = ['Semanal', 'Quincenal', 'Mensual'];
 const rules = [(v: any) => !!v || 'Es obligatorio llenar este campo.'];
 const error = ref<string | null>(null);
+
+// Añadir skill
+const addSkill = (skillToAdd: string) => {
+  if (skillToAdd && !skills.value.some(s => s.toLowerCase() === skillToAdd.toLowerCase())) {
+    skills.value.push(skillToAdd);  // Añadir la habilidad al array
+    newSkill.value = '';  // Limpiar el campo de entrada
+  }
+};
+// Remove skill
+const removeSkill = (skillIndex: number) => {
+    skills.value.splice(skillIndex, 1);
+    console.log('skill removed', skills.value)
+};
 
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
@@ -62,9 +80,15 @@ const submitVacant = async () => {
         try {
             vacant.value.description = editor.value ? editor.value.getHTML() : '';
             if (vacant.value.description && vacant.value.description != '' && vacant.value.description != '<p></p>') {
-                const response = await axios.post('http://localhost:3000/vacancies/create', vacant.value);
-                //console.log('vacant created:', response.data);
-                router.push('/vacancies/list-all');
+                if (skills.value.length && skills.value.length > 0) {
+                    vacant.value.requirements = skills.value.join(',');
+                    console.log('vacant value', vacant.value)
+                    await axios.post('http://localhost:3000/vacancies/create', vacant.value);
+                    router.push('/vacancies/list-all');
+                }
+                else {
+                    error.value = 'Es obligatorio agregar habilidades requeridas.';
+                }
             }
             else {
                 error.value = 'Es obligatorio agregar una descripción.';
@@ -136,6 +160,32 @@ const submitVacant = async () => {
                                 </div>
                                 <editor-content :editor="editor" />
                             </v-card>
+                        </v-col>
+
+                        <!-- Habilidades requeridas -->
+                        <v-col cols="12" md="4">
+                            <v-label class="font-weight-semibold pb-2">Habilidades Requeridas</v-label>
+                            <v-text-field v-model="newSkill" label="Añadir nueva habilidad" placeholder="Ej: JavaScript, Diseño UX, Marketing Digital"
+                                variant="outlined" hide-details="auto" class="mb-4" @keyup.enter="addSkill(newSkill)"
+                            >
+                                <template v-slot:append>
+                                    <v-btn color="success" size="sm" icon="mdi-plus" :disabled="!newSkill.trim()" @click="addSkill(newSkill)"></v-btn>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-chip-group class="scrollable-chips">
+                                <v-chip
+                                    v-for="(skill, index) in skills"
+                                    :key="index"
+                                    closable
+                                    @click:close="removeSkill(index)"
+                                    color="primary"
+                                    variant="outlined"
+                                >
+                                    {{ skill }}
+                                </v-chip>
+                            </v-chip-group>
                         </v-col>
                     </v-row>
                 </div>

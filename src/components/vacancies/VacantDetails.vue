@@ -151,7 +151,7 @@ const capitalizeFirstLetter = (str: string) => {
                                     <h3>{{ vacantDetail?.company }}</h3>
                                     <span class="text-subtitle-2 opacity-50">
                                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ vacantDetail?.user.name }} {{ vacantDetail?.user.lastName }}
+                                        Reclutador: {{ vacantDetail?.user.name }} {{ vacantDetail?.user.lastName }}
                                     </span>
                                 </v-col>
                                 <v-col cols="12" md="3">

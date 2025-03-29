@@ -153,7 +153,7 @@ const formattedEndDate = computed(() => formatDefaultDate(updateEndDate.value));
                     </v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
-                    <v-chip-group>
+                    <v-chip-group class="scrollable-chips">
                         <v-chip
                             v-for="(skill, index) in updateRequirements"
                             :key="index"
@@ -175,3 +175,12 @@ const formattedEndDate = computed(() => formatDefaultDate(updateEndDate.value));
         </div>
     </v-form>
 </template>
+
+<style>
+.scrollable-chips {
+  max-height: 200px; /* Ajusta este valor según lo que necesites */
+  overflow-y: auto;  /* Permite el scroll vertical cuando sea necesario */
+  display: flex;
+  flex-wrap: wrap;
+}
+</style>
