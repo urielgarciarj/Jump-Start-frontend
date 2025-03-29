@@ -7,8 +7,10 @@ import axios from 'axios';
 
 const route = useRoute();
 const authStore = useAuthStore();
-const loggedInUserId = ref(authStore.userId);
-const userId = ref(route.params.id || loggedInUserId.value);
+const loggedInUserId = authStore.userId?.toString() || undefined;
+const userId = ref<any | undefined>(undefined);
+userId.value = route.params.id || loggedInUserId;
+const isOwnProfile = userId.value === loggedInUserId;
 
 // Getting email of the user
 const email = ref('');
@@ -50,7 +52,7 @@ onMounted(async () => {
 });
 
 watch(() => route.params.id, async (newUserId) => {
-    userId.value = newUserId || loggedInUserId.value;
+    userId.value = newUserId || loggedInUserId;
     await fetchUserData();
 });
 
@@ -115,7 +117,7 @@ const addSkill = () => {
 
 // Actualizar una skill específica usando el endpoint de actualización
 const updateSkill = async (skill: Skill) => {
-  if (!profileId.value || loggedInUserId.value !== userId.value) return;
+  if (!profileId.value || loggedInUserId !== userId.value) return;
   
   isSavingSkills.value = true;
   
@@ -136,7 +138,7 @@ const updateSkill = async (skill: Skill) => {
 
 // Eliminar skill usando el endpoint específico para eliminar
 const removeSkill = async (skillToRemove: Skill) => {
-  if (!profileId.value || loggedInUserId.value !== userId.value) return;
+  if (!profileId.value || loggedInUserId !== userId.value) return;
   
   isSavingSkills.value = true;
   
@@ -163,7 +165,7 @@ const removeSkill = async (skillToRemove: Skill) => {
 
 // Guardar todas las skills en el backend
 const saveSkills = async () => {
-  if (!profileId.value || loggedInUserId.value !== userId.value) return;
+  if (!profileId.value || loggedInUserId !== userId.value) return;
   
   isSavingSkills.value = true;
   
@@ -213,7 +215,7 @@ onMounted(async () => {
                         <h4 class="text-h4">Habilidades</h4>
                         <v-dialog v-model="dialog" max-width="600">
                             <template v-slot:activator="{ props }">
-                                <v-btn v-if="loggedInUserId === userId" color="lightsuccess" v-bind="props" size="29">
+                                <v-btn v-if="isOwnProfile" color="lightsuccess" v-bind="props" size="29">
                                     <Icon icon="solar:pen-linear" class="text-success" height="15" />
                                     <v-tooltip location="bottom">Editar</v-tooltip>
                                 </v-btn>
@@ -305,7 +307,7 @@ onMounted(async () => {
                             variant="tonal"
                             class="mt-3 mb-6"
                         >
-                            {{ loggedInUserId === userId ? 'Aún no has añadido habilidades. ¡Añade algunas para destacar tu perfil!' : 'Este usuario aún no ha añadido habilidades.' }}
+                            {{ isOwnProfile ? 'Aún no has añadido habilidades. ¡Añade algunas para destacar tu perfil!' : 'Este usuario aún no ha añadido habilidades.' }}
                         </v-alert>
                     </div>
 

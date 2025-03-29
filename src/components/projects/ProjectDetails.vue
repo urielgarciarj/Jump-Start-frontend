@@ -247,7 +247,7 @@ const getMatchColor = (percentage: number) => {
                                     <h3>Proyecto: {{ projectDetail?.name }}</h3>
                                     <span class="text-subtitle-2 opacity-50">
                                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ projectDetail?.professor.name }} {{ projectDetail?.professor.lastName }}
+                                        Docente: {{ projectDetail?.professor.name }} {{ projectDetail?.professor.lastName }}
                                     </span>
                                 </v-col>
                                 <v-col cols="12" md="3">

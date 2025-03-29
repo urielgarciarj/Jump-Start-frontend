@@ -29,13 +29,13 @@ const searchQuery = ref();
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
   try {
-    const getUser = await axios.get('http://localhost:3000/users/user/' + userId);
+    const getUser = await axios.get('http://localhost:3000/users/user/' + userId.value);
     if (getUser.data && getUser.data.role.toLowerCase() === 'estudiante') {
-      const response = await axios.get('http://localhost:3000/enrolls/list-projects/by-user-enrolled/' + userId);
+      const response = await axios.get('http://localhost:3000/enrolls/list-projects/by-user-enrolled/' + userId.value);
       projectsArray.value = response.data;     
     }
     if (getUser.data && getUser.data.role.toLowerCase() === 'docente') {
-      const response = await axios.get('http://localhost:3000/projects/list/' + userId);
+      const response = await axios.get('http://localhost:3000/projects/list/' + userId.value);
       projectsArray.value = response.data;  
     }
   } catch (error) {
@@ -70,16 +70,18 @@ const filteredProjects = computed(() => {
           ></v-select>
         </v-col>
     </v-row>
-    <v-row>
+    <v-row class="d-flex my-5">
+      <v-col cols="12" class="d-flex">
         <v-card v-if="filteredProjects.length === 0" class="pa-4 mb-4 my-5 text-center" variant="outlined" >
-        <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
-          <h3 class="text-h6 mb-2">No hay proyectos disponibles</h3>
-          <p class="text-body-2 text-medium-emphasis">
-              {{ isOwnProfile ? 'Aún no has creado ningún proyecto.' : 'Este usuario aún no tiene proyectos registrados.' }}
-          </p>
-      </v-card>
+          <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
+            <h3 class="text-h6 mb-2">No hay proyectos disponibles</h3>
+            <p class="text-body-2 text-medium-emphasis">
+                {{ isOwnProfile ? 'Aún no has creado ningún proyecto.' : 'Este usuario aún no tiene proyectos registrados.' }}
+            </p>
+        </v-card>
         <template v-for="project in filteredProjects" :key="project.id">
             <ProjectContent :project="project"/>
         </template>
+      </v-col>
     </v-row>
 </template>

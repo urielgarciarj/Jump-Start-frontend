@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef, onMounted, watch } from 'vue';
+import { ref, shallowRef, onMounted, watch, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { UserIcon, ArchiveIcon, FileStarIcon, FileCvIcon } from 'vue-tabler-icons';
 import { Icon } from '@iconify/vue';
@@ -82,6 +82,10 @@ onMounted(() => {
     fetchUserData();
     fetchProfileData();
 });
+
+// computed(() => {
+//     updateTabs(role.value);
+// });
 
 // Updates available tabs based on user role
 const updateTabs = (role: String) => {
