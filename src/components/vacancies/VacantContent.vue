@@ -12,6 +12,19 @@ const props = defineProps({
     vacant: Object
 });
 
+// Verificar si la vacante es recomendada (tiene propiedades de coincidencia)
+const isRecommended = computed(() => {
+    return props.vacant && props.vacant.matchPercentage !== undefined;
+});
+
+// Función para obtener color basado en el porcentaje de coincidencia
+const getMatchColor = (percentage: number) => {
+    if (percentage >= 90) return 'success';
+    if (percentage >= 70) return 'info';
+    if (percentage >= 50) return 'warning';
+    return 'error';
+};
+
 const showAlert = ref(false); // Controlar la visibilidad del snackbar
 const alertType = ref<'success' | 'error' | 'info' | 'warning'>('success');
 const snackbarMessage = ref(''); // Mensaje para mostrar en el snackbar
@@ -58,7 +71,27 @@ const formatDateTime = (date: string) => {
         </template>
         <div>{{ snackbarMessage }}</div>
     </v-alert>
-     <v-card variant="outlined">
+    <v-card variant="outlined">
+        <!-- Banner de coincidencia para vacantes recomendadas -->
+        <v-banner v-if="isRecommended && vacant && vacant.matchPercentage" 
+           :color="getMatchColor(vacant.matchPercentage)" 
+           class="match-banner"
+           density="compact"
+        >
+            <template v-slot:prepend>
+                <v-icon icon="mdi-checkbox-marked-circle-outline" class="mr-2"></v-icon>
+            </template>
+            <div class="d-flex justify-space-between align-center w-100">
+                <span>Coincidencia de habilidades: <strong>{{ vacant.matchPercentage }}%</strong></span>
+                <v-tooltip location="top">
+                    <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" icon="mdi-information-outline"></v-icon>
+                    </template>
+                    Esta vacante coincide con tus habilidades.
+                </v-tooltip>
+            </div>
+        </v-banner>
+        
         <div class="d-flex mainbox">
             <!---left side for genral info -->
             <div class="left-part">
@@ -67,7 +100,7 @@ const formatDateTime = (date: string) => {
                     <h3 >{{ vacant?.company }}</h3>
                     <span class="text-subtitle-2 opacity-50">
                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                        {{ vacant?.user.name }} {{ vacant?.user.lastName }}
+                        {{ vacant?.user?.name || vacant?.recruiter?.name }} {{ vacant?.user?.lastName || vacant?.recruiter?.lastName }}
                     </span>
                     <br /><br />
                     <div class="d-flex gap-3 mb-5" v-if="vacant?.location">
@@ -119,7 +152,7 @@ const formatDateTime = (date: string) => {
                                 <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
                                 {{ formatDateTime(vacant?.createdAt) }}
                             </span>
-                            <v-btn v-if="vacant?.user.id === userId" :to="`/details/job-opportunity/${vacant?.id}`" icon flat size="32">
+                            <v-btn v-if="vacant?.user && vacant?.user.id === userId" :to="`/details/job-opportunity/${vacant?.id}`" icon flat size="32">
                                 <Icon icon="solar:eye-linear" class="text-primary" height="18" />
                                 <v-tooltip activator="parent" location="bottom">Ver Detalles</v-tooltip>
                             </v-btn>
@@ -128,11 +161,31 @@ const formatDateTime = (date: string) => {
                         <div v-html="vacant?.description"></div>
                         <br />
                         <v-divider></v-divider>
+                        
+                        <!-- Habilidades requeridas -->
                         <div class="d-block gap-3">
                             <h4>Habilidades Requeridas</h4>
                             <span class="text-body-1">
                                 {{ vacant?.requirements }}
                             </span>
+                        </div>
+                        
+                        <!-- Mostrar habilidades coincidentes para vacantes recomendadas -->
+                        <div v-if="isRecommended && vacant && vacant.matchingSkills" class="mt-4">
+                            <v-divider></v-divider>
+                            <h4 class="mt-3">Tus habilidades coincidentes</h4>
+                            <v-chip-group class="mt-2">
+                                <v-chip
+                                    v-for="skill in vacant.matchingSkills"
+                                    :key="skill"
+                                    color="success"
+                                    variant="tonal"
+                                    size="small"
+                                    class="ma-1"
+                                >
+                                    {{ skill }}
+                                </v-chip>
+                            </v-chip-group>
                         </div>
                     </v-card-text>
                 </v-card-item>
@@ -165,5 +218,9 @@ const formatDateTime = (date: string) => {
 .right-part {
     width: 100%;
     position: relative;
+}
+
+.match-banner {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 </style>
