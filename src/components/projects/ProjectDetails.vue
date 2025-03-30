@@ -53,6 +53,7 @@ const headers : any = ref([
 onMounted(async () => {
     try {
         const response = await axios.get(`http://localhost:3000/projects/project/detail/${projectId}`);
+        console.log('response', response.data)
         if (!response.data) { // If no response data, throw error
             error.value = 'Oferta laboral no encontrada.';
         } else { // The vacant belong to the currUser, proceed to get applications 
@@ -247,7 +248,7 @@ const getMatchColor = (percentage: number) => {
                                     <h3>Proyecto: {{ projectDetail?.name }}</h3>
                                     <span class="text-subtitle-2 opacity-50">
                                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ projectDetail?.professor.name }} {{ projectDetail?.professor.lastName }}
+                                        Docente: {{ projectDetail?.professor.name }} {{ projectDetail?.professor.lastName }}
                                     </span>
                                 </v-col>
                                 <v-col cols="12" md="3">
@@ -285,7 +286,7 @@ const getMatchColor = (percentage: number) => {
                                     </span>
                                 </v-col>
                                 <v-col cols="12" md="12">
-                                    <h3>Requerimientos</h3>
+                                    <h3>Habilidades Requeridas</h3>
                                     <span class="text-subtitle-1 opacity-50">
                                         {{ projectDetail?.requirements }}
                                     </span>
@@ -414,8 +415,8 @@ const getMatchColor = (percentage: number) => {
         </v-card>
     </v-dialog>
     
-    <!-- Sección de estudiantes recomendados -->
-    <v-card v-if="userRole === 'Docente'" elevation="10" class="mt-6">
+    <!-- Sección de estudiantes recomendados *** Solo disponible para el docente que creo el proyecto -->
+    <v-card v-if="projectDetail?.professor.id === userId" elevation="10" class="mt-6">
         <v-card-item>
             <v-container>
                 <v-row>

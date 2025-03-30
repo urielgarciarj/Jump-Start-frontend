@@ -27,13 +27,13 @@ const breadcrumbs = ref([
 // Hacer la petición HTTP cuando el componente se monte
 onMounted(async () => {
   try {
-    const getUser = await axios.get('http://localhost:3000/users/user/' + userId);
+    const getUser = await axios.get('http://localhost:3000/users/user/' + userId.value);
     if (getUser.data && getUser.data.role.toLowerCase() === 'estudiante') {
-      const response = await axios.get('http://localhost:3000/applications/list-vacants/by-user/' + userId);
+      const response = await axios.get('http://localhost:3000/applications/list-vacants/by-user/' + userId.value);
       vacantsArray.value = response.data;     
     }
     if (getUser.data && getUser.data.role.toLowerCase() === 'reclutador') {
-      const response = await axios.get('http://localhost:3000/vacancies/list/' + userId);
+      const response = await axios.get('http://localhost:3000/vacancies/list/' + userId.value);
       vacantsArray.value = response.data;  
     }
   } catch (error) {
@@ -48,14 +48,19 @@ onMounted(async () => {
     <ProfileBanner 
         :userId="userId"
     />
-    <v-card v-if="vacantsArray.length === 0" class="pa-4 mb-4 my-5 text-center" variant="outlined" >
-      <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
-        <h3 class="text-h6 mb-2">No hay vacantes disponibles</h3>
-        <p class="text-body-2 text-medium-emphasis">
-            {{ isOwnProfile ? 'Aún no has creado ninguna vacante.' : 'Este usuario aún no ha registrado vacantes.' }}
-        </p>
-    </v-card>
-    <v-col v-for="vacant in vacantsArray" :key="vacant.id" cols="12" md="12">
-        <VacantContent :vacant="vacant"/>
-    </v-col>
+
+    <v-row class="d-flex my-5 justify-center">
+      <v-col v-if="vacantsArray.length === 0" cols="12" class="d-flex">
+        <v-card v-if="vacantsArray.length === 0" class="pa-4 mb-4 my-5 text-center" variant="outlined" >
+          <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
+            <h3 class="text-h6 mb-2">No hay vacantes disponibles</h3>
+            <p class="text-body-2 text-medium-emphasis">
+                {{ isOwnProfile ? 'Aún no has creado ninguna vacante.' : 'Este usuario aún no ha registrado vacantes.' }}
+            </p>
+        </v-card>
+      </v-col>
+      <v-col v-for="vacant in vacantsArray" :key="vacant.id" cols="12" md="12">
+          <VacantContent :vacant="vacant"/>
+      </v-col>
+    </v-row>
 </template>

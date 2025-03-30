@@ -99,7 +99,7 @@ const filteredProjects = computed(() => {
                 color="primary"
             ></v-text-field>
         </v-col>
-        <v-col cols="12" sm="6" md="4" class="d-flex justify-start pl-2">
+        <v-col v-if="userRole.toLowerCase() === 'estudiante'" cols="12" sm="6" md="4" class="d-flex justify-start pl-2">
             <v-select
                 v-model="filterType"
                 :items="filterOptions"

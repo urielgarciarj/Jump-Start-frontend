@@ -19,7 +19,7 @@ const userId = authStore.userId;
 const project = ref({
     name: '',
     category: '',
-    status: '',
+    status: 'abierto',
     description: '',
     requirements: '',
     startDate: '',
@@ -27,6 +27,9 @@ const project = ref({
     dateCreated: new Date().toISOString(),
     idTeacher: userId
 });
+
+const skills = ref<string[]>([]);
+const newSkill = ref<string>('');
 
 const statusesOptions = [
   { text: 'Abierto', value: 'abierto' },
@@ -48,12 +51,30 @@ const notEmptyRule = [
   (value: string) => !!value || 'Este campo es obligatorio.'
 ];
 
+// Añadir skill
+const addSkill = (skillToAdd: string) => {
+  if (skillToAdd && !skills.value.some(s => s.toLowerCase() === skillToAdd.toLowerCase())) {
+    skills.value.push(skillToAdd);  // Añadir la habilidad al array
+    newSkill.value = '';  // Limpiar el campo de entrada
+  }
+};
+// Remove skill
+const removeSkill = (skillIndex: number) => {
+    skills.value.splice(skillIndex, 1);
+    console.log('skill removed', skills.value)
+};
+
 const submitProject = async () => {
     if (valid.value) {
         try {
-            const response = await axios.post('http://localhost:3000/projects/create', project.value);
-            console.log('project created:', response.data);
-            router.push('/projects/list-all');
+            if (skills.value.length && skills.value.length > 0) {
+                project.value.requirements = skills.value.join(',');
+                await axios.post('http://localhost:3000/projects/create', project.value);
+                router.push('/projects/list-all');                
+            } 
+            else {
+                error.value = 'Es obligatorio agregar habilidades requeridas.';
+            }
             
         } catch (err) {
             console.error('Error:', err);
@@ -105,9 +126,29 @@ const submitProject = async () => {
                             <v-label class="font-weight-semibold pb-2">Descripción</v-label>
                             <v-textarea v-model="project.description" :rules="notEmptyRule" required />
                         </v-col>
-                        <v-col cols="12">
-                            <v-label class="font-weight-semibold pb-2">Requerimientos</v-label>
-                            <v-textarea v-model="project.requirements"  :rules="notEmptyRule" required />
+                        <v-col cols="12" md="4">
+                            <v-label class="font-weight-semibold pb-2">Habilidades Requeridas</v-label>
+                            <v-text-field v-model="newSkill" label="Añadir nueva habilidad" placeholder="Ej: JavaScript, Diseño UX, Marketing Digital"
+                                variant="outlined" hide-details="auto" class="mb-4" @keyup.enter="addSkill(newSkill)"
+                            >
+                                <template v-slot:append>
+                                    <v-btn color="success" size="sm" icon="mdi-plus" :disabled="!newSkill.trim()" @click="addSkill(newSkill)"></v-btn>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-chip-group class="scrollable-chips">
+                                <v-chip
+                                    v-for="(skill, index) in skills"
+                                    :key="index"
+                                    closable
+                                    @click:close="removeSkill(index)"
+                                    color="primary"
+                                    variant="outlined"
+                                >
+                                    {{ skill }}
+                                </v-chip>
+                            </v-chip-group>
                         </v-col>
                     </v-row>
                 </div>
@@ -120,4 +161,13 @@ const submitProject = async () => {
         </v-card-item>
     </v-card>
 </template>
+
+<style>
+.scrollable-chips {
+  max-height: 200px; /* Ajusta este valor según lo que necesites */
+  overflow-y: auto;  /* Permite el scroll vertical cuando sea necesario */
+  display: flex;
+  flex-wrap: wrap;
+}
+</style>
 

@@ -12,7 +12,7 @@ const updateName = ref(props.project?.name || '');
 const updateStatus = ref(props.project?.status || '');
 const updateCategory = ref(props.project?.category || '');
 const updateDescription = ref(props.project?.description || '');
-const updateRequirements = ref(props.project?.requirements || '');
+const updateRequirements = ref(props.project?.requirements ? props.project.requirements.split(',') : []);
 const updateStartDate = ref(props.project?.startDate || '');
 const updateEndDate = ref(props.project?.endDate || '');
 
@@ -30,6 +30,7 @@ const categoryOptions = [
     "Proyectos de Historia y Cultura", "Proyectos de Ingeniería y Construcción", "Proyectos Recreativos"
 ];
 
+const newSkill = ref<string>('');
 const valid = ref(false);
 const error = ref<string | null>(null);
 const notEmptyRule = [
@@ -44,18 +45,23 @@ const cancelEdit = () => {
 const submitVacant = async () => {
     if (valid.value) {
         try {
-            const projectData = {
-                name: updateName.value,
-                category: updateCategory.value,
-                status: updateStatus.value,
-                description: updateDescription.value,
-                requirements: updateRequirements.value,
-                startDate: updateStartDate.value,
-                endDate: updateEndDate.value
+            if (updateRequirements.value.length && updateRequirements.value.length > 0) {
+                const projectData = {
+                    name: updateName.value,
+                    category: updateCategory.value,
+                    status: updateStatus.value,
+                    description: updateDescription.value,
+                    requirements: updateRequirements.value.join(','),
+                    startDate: updateStartDate.value,
+                    endDate: updateEndDate.value
+                }
+                const response = await axios.put(`http://localhost:3000/projects/updateFields/${props.project?.id}`, projectData);
+                // Emitir evento para actualizar el proyecto en el componente principal
+                emit('updateProject', {...props.project,...response.data,});
             }
-            const response = await axios.put(`http://localhost:3000/projects/updateFields/${props.project?.id}`, projectData);
-            // Emitir evento para actualizar el proyecto en el componente principal
-            emit('updateProject', {...props.project,...response.data,});
+            else {
+                error.value = 'Es obligatorio agregar habilidades requeridas.';
+            }
             
         } catch (err) {
             console.error('Error:', err);
@@ -66,6 +72,20 @@ const submitVacant = async () => {
             }
         }
     }
+};
+
+// Añadir skill
+const addSkill = (skillToAdd: string) => {
+  if (skillToAdd && !updateRequirements.value.some((s: string) => s.toLowerCase() === skillToAdd.toLowerCase())) {
+    updateRequirements.value.push(skillToAdd);  // Añadir la habilidad al array
+    newSkill.value = '';  // Limpiar el campo de entrada
+    console.log('Skill added:', updateRequirements.value);  // Depuración
+  }
+};
+
+const removeSkill = (skillIndex: number) => {
+    updateRequirements.value.splice(skillIndex, 1);
+    console.log('skill removed', updateRequirements.value)
 };
 
 // Formatear fecha a 'YYYY-MM-DD'
@@ -122,9 +142,29 @@ const formattedEndDate = computed(() => formatDefaultDate(updateEndDate.value));
                     <v-label class="font-weight-semibold pb-2">Descripción</v-label>
                     <v-textarea v-model="updateDescription" :rules="notEmptyRule" required />
                 </v-col>
-                <v-col cols="12">
-                    <v-label class="font-weight-semibold pb-2">Requerimientos</v-label>
-                    <v-textarea v-model="updateRequirements"  :rules="notEmptyRule" required />
+                <v-col cols="12" md="4">
+                    <v-label class="font-weight-semibold pb-2">Habilidades Requeridas</v-label>
+                    <v-text-field v-model="newSkill" label="Añadir nueva habilidad" placeholder="Ej: JavaScript, Diseño UX, Marketing Digital"
+                        variant="outlined" hide-details="auto" class="mb-4" @keyup.enter="addSkill(newSkill)"
+                    >
+                        <template v-slot:append>
+                            <v-btn color="success" size="sm" icon="mdi-plus" :disabled="!newSkill.trim()" @click="addSkill(newSkill)"></v-btn>
+                        </template>
+                    </v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                    <v-chip-group class="scrollable-chips">
+                        <v-chip
+                            v-for="(skill, index) in updateRequirements"
+                            :key="index"
+                            closable
+                            @click:close="removeSkill(index)"
+                            color="primary"
+                            variant="outlined"
+                        >
+                            {{ skill }}
+                        </v-chip>
+                    </v-chip-group>
                 </v-col>
             </v-row>
         </div>
@@ -135,3 +175,12 @@ const formattedEndDate = computed(() => formatDefaultDate(updateEndDate.value));
         </div>
     </v-form>
 </template>
+
+<style>
+.scrollable-chips {
+  max-height: 200px; /* Ajusta este valor según lo que necesites */
+  overflow-y: auto;  /* Permite el scroll vertical cuando sea necesario */
+  display: flex;
+  flex-wrap: wrap;
+}
+</style>

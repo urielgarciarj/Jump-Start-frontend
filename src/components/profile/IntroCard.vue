@@ -8,8 +8,10 @@ import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
 const authStore = useAuthStore();
-const loggedInUserId = ref(authStore.userId);
-const userId = ref(route.params.id || loggedInUserId.value);
+const loggedInUserId = authStore.userId?.toString() || undefined;
+const userId = ref<any | undefined>(undefined);
+userId.value = route.params.id || loggedInUserId;
+const isOwnProfile = userId.value === loggedInUserId;
 
 // Getting email of the user
 const email = ref('');
@@ -48,7 +50,7 @@ const fetchProfileData = async () => {
 
 const saveChanges = async () => {
     try {
-        await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId.value}`, {
+        await axios.patch(`http://localhost:3000/profiles/upsert/${loggedInUserId}`, {
             aboutMe: profileIntroduction.value,
             jobCompany: profileCompany.value,
             university: profileUniversity.value,
@@ -71,7 +73,7 @@ onMounted(async () => {
 });
 
 watch(() => route.params.id, async (newUserId) => {
-    userId.value = newUserId || loggedInUserId.value;
+    userId.value = newUserId || loggedInUserId;
     await fetchUserData();
 });
 
@@ -90,7 +92,7 @@ function close() {
                         <h4 class="text-h4">Información personal</h4>
                         <v-dialog v-model="dialog" max-width="500">
                             <template v-slot:activator="{ props }">
-                                <v-btn v-if="loggedInUserId === userId" color="lightsuccess" v-bind="props" size="29">
+                                <v-btn v-if="isOwnProfile" color="lightsuccess" v-bind="props" size="29">
                                     <Icon icon="solar:pen-linear" class="text-success" height="15" />
                                     <v-tooltip location="bottom">Editar</v-tooltip>
                                 </v-btn>
