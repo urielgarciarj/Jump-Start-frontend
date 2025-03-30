@@ -62,6 +62,11 @@ const formatDateTime = (date: string) => {
     minute: '2-digit', // Minutos (en formato 2 dígitos)
   });
 };
+
+// Agregar verificación de status para evitar undefined
+const hasValidStatus = computed(() => {
+  return props.vacant && props.vacant.status !== undefined;
+});
 </script>
 
 <template>
@@ -131,10 +136,10 @@ const formatDateTime = (date: string) => {
                     <div class="d-flex gap-3 mb-5">
                         <span class="text-h6">Estado:</span>
                         <v-chip color="success" class="font-weight-bold d-flex justify-end" size="small" rounded="sm"> 
-                            {{ vacant?.status.charAt(0).toUpperCase() + vacant?.status.slice(1) }}
+                            {{ vacant?.status ? (vacant.status.charAt(0).toUpperCase() + vacant.status.slice(1)) : 'Desconocido' }}
                         </v-chip>
                     </div>
-                    <div v-if="userRole.toLowerCase() === 'estudiante' && vacant?.status.toLowerCase() === 'activo'">
+                    <div v-if="userRole && vacant?.status && userRole.toLowerCase() === 'estudiante' && vacant.status.toLowerCase() === 'activo'">
                         <v-col color="secondary" class="font-weight-bold d-flex" sm="6" rounded="sm"> 
                             <sendApply :vacant="vacant?.id" @applySaved="applicationSent" @applyDeleted="applicationDeleted"/>
                         </v-col>
