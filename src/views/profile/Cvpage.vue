@@ -38,7 +38,7 @@ const file = ref<File | null>(null);
 onMounted(async () => {
   try {
     const response = await axios.get(`http://localhost:3000/profiles/download-cv/${userId.value}`);
-    console.log('response', response)
+    //console.log('response', response)
     cvUrl.value = response.data.cvUrl; // Almacenar la URL del PDF
   } catch (error) {
     console.error('Error al obtener cv url:', error);
