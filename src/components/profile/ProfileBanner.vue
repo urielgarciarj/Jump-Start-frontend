@@ -14,7 +14,6 @@ const props = defineProps({
 const authStore = useAuthStore();
 const loggedInUserId = authStore.userId;
 const isOwnProfile = props.userId == loggedInUserId;
-console.log('isOwnProfile', isOwnProfile)
 const tab = ref(null);
 const items = shallowRef([
     { tab: 'Perfil', icon: UserIcon, href: `/profile/${props.userId}` }
