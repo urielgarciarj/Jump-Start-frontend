@@ -7,6 +7,7 @@ import axios from 'axios';
 // Components
 import profileBg from '@/assets/images/backgrounds/profilebg.jpg';
 import UserImage from '@/assets/images/profile/user-5.jpg';
+import { VLazy } from 'vuetify/lib/components/index.mjs';
 
 const props = defineProps({
     userId: String
@@ -26,13 +27,22 @@ const role = ref('');
 // Getting profile picture from profile of the user
 const profilePicture = ref('');
 
+// social media links
+const isEditing = ref(false);
+const showSuccessPopup = ref(false);
+const socialLinks = ref({
+    facebook: "",
+    twitter: "",
+    linkedin: "",
+    instagram: "",
+})
 const fetchUserData = async () => {
     try {
         const response = await axios.get(`http://localhost:3000/users/user/${props.userId}`);
         const userData = response.data;
         fullName.value = `${userData.name} ${userData.lastName}`;
         role.value = userData.role;
-
+        socialLinks.value = userData.socialLinks || {};
         updateTabs(userData.role);
     } catch (error) {
         console.error('Error fetching user data:', error);
@@ -46,6 +56,16 @@ const fetchProfileData = async () => {
         profilePicture.value = profileData.picture;
     } catch (error) {
         console.error('Error fetching profile data:', error);
+    }
+};
+
+// Guardar cambios en redes sociales
+const saveSocialLinks = async () => {
+    try {
+        await axios.put(`http://localhost:3000/profiles/update-social-links/${props.userId}`, socialLinks.value);
+        isEditing.value = false;
+    } catch (error) {
+        console.error('Error saving social links:', error);
     }
 };
 
@@ -91,6 +111,7 @@ onMounted(() => {
 const updateTabs = (role: String) => {
     try {
         if (!role) return;
+        items.value = [{ tab: 'Perfil', icon: UserIcon, href: `/profile/${props.userId}` }];
         switch (role.toLowerCase()) {
             case 'docente':
                 items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + props.userId });
@@ -136,18 +157,39 @@ const updateTabs = (role: String) => {
                 </v-col>
                 <v-col cols="12" lg="4" class="d-flex align-center justify-center justify-lg-end order-sm-third">
                     <div class="d-flex align-center justify-space-between px-10 py-1 gap-3">
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-facebook"
+                        <v-btn v-if="socialLinks.facebook" :href="socialLinks.facebook" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-facebook"
                             ><BrandFacebookIcon size="16"
                         /></v-btn>
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-twitter"
+                        <v-btn v-if="socialLinks.twitter" :href="socialLinks.twitter" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-twitter"
                             ><BrandTwitterIcon size="16"
                         /></v-btn>
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-dribbble"
-                            ><BrandDribbbleIcon size="16"
+                        <v-btn v-if="socialLinks.linkedin" :href="socialLinks.linkedin" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-linkedin"
+                            ><BrandLinkedinIcon size="16"
                         /></v-btn>
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-youtube"
-                            ><BrandYoutubeIcon size="16"
+                        <v-btn v-if="socialLinks.instagram" :href="socialLinks.instagram" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-instagram"
+                            ><BrandInstagramIcon size="16"
                         /></v-btn>
+                        <v-btn icon class="ml-2" @click="isEditing = true">
+                            <Icon icon="solar:pen-linear" class="text-success" />
+                        </v-btn>
+                        <v-dialog v-model="isEditing" persistent max-width="600px">
+                        <v-card variant="outlined">
+                                <v-card-title class="pa-4 bg-primary">
+                                    <span class="title text-white">Ingresa Redes Sociales</span>
+                                </v-card-title>
+                                <v-card-text>
+                                    <v-text-field v-model="socialLinks.facebook" label="Facebook" prepend-icon="mdi-facebook" />
+                                    <v-text-field v-model="socialLinks.twitter" label="Twitter" prepend-icon="mdi-twitter" />
+                                    <v-text-field v-model="socialLinks.linkedin" label="LinkedIn" prepend-icon="mdi-linkedin" />
+                                    <v-text-field v-model="socialLinks.instagram" label="Instagram" prepend-icon="mdi-instagram" />
+                                </v-card-text>
+                                <v-card-actions class="pa-4">
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="error" variant="flat" @click="isEditing = false">Cancelar</v-btn>
+                                    <v-btn color="primary" variant="flat" @click="saveSocialLinks">Guardar</v-btn>
+                                </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                     </div>
                 </v-col>
                 <v-col md="12" class="order-sm-last">
@@ -230,10 +272,10 @@ const updateTabs = (role: String) => {
 .btn-brand-twitter {
     background-color: rgb(29, 161, 242) !important;
 }
-.btn-brand-dribbble {
+.btn-brand-linkedin {
     background-color: rgb(234, 76, 137) !important;
 }
-.btn-brand-youtube {
+.btn-brand-instagram {
     background-color: rgb(205, 32, 31) !important;
 }
 </style>
