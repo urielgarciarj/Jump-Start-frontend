@@ -13,7 +13,8 @@ const props = defineProps({
 });
 const authStore = useAuthStore();
 const loggedInUserId = authStore.userId;
-
+const isOwnProfile = props.userId == loggedInUserId;
+console.log('isOwnProfile', isOwnProfile)
 const tab = ref(null);
 const items = shallowRef([
     { tab: 'Perfil', icon: UserIcon, href: `/profile/${props.userId}` }
@@ -126,9 +127,9 @@ const updateTabs = (role: String) => {
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
                                 <img :src="profilePicture || UserImage" alt="Mathew" width="100" @click="triggerFileInput" />
-                                <Icon v-if="loggedInUserId === userId" icon="solar:pen-linear" class="edit-icon" height="25" />
+                                <Icon v-if="isOwnProfile" icon="solar:pen-linear" class="edit-icon" height="25" />
                             </v-avatar>
-                            <input v-if="loggedInUserId === userId" type="file" ref="fileInput" @change="onFileChange" style="display: none" />
+                            <input v-if="isOwnProfile" type="file" ref="fileInput" @change="onFileChange" style="display: none" />
                         </div>
                         <h5 class="text-h5 mt-3">{{ fullName }}</h5>
                         <span class="textSecondary font-weight-regular">{{ role }}</span>

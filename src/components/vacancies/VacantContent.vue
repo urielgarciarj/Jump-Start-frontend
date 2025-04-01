@@ -103,9 +103,11 @@ const hasValidStatus = computed(() => {
                 <v-card-item>
                     <h2 >{{ vacant?.name }}</h2>
                     <h3 >{{ vacant?.company }}</h3>
-                    <span class="text-subtitle-2 opacity-50">
+                    <span class="text-subtitle-2 opacity-50 custom-text-primary">
                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                        {{ vacant?.user?.name || vacant?.recruiter?.name }} {{ vacant?.user?.lastName || vacant?.recruiter?.lastName }}
+                        <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${vacant?.user?.id || vacant?.recruiter?.id}`" >
+                            {{ vacant?.user?.name || vacant?.recruiter?.name }} {{ vacant?.user?.lastName || vacant?.recruiter?.lastName }}
+                        </RouterLink>
                     </span>
                     <br /><br />
                     <div class="d-flex gap-3 mb-5" v-if="vacant?.location">
