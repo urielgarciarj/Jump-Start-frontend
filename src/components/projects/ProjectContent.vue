@@ -123,7 +123,11 @@ const getDisplayDate = computed(() => {
                         <img :src="project?.professor.profile?.picture || UserImage" alt="icon" height="40" />
                     </v-avatar>
                     <div>
-                        <span class="text-subtitle ml-2">{{ project?.professor.name }} {{ project?.professor.lastName }}</span>
+                        <span class="text-subtitle ml-2 custom-text-primary">
+                            <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${project?.professor.id}`" >
+                                {{ project?.professor.name }} {{ project?.professor.lastName }}
+                            </RouterLink>
+                        </span>
                         <br />
                         <span class="text-subtitle-2 ml-2 textSecondary">{{ project?.professor.profile?.university }}</span>
                     </div>

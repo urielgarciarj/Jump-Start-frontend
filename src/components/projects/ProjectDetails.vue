@@ -53,7 +53,6 @@ const headers : any = ref([
 onMounted(async () => {
     try {
         const response = await axios.get(`http://localhost:3000/projects/project/detail/${projectId}`);
-        console.log('response', response.data)
         if (!response.data) { // If no response data, throw error
             error.value = 'Oferta laboral no encontrada.';
         } else { // The vacant belong to the currUser, proceed to get applications 
