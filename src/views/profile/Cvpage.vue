@@ -43,10 +43,9 @@ onMounted(async () => {
     <ProfileBanner 
         :userId="userId"
     />
-    <v-row class="mt-4">
-      <v-col>
-        Aqui pondria mi CV.
-        SI TUVIERA UNO!
-      </v-col>
-    </v-row>
+
+    <v-card class="mb-3 pa-5 my-5">
+          Aqui pondria mi CV.
+          SI TUVIERA UNO!
+    </v-card>
 </template>
