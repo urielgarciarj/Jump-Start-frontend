@@ -58,7 +58,7 @@ const filteredProjects = computed(() => {
     <ProfileBanner 
         :userId="userId"
     />
-    <v-row v-if="filteredProjects.length > 0" class="d-flex my-5 justify-end">
+    <v-row class="d-flex my-5 justify-end">
         <v-col cols="12" sm="6" class="d-flex justify-end">
           <v-select
             v-model="searchQuery"
@@ -71,17 +71,15 @@ const filteredProjects = computed(() => {
         </v-col>
     </v-row>
     <v-row class="d-flex my-5">
-      <v-col cols="12" class="d-flex">
-        <v-card v-if="filteredProjects.length === 0" class="pa-4 mb-4 my-5 text-center" variant="outlined" >
-          <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
-            <h3 class="text-h6 mb-2">No hay proyectos disponibles</h3>
-            <p class="text-body-2 text-medium-emphasis">
-                {{ isOwnProfile ? 'Aún no has creado ningún proyecto.' : 'Este usuario aún no tiene proyectos registrados.' }}
-            </p>
-        </v-card>
-        <template v-for="project in filteredProjects" :key="project.id">
-            <ProjectContent :project="project"/>
-        </template>
-      </v-col>
+      <v-card v-if="filteredProjects.length === 0" class="pa-4 mb-4 my-5 text-center" variant="outlined" >
+        <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
+          <h3 class="text-h6 mb-2">No hay proyectos disponibles</h3>
+          <p class="text-body-2 text-medium-emphasis">
+              {{ isOwnProfile ? 'Aún no has creado ningún proyecto.' : 'Este usuario aún no tiene proyectos registrados.' }}
+          </p>
+      </v-card>
+      <template v-for="project in filteredProjects" :key="project.id">
+          <ProjectContent :project="project"/>
+      </template>
     </v-row>
 </template>
