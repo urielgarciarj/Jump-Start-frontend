@@ -133,8 +133,8 @@ const formatDateTime = (date: string) => {
 
 <style scoped>
 .adjusted-image {
-  max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
-  max-height: 100%; /* Limita la altura máxima de la imagen */
+  max-width: 70%; /* La imagen no puede exceder el tamaño del contenedor */
+  max-height: 80%; /* Limita la altura máxima de la imagen */
   object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
 }
 </style>
@@ -157,7 +157,11 @@ const formatDateTime = (date: string) => {
                     </template>
                 </v-avatar>
                 <div class="d-block d-sm-flex align-center gap-3">
-                    <h6 class="text-h6">{{ post?.user.name }} {{ post?.user.lastName }}</h6>
+                    <h6 class="text-h6 custom-text-primary">
+                        <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${post?.user.id}`" >
+                            {{ post?.user.name }} {{ post?.user.lastName }}
+                        </RouterLink>
+                    </h6>
                     <span class="text-subtitle-2 opacity-50">
                         <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
                         {{ formatDateTime(post?.dateCreated) }}

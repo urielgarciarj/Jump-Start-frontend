@@ -1,21 +1,23 @@
 <script setup lang="ts">
-import { ref, shallowRef, onMounted } from 'vue';
-import { HeartIcon, PhotoIcon, UserCircleIcon, UsersIcon } from 'vue-tabler-icons';
+import { ref, shallowRef, onMounted, watch, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { UserIcon, ArchiveIcon, FileStarIcon, FileCvIcon } from 'vue-tabler-icons';
+import { Icon } from '@iconify/vue';
+import axios from 'axios';
+// Components
 import profileBg from '@/assets/images/backgrounds/profilebg.jpg';
 import UserImage from '@/assets/images/profile/user-5.jpg';
-import axios from 'axios';
-import { useAuthStore } from '@/stores/auth';
-import { Icon } from '@iconify/vue';
+import { VLazy } from 'vuetify/lib/components/index.mjs';
 
+const props = defineProps({
+    userId: String
+});
 const authStore = useAuthStore();
-const userId = authStore.userId;
-
+const loggedInUserId = authStore.userId;
+const isOwnProfile = props.userId == loggedInUserId;
 const tab = ref(null);
 const items = shallowRef([
-    { tab: 'Profile', icon: UserCircleIcon, href: '/profile' },
-    { tab: 'Mi CV', icon: HeartIcon, href: '/cv' },
-    { tab: 'Proyectos', icon: UsersIcon, href: '/myprojects' },
-    { tab: 'Mis Solicitudes', icon: UsersIcon, href: '/userapplications' },
+    { tab: 'Perfil', icon: UserIcon, href: `/profile/${props.userId}` }
 ]);
 
 // Getting full name of the user
@@ -25,12 +27,23 @@ const role = ref('');
 // Getting profile picture from profile of the user
 const profilePicture = ref('');
 
+// social media links
+const isEditing = ref(false);
+const showSuccessPopup = ref(false);
+const socialLinks = ref({
+    facebook: "",
+    twitter: "",
+    linkedin: "",
+    instagram: "",
+})
 const fetchUserData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/users/user/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/user/${props.userId}`);
         const userData = response.data;
         fullName.value = `${userData.name} ${userData.lastName}`;
         role.value = userData.role;
+        socialLinks.value = userData.socialLinks || {};
+        updateTabs(userData.role);
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
@@ -38,11 +51,21 @@ const fetchUserData = async () => {
 
 const fetchProfileData = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/profiles/${userId}`);
+        const response = await axios.get(`http://localhost:3000/profiles/${props.userId}`);
         const profileData = response.data;
         profilePicture.value = profileData.picture;
     } catch (error) {
         console.error('Error fetching profile data:', error);
+    }
+};
+
+// Guardar cambios en redes sociales
+const saveSocialLinks = async () => {
+    try {
+        await axios.put(`http://localhost:3000/profiles/update-social-links/${props.userId}`, socialLinks.value);
+        isEditing.value = false;
+    } catch (error) {
+        console.error('Error saving social links:', error);
     }
 };
 
@@ -55,13 +78,13 @@ const onFileChange = async (event: Event) => {
             formData.append('file', file);
 
             try {
-                const response = await axios.post(`http://localhost:3000/profiles/upload-profile-picture/${userId}`, formData, {
+                const response = await axios.post(`http://localhost:3000/profiles/upload-profile-picture/${loggedInUserId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
                 profilePicture.value = response.data.fileUrl; // Actualiza la imagen mostrada
-                console.log('Image uploaded:', profilePicture.value);
+                //console.log('Image uploaded:', profilePicture.value);
             } catch (error) {
                 console.error('Error uploading image:', error);
             }
@@ -79,15 +102,36 @@ onMounted(() => {
     fetchUserData();
     fetchProfileData();
 });
-</script>
 
-<style scoped>
-.adjusted-image {
-    max-width: 100%; /* La imagen no puede exceder el tamaño del contenedor */
-    max-height: 100%; /* Limita la altura máxima de la imagen */
-    object-fit: contain; /* Asegura que la imagen se ajusta manteniendo su proporción */
-}
-</style>
+// computed(() => {
+//     updateTabs(role.value);
+// });
+
+// Updates available tabs based on user role
+const updateTabs = (role: String) => {
+    try {
+        if (!role) return;
+        items.value = [{ tab: 'Perfil', icon: UserIcon, href: `/profile/${props.userId}` }];
+        switch (role.toLowerCase()) {
+            case 'docente':
+                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + props.userId });
+                break;
+            case 'reclutador':
+                items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + props.userId });
+                break;
+            case 'estudiante':
+                items.value.push({ tab: 'CV', icon: FileCvIcon, href: '/cv/' + props.userId });
+                items.value.push({ tab: 'Proyectos', icon: FileStarIcon, href: '/myprojects/' + props.userId });
+                if (props.userId == loggedInUserId) {// Just the owner estudent can view the vacants where he send an apply
+                    items.value.push({ tab: 'Ofertas laborales', icon: ArchiveIcon, href: '/userapplications/' + props.userId });
+                }
+                break;
+        }
+    } catch (error) {
+        console.error('Error fetching profile data:', error);
+    }
+};
+</script>
 
 <template>
     <v-card elevation="10" class="overflow-hidden">
@@ -96,23 +140,6 @@ onMounted(() => {
             <v-row class="mt-1">
                 <v-col cols="12" lg="4" sm="12" class="order-sm-second">
                     <div class="px-4 py-1">
-                        <v-row class="justify-center">
-                            <v-col cols="4" class="text-center">
-                                <FileDescriptionIcon size="20" />
-                                <h4 class="text-h4">938</h4>
-                                <h6 class="text-h6 font-weight-regular">Posts</h6>
-                            </v-col>
-                            <v-col cols="4" class="text-center">
-                                <UserCircleIcon size="20" />
-                                <h4 class="text-h4">3,586</h4>
-                                <h6 class="text-h6 font-weight-regular">Seguidores</h6>
-                            </v-col>
-                            <v-col cols="4" class="text-center">
-                                <UserCheckIcon size="20" />
-                                <h4 class="text-h4">2,659</h4>
-                                <h6 class="text-h6 font-weight-regular">Siguiendo</h6>
-                            </v-col>
-                        </v-row>
                     </div>
                 </v-col>
                 <v-col cols="12" lg="4" sm="12" class="d-flex justify-center order-sml-first">
@@ -120,9 +147,9 @@ onMounted(() => {
                         <div class="avatar-border">
                             <v-avatar size="100" class="userImage">
                                 <img :src="profilePicture || UserImage" alt="Mathew" width="100" @click="triggerFileInput" />
-                                <Icon icon="solar:pen-linear" class="edit-icon" height="25" />
+                                <Icon v-if="isOwnProfile" icon="solar:pen-linear" class="edit-icon" height="25" />
                             </v-avatar>
-                            <input type="file" ref="fileInput" @change="onFileChange" style="display: none" />
+                            <input v-if="isOwnProfile" type="file" ref="fileInput" @change="onFileChange" style="display: none" />
                         </div>
                         <h5 class="text-h5 mt-3">{{ fullName }}</h5>
                         <span class="textSecondary font-weight-regular">{{ role }}</span>
@@ -130,18 +157,39 @@ onMounted(() => {
                 </v-col>
                 <v-col cols="12" lg="4" class="d-flex align-center justify-center justify-lg-end order-sm-third">
                     <div class="d-flex align-center justify-space-between px-10 py-1 gap-3">
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-facebook"
+                        <v-btn v-if="socialLinks.facebook" :href="socialLinks.facebook" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-facebook"
                             ><BrandFacebookIcon size="16"
                         /></v-btn>
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-twitter"
+                        <v-btn v-if="socialLinks.twitter" :href="socialLinks.twitter" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-twitter"
                             ><BrandTwitterIcon size="16"
                         /></v-btn>
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-dribbble"
-                            ><BrandDribbbleIcon size="16"
+                        <v-btn v-if="socialLinks.linkedin" :href="socialLinks.linkedin" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-linkedin"
+                            ><BrandLinkedinIcon size="16"
                         /></v-btn>
-                        <v-btn icon variant="flat" size="x-small" color="primary" class="btn-brand-youtube"
-                            ><BrandYoutubeIcon size="16"
+                        <v-btn v-if="socialLinks.instagram" :href="socialLinks.instagram" target="_blank" icon variant="flat" size="x-small" color="primary" class="btn-brand-instagram"
+                            ><BrandInstagramIcon size="16"
                         /></v-btn>
+                        <v-btn icon class="ml-2" @click="isEditing = true">
+                            <Icon icon="solar:pen-linear" class="text-success" />
+                        </v-btn>
+                        <v-dialog v-model="isEditing" persistent max-width="600px">
+                        <v-card variant="outlined">
+                                <v-card-title class="pa-4 bg-primary">
+                                    <span class="title text-white">Ingresa Redes Sociales</span>
+                                </v-card-title>
+                                <v-card-text>
+                                    <v-text-field v-model="socialLinks.facebook" label="Facebook" prepend-icon="mdi-facebook" />
+                                    <v-text-field v-model="socialLinks.twitter" label="Twitter" prepend-icon="mdi-twitter" />
+                                    <v-text-field v-model="socialLinks.linkedin" label="LinkedIn" prepend-icon="mdi-linkedin" />
+                                    <v-text-field v-model="socialLinks.instagram" label="Instagram" prepend-icon="mdi-instagram" />
+                                </v-card-text>
+                                <v-card-actions class="pa-4">
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="error" variant="flat" @click="isEditing = false">Cancelar</v-btn>
+                                    <v-btn color="primary" variant="flat" @click="saveSocialLinks">Guardar</v-btn>
+                                </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                     </div>
                 </v-col>
                 <v-col md="12" class="order-sm-last">
@@ -156,7 +204,8 @@ onMounted(() => {
         </div>
     </v-card>
 </template>
-<style lang="scss">
+
+<style scoped>
 .avatar-border {
     background-image: linear-gradient(rgb(80, 178, 252), rgb(244, 76, 102));
     border-radius: 50%;
@@ -223,10 +272,10 @@ onMounted(() => {
 .btn-brand-twitter {
     background-color: rgb(29, 161, 242) !important;
 }
-.btn-brand-dribbble {
+.btn-brand-linkedin {
     background-color: rgb(234, 76, 137) !important;
 }
-.btn-brand-youtube {
+.btn-brand-instagram {
     background-color: rgb(205, 32, 31) !important;
 }
 </style>

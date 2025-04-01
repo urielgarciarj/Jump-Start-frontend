@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LogoIcon from '@/layouts/full/logo/LogoIcon.vue';
+import LogoImage from '@/assets/images/logos/long-jump-img.png';
 /* Login form */
 import LoginForm from '@/components/auth/LoginForm.vue';
 </script>
@@ -29,7 +30,7 @@ import LoginForm from '@/components/auth/LoginForm.vue';
             <v-col cols="12" lg="7" xl="8" class="d-lg-flex d-none align-center justify-center authentication bg-textPrimary position-relative">
                 <div class="circle-top"></div>
                 <div>
-                    <LogoIcon class="circle-bottom" />
+                    <img :src="LogoImage" class="image-bottom" alt="home" />
                 </div>
                 <div class="d-flex justify-center align-center w-100 h-n80">
                     <v-row class="justify-center z-index-2">
@@ -48,3 +49,17 @@ import LoginForm from '@/components/auth/LoginForm.vue';
         </v-row>
     </div>
 </template>
+
+<style scoped>
+.image-bottom {
+  position: absolute;
+  bottom: 0;
+  right: 1%;
+  height: 450px;
+  width: 450px;
+  display: block;
+  background: 0 0;
+  z-index: 1;
+  opacity: 0.5;
+}
+</style>

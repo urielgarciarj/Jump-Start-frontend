@@ -142,7 +142,7 @@ const confirmDelete = async () => {
     <v-form v-model="valid" @submit.prevent="saveApplication" enctype="multipart/form-data">
         <v-dialog v-model="isActive"  transition="dialog-bottom-transition" class="dialog-mw">
             <template v-slot:activator="{ props }">
-                <v-btn color="primary" class="w-100" v-bind="props" flat>{{ hasSubmitted ? 'Ver Solicitud' : 'Enviar Solicitud' }}</v-btn>
+                <v-btn color="primary" class="w-100" v-bind="props" flat>{{ hasSubmitted ? 'Ver Mi Solicitud' : 'Enviar Solicitud' }}</v-btn>
             </template>
             <template v-slot:default="{ isActive }">
                 <v-card>
@@ -152,6 +152,9 @@ const confirmDelete = async () => {
                             <v-col cols="12">
                                 <v-alert v-if="error" type="error" dismissible>
                                     {{ error }}
+                                </v-alert>
+                                <v-alert v-if="!hasSubmitted" type="info" variant="tonal" class="mb-3">
+                                    Para postularte a la vacante, por favor llena tu solicitud de forma breve y concisa. Ten en cuenta que, una vez enviada, no podrás editarla. Sin embargo, podrás consultarla y eliminarla en cualquier momento.
                                 </v-alert>
                             </v-col>
                             <v-col cols="12">

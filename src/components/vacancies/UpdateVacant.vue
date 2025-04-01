@@ -19,6 +19,8 @@ const updateModality = ref(props.vacant?.modality || '');
 const updateLevel = ref(props.vacant?.level || '');
 const updateSalary = ref(props.vacant?.salary || '');
 const updateSalaryPeriod = ref(props.vacant?.salaryPeriod || '');
+const updateRequirements = ref(props.vacant?.requirements ? props.vacant.requirements.split(',') : []);
+const newSkill = ref<string>('');
 
 const modalityOps = ['Presencial', 'Remoto', 'Hibrido'];
 const salaryPeriodOps = ['Semanal', 'Quincenal', 'Mensual'];
@@ -39,26 +41,45 @@ const cancelEdit = () => {
   emit('cancelEdit');
 };
 
+// Añadir skill
+const addSkill = (skillToAdd: string) => {
+  if (skillToAdd && !updateRequirements.value.some((s: string) => s.toLowerCase() === skillToAdd.toLowerCase())) {
+    updateRequirements.value.push(skillToAdd);  // Añadir la habilidad al array
+    newSkill.value = '';  // Limpiar el campo de entrada
+    console.log('Skill added:', updateRequirements.value);  // Depuración
+  }
+};
+
+const removeSkill = (skillIndex: number) => {
+    updateRequirements.value.splice(skillIndex, 1);
+    console.log('skill removed', updateRequirements.value)
+};
+
 const submitVacant = async () => {
     if (valid.value) {
         try {
             if (editor.value && editor.value.getHTML() != '' && editor.value.getHTML() != '<p></p>') {
-
-                const vacantData = {
-                    name: updateName.value,
-                    description: editor.value.getHTML(),
-                    status: updateStatus.value,
-                    location: updateLocation.value,
-                    category: updateCategory.value,
-                    modality: updateModality.value,
-                    level: updateLevel.value,
-                    salary: updateSalary.value,
-                    salaryPeriod: updateSalaryPeriod.value
+                if (updateRequirements.value.length && updateRequirements.value.length > 0) {
+                    const vacantData = {
+                        name: updateName.value,
+                        description: editor.value.getHTML(),
+                        status: updateStatus.value,
+                        location: updateLocation.value,
+                        category: updateCategory.value,
+                        modality: updateModality.value,
+                        level: updateLevel.value,
+                        salary: updateSalary.value || 0,
+                        salaryPeriod: updateSalaryPeriod.value,
+                        requirements: updateRequirements.value.join(',')
+                    }
+                    const response = await axios.put(`http://localhost:3000/vacancies/update/${props.vacant?.id}`, vacantData);
+                    //console.log('vacant updated:', response.data);
+                    // Emitir evento para actualizar el post en el componente principal
+                    emit('updateVacant', {...props.vacant,...response.data,});
+                    }
+                else {
+                    error.value = 'Es obligatorio agregar habilidades requeridas.';
                 }
-                const response = await axios.put(`http://localhost:3000/vacancies/update/${props.vacant?.id}`, vacantData);
-                //console.log('vacant updated:', response.data);
-                // Emitir evento para actualizar el post en el componente principal
-                emit('updateVacant', {...props.vacant,...response.data,});
             }
             else {
                 error.value = 'Es obligatorio agregar una descripción.';
@@ -129,6 +150,32 @@ const submitVacant = async () => {
                         <editor-content :editor="editor" />
                     </v-card>
                 </v-col>
+
+                <!-- Habilidades requeridas -->
+                <v-col cols="12" md="4">
+                    <v-label class="font-weight-semibold pb-2">Habilidades Requeridas</v-label>
+                    <v-text-field v-model="newSkill" label="Añadir nueva habilidad" placeholder="Ej: JavaScript, Diseño UX, Marketing Digital"
+                        variant="outlined" hide-details="auto" class="mb-4" @keyup.enter="addSkill(newSkill)"
+                    >
+                        <template v-slot:append>
+                            <v-btn color="success" size="sm" icon="mdi-plus" :disabled="!newSkill.trim()" @click="addSkill(newSkill)"></v-btn>
+                        </template>
+                    </v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                    <v-chip-group class="scrollable-chips">
+                        <v-chip
+                            v-for="(skill, index) in updateRequirements"
+                            :key="index"
+                            closable
+                            @click:close="removeSkill(index)"
+                            color="primary"
+                            variant="outlined"
+                        >
+                            {{ skill }}
+                        </v-chip>
+                    </v-chip-group>
+                </v-col>
             </v-row>
         </div>
 
@@ -138,3 +185,12 @@ const submitVacant = async () => {
         </div>
     </v-form>
 </template>
+
+<style>
+.scrollable-chips {
+  max-height: 200px; /* Ajusta este valor según lo que necesites */
+  overflow-y: auto;  /* Permite el scroll vertical cuando sea necesario */
+  display: flex;
+  flex-wrap: wrap;
+}
+</style>
