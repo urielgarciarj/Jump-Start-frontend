@@ -58,7 +58,7 @@ const uploadCV = async () => {
                 'Content-Type': 'multipart/form-data'
             }
             });
-            cvUrl.value = response.data.cvUrl; // Actualizar la URL del CV
+            cvUrl.value = response.data.fileUrl; // Actualizar la URL del CV
         } catch (error) {
             console.error('Error al subir el CV:', error);
         }
