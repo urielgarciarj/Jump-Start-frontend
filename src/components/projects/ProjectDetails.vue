@@ -373,7 +373,13 @@ const getMatchColor = (percentage: number) => {
                                                 </template>
                                             </v-avatar>
                                         </td>
-                                        <td>{{ item.name }}</td>
+                                        <td>
+                                            <span class="text-subtitle ml-2 custom-text-primary">
+                                                <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${item?.user.id}`" >
+                                                    {{ item.name }}
+                                                </RouterLink>
+                                            </span>
+                                        </td>
                                         <td>{{ formatDateTime(item.dateCreated) }}</td>
                                         <td>{{ item.comments }}</td>
                                         <td>
