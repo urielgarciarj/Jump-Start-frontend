@@ -484,8 +484,10 @@ const getMatchColor = (percentage: number) => {
                                         <img :src="user.picture || UserImage" alt="Mathew" width="100" />
                                     </v-avatar>
                                     <div>
-                                        <v-card-title class="text-h5 mb-1 pa-0">
-                                            {{ user.name }} {{ user.lastName }}
+                                        <v-card-title class="text-h5 mb-1 pa-0 custom-text-primary">
+                                            <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${user?.userId}`" >
+                                                {{ user.name }} {{ user.lastName }}
+                                            </RouterLink>
                                         </v-card-title>
                                         <v-card-subtitle class="pa-0 text-medium-emphasis">
                                             {{ user.email }}

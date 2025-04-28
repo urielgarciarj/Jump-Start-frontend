@@ -168,7 +168,7 @@ function close() {
                         </v-dialog>
                     </div>
                     <p class="my-3 text-subtitle-1 lh-md textSecondary mb-6">
-                        {{ profileIntroduction || 'Aun no agregado' }}
+                        {{ profileIntroduction || 'Mi trayectoria...' }}
                     </p>
                     <div class="d-flex gap-3 mb-5">
                         <BriefcaseIcon size="21" />
