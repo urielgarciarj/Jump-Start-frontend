@@ -55,9 +55,9 @@ watch(priority, (newPriority) => {
         <!-- ---------------------------------------------- -->
         <!-- Notification -->
         <!-- ---------------------------------------------- -->
-        <div class="hidden-sm-and-down">
+        <!-- <div class="hidden-sm-and-down">
             <NotificationDD />
-        </div>
+        </div> -->
         
         <!-- ---------------------------------------------- -->
         <!-- User Profile -->
@@ -68,25 +68,26 @@ watch(priority, (newPriority) => {
 
         <!----Mobile ----->
         <v-menu :close-on-content-click="true" class="mobile_popup ">
-                    <template v-slot:activator="{ props }">
-                        <v-btn icon class="hidden-md-and-up custom-hover-primary"  color="primary" variant="text" v-bind="props" size="small">
-                            <Icon icon="solar:menu-dots-bold-duotone" height="22"   />
-                        </v-btn>
-                    </template>
-                    <v-sheet rounded="lg" elevation="10" class="mt-4 dropdown-box px-4 py-3">
-                        <div class="d-flex justify-space-between align-center">
-                            <RightMobileSidebar/>
-                            <LanguageDD />
-                            <v-btn icon variant="text" class="mr-sm-3 mr-2 custom-hover-primary" to="/ecommerce/checkout"
-                                size="small">
-                                <v-badge color="primary" content="0" offset-x="-4" offset-y="-6">
-                                    <Icon icon="solar:cart-large-2-outline" height="22"   />
-                                </v-badge>
-                            </v-btn>
-                            <NotificationDD />
-                            <ProfileDD />
-                        </div>
-                    </v-sheet>
-                </v-menu>
+            <template v-slot:activator="{ props }">
+                <v-btn icon class="hidden-md-and-up custom-hover-primary"  color="primary" variant="text" v-bind="props" size="small">
+                    <!-- <Icon icon="solar:menu-dots-bold-duotone" height="22"   /> -->
+                    <ProfileDD />
+                </v-btn>
+            </template>
+            <!-- <v-sheet rounded="lg" elevation="10" class="mt-4 dropdown-box px-4 py-3">
+                <div class="d-flex justify-space-between align-center">
+                    <RightMobileSidebar/>
+                    <LanguageDD />
+                    <v-btn icon variant="text" class="mr-sm-3 mr-2 custom-hover-primary" to="/ecommerce/checkout"
+                        size="small">
+                        <v-badge color="primary" content="0" offset-x="-4" offset-y="-6">
+                            <Icon icon="solar:cart-large-2-outline" height="22"   />
+                        </v-badge>
+                    </v-btn>
+                    <NotificationDD />
+                    <ProfileDD />
+                </div>
+            </v-sheet> -->
+        </v-menu>
     </v-app-bar>
 </template>

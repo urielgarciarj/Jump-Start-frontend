@@ -1,26 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
 const props = defineProps({
     column: Object,
 });
-console.log('column received', props.column)
-// common components
-const dialog = ref(false);
-//const store = useTaskStore();
-const title = ref('');
-const subtitle = ref('');
-const category = ref('Mobile');
-const categorybg = ref('primary')
-const columnId = ref(props.column?.id)
-
-function addItemAndClear() {
-    
-    title.value = '',
-    subtitle.value = '',
-    category.value = 'Mobile',
-    categorybg.value = 'primary'
-}
 
 const capitalizeFirstLetter = (str: string) => {
     if(!str) return '';
@@ -45,9 +26,7 @@ const capitalizeFirstLetter = (str: string) => {
                         </h6>
                     </div>
                     <div class="d-flex align-center justify-space-between px-4 py-2">
-                        <v-text>
-                            {{ project?.category }}
-                        </v-text>
+                        {{ project?.category }}
                     </div>
                 </v-card>
             </div>
