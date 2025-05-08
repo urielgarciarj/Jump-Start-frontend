@@ -103,10 +103,6 @@ onMounted(() => {
     fetchProfileData();
 });
 
-// computed(() => {
-//     updateTabs(role.value);
-// });
-
 // Updates available tabs based on user role
 const updateTabs = (role: String) => {
     try {

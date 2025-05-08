@@ -12,7 +12,6 @@ onMounted(async () => {
     try {
     const response = await axios.get(`http://localhost:3000/projects/list/${userId}`);
     projects.value = response.data;
-    console.log('kanban response', response.data);
   } catch (error) {
     console.error('Error al obtener el listado de vacantes:', error);
   }

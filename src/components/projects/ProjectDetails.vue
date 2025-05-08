@@ -61,7 +61,6 @@ onMounted(async () => {
             const _response = await axios.get(`http://localhost:3000/enrolls/list-by/project/${projectId}`);
             pendingEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Pendiente');
             aceptedEnrollsList.value = _response.data.filter((e: { status: string; }) => e.status === 'Aceptado');
-            
             // Si el usuario es docente, cargar usuarios recomendados
             if (userRole === 'Docente') {
                 await fetchRecommendedUsers();
@@ -332,10 +331,16 @@ const getMatchColor = (percentage: number) => {
                                                 </template>
                                             </v-avatar>
                                         </td>
-                                        <td>{{ item.name }}</td>
+                                        <td>
+                                            <span class="text-subtitle ml-2 custom-text-primary">
+                                                <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${item?.user.id}`" >
+                                                    {{ item.name }}
+                                                </RouterLink>
+                                            </span>
+                                        </td>
                                         <td>{{ formatDateTime(item.dateCreated) }}</td>
                                         <td>{{ item.comments }}</td>
-                                        <td>
+                                        <td v-if="projectDetail?.professor.id === userId">
                                             <div class="d-flex align-center">
                                                 <v-tooltip text="Rechazar">
                                                     <template v-slot:activator="{ props }">
@@ -368,7 +373,13 @@ const getMatchColor = (percentage: number) => {
                                                 </template>
                                             </v-avatar>
                                         </td>
-                                        <td>{{ item.name }}</td>
+                                        <td>
+                                            <span class="text-subtitle ml-2 custom-text-primary">
+                                                <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${item?.user.id}`" >
+                                                    {{ item.name }}
+                                                </RouterLink>
+                                            </span>
+                                        </td>
                                         <td>{{ formatDateTime(item.dateCreated) }}</td>
                                         <td>{{ item.comments }}</td>
                                         <td>
@@ -473,8 +484,10 @@ const getMatchColor = (percentage: number) => {
                                         <img :src="user.picture || UserImage" alt="Mathew" width="100" />
                                     </v-avatar>
                                     <div>
-                                        <v-card-title class="text-h5 mb-1 pa-0">
-                                            {{ user.name }} {{ user.lastName }}
+                                        <v-card-title class="text-h5 mb-1 pa-0 custom-text-primary">
+                                            <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${user?.userId}`" >
+                                                {{ user.name }} {{ user.lastName }}
+                                            </RouterLink>
                                         </v-card-title>
                                         <v-card-subtitle class="pa-0 text-medium-emphasis">
                                             {{ user.email }}

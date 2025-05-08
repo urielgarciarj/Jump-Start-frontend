@@ -80,7 +80,7 @@ const fetchRecommendedStudents = async () => {
         const response = await axios.get(`http://localhost:3000/vacancies/recommend-students-for-vacant/${vacantId}`);
         
         recommendedStudents.value = response.data.recommendedStudents || [];
-        
+
         // Ordenar por porcentaje de coincidencia (de mayor a menor)
         recommendedStudents.value.sort((a, b) => b.matchPercentage - a.matchPercentage);
     } catch (error) {
@@ -385,8 +385,10 @@ const getMatchColor = (percentage: number) => {
                                         <img :src="user.picture || UserImage" alt="Foto de perfil" class="profile-image" />
                                     </v-avatar>
                                     <div class="user-info">
-                                        <v-card-title class="text-h5 mb-1 pa-0">
-                                            {{ user.name }} {{ user.lastName }}
+                                        <v-card-title class="text-h5 mb-1 pa-0 custom-text-primary">
+                                            <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${user?.userId}`" >
+                                                {{ user.name }} {{ user.lastName }}
+                                            </RouterLink>
                                         </v-card-title>
                                         <v-card-subtitle class="pa-0 text-medium-emphasis">
                                             {{ user.email }}
