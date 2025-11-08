@@ -209,18 +209,23 @@ onMounted(async () => {
 <template>
     <v-row>
         <v-col cols="12">
-            <v-card variant="outlined">
-                <v-card-item>
+            <v-card variant="outlined" class="skills-card" rounded="lg">
+                <v-card-item class="pa-6">
                     <div class="d-flex justify-space-between align-center mb-4">
-                        <h4 class="text-h4">Habilidades</h4>
+                        <div class="d-flex align-center gap-2">
+                            <div class="card-icon-wrapper">
+                                <Icon icon="mdi:lightbulb-on-outline" height="24" class="card-icon" />
+                            </div>
+                            <h4 class="text-h5 font-weight-bold mb-0">Habilidades</h4>
+                        </div>
                         <v-dialog v-model="dialog" max-width="600">
                             <template v-slot:activator="{ props }">
-                                <v-btn v-if="isOwnProfile" color="lightsuccess" v-bind="props" size="29">
-                                    <Icon icon="solar:pen-linear" class="text-success" height="15" />
-                                    <v-tooltip location="bottom">Editar</v-tooltip>
+                                <v-btn v-if="isOwnProfile" color="success" v-bind="props" size="small" variant="flat" class="edit-btn">
+                                    <Icon icon="solar:pen-linear" height="18" class="mr-1" />
+                                    Editar
                                 </v-btn>
                             </template>
-                            <v-card>
+                            <v-card rounded="lg">
                                 <v-card-title class="pa-4 bg-primary">
                                     <span class="title text-white">Gestionar Habilidades</span>
                                 </v-card-title>
@@ -250,26 +255,28 @@ onMounted(async () => {
                                         </v-col>
 
                                         <v-col cols="12">
-                                            <div class="text-subtitle-1 mb-2">Mis habilidades</div>
-                                            <v-chip-group>
+                                            <div class="text-subtitle-1 mb-3 font-weight-medium">Mis habilidades</div>
+                                            <div class="skills-edit-container">
                                                 <v-chip
                                                     v-for="skill in filteredSkills"
                                                     :key="skill.name"
                                                     closable
                                                     @click:close="removeSkill(skill)"
                                                     color="primary"
-                                                    variant="outlined"
-                                                    class="ma-1"
+                                                    variant="tonal"
+                                                    class="ma-1 skill-chip-edit"
+                                                    size="small"
                                                 >
                                                     {{ skill.name }}
                                                 </v-chip>
-                                            </v-chip-group>
+                                            </div>
 
                                             <v-alert
                                                 v-if="filteredSkills.length === 0"
                                                 type="info"
                                                 variant="tonal"
                                                 class="mt-3"
+                                                rounded="lg"
                                             >
                                                 No tienes habilidades añadidas. ¡Añade algunas!
                                             </v-alert>
@@ -287,31 +294,29 @@ onMounted(async () => {
                     </div>
 
                     <!-- Visualización de habilidades -->
-                    <div class="skills-container mt-2">
-                        <div v-if="skills.length > 0" class="mb-4">
-                            <v-chip-group class="skills-chip-group">
-                                <v-chip
-                                    v-for="skill in skills"
-                                    :key="skill.name"
-                                    color="primary"
-                                    variant="tonal"
-                                    class="ma-1 skill-chip"
-                                >
-                                    {{ skill.name }}
-                                </v-chip>
-                            </v-chip-group>
+                    <div class="skills-container">
+                        <div v-if="skills.length > 0" class="skills-display">
+                            <v-chip
+                                v-for="skill in skills"
+                                :key="skill.name"
+                                color="primary"
+                                variant="tonal"
+                                class="skill-chip-display"
+                                size="small"
+                            >
+                                {{ skill.name }}
+                            </v-chip>
                         </div>
                         <v-alert
                             v-else
                             type="info"
                             variant="tonal"
-                            class="mt-3 mb-6"
+                            class="mt-3 empty-skills-alert"
+                            rounded="lg"
                         >
                             {{ isOwnProfile ? 'Aún no has añadido habilidades. ¡Añade algunas para destacar tu perfil!' : 'Este usuario aún no ha añadido habilidades.' }}
                         </v-alert>
                     </div>
-
-                    <v-divider class="mb-4"></v-divider>
                 </v-card-item>
             </v-card>
         </v-col>
@@ -319,23 +324,102 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.skills-card {
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.skills-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.card-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon {
+    color: rgb(255, 193, 7);
+}
+
+.edit-btn {
+    border-radius: 8px;
+    text-transform: none;
+    font-weight: 500;
+}
+
 .skills-container {
-  margin-top: 16px;
-  width: 100%;
+    width: 100%;
 }
 
-.skills-chip-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 0;
+.skills-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 0;
 }
 
-.skill-chip {
-  font-size: 14px;
-  font-weight: 500;
-  margin: 4px !important;
-  height: 32px !important;
-  border-radius: 16px !important;
+.skill-chip-display {
+    font-size: 13px;
+    font-weight: 500;
+    height: 32px !important;
+    border-radius: 16px !important;
+    padding: 0 16px !important;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%) !important;
+    color: rgb(99, 102, 241) !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+}
+
+.skill-chip-display:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%) !important;
+}
+
+.skills-edit-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(99, 102, 241, 0.02);
+    border-radius: 12px;
+    min-height: 60px;
+}
+
+.skill-chip-edit {
+    font-size: 13px;
+    font-weight: 500;
+    height: 32px !important;
+    border-radius: 16px !important;
+    transition: all 0.2s ease;
+}
+
+.skill-chip-edit:hover {
+    transform: scale(1.05);
+}
+
+.empty-skills-alert {
+    border-left: 3px solid rgb(33, 150, 243);
+}
+
+@media (max-width: 600px) {
+    .skills-card {
+        border-radius: 12px !important;
+    }
+    
+    .skill-chip-display {
+        font-size: 12px;
+        height: 28px !important;
+        padding: 0 12px !important;
+    }
 }
 </style>

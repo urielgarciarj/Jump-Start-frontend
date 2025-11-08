@@ -22,8 +22,9 @@
 }
 
 .leftSidebar {
-    box-shadow: none !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.04) !important;
     left: 70px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .logo {
         padding-left: 7px;
@@ -85,8 +86,9 @@
 
     .v-list-group__items {
         .v-list-item {
-            min-height: 35px !important;
+            min-height: 40px !important;
             padding-inline-start: calc(12px + var(--indent-padding) / 10) !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
             .v-list-item__prepend .dot {
                 height: 6px;
@@ -94,17 +96,23 @@
                 background-color: rgb(var(--v-theme-textSecondary));
                 border-radius: 50%;
                 margin-inline-end: 8px !important;
+                transition: all 0.2s ease;
             }
 
             .v-list-item-title {
                 font-size: 14px !important;
+                font-weight: 500;
+                transition: all 0.2s ease;
             }
 
             &:hover {
                 color: rgb(var(--v-theme-primary));
+                transform: translateX(4px);
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%) !important;
 
                 .v-list-item__prepend .dot {
                     background-color: rgb(var(--v-theme-primary));
+                    transform: scale(1.2);
                 }
             }
 
@@ -119,16 +127,28 @@
 
     .v-list-group__items .v-list-item,
     .v-list-item {
-        border-radius: $border-radius-root + 4;
-        color: rgba(var(--v-theme-textPrimary), 0.8);
-        margin: 0 0 8px;
+        border-radius: 12px;
+        color: rgba(var(--v-theme-textPrimary), 0.85);
+        margin: 0 0 6px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 8px 12px !important;
 
         &:hover {
             color: rgb(var(--v-theme-primary));
+            transform: translateX(4px);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%) !important;
         }
 
         .v-list-item__prepend {
             margin-inline-end: 13px;
+            
+            .iconify {
+                transition: all 0.2s ease;
+            }
+        }
+
+        &:hover .v-list-item__prepend .iconify {
+            transform: scale(1.1);
         }
 
         .v-list-item__append {
@@ -141,7 +161,8 @@
 
         .v-list-item-title {
             font-size: 15px;
-
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
     }
 
@@ -151,9 +172,11 @@
 
         >.v-list-item.v-list-item--active,
         .v-list-item--active>.v-list-item__overlay {
-            background: rgb(var(--v-theme-primary));
-            color: white;
-            box-shadow: 0 17px 20px -8px rgba(var(--v-theme-primary), 0.2);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(168, 85, 247, 0.95) 100%) !important;
+            color: white !important;
+            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4);
+            border-radius: 12px;
+            transform: translateX(2px);
         }
 
         >.v-list-group {
@@ -161,15 +184,17 @@
 
             >.v-list-item--active,
             >.v-list-item--active:hover {
-                background: rgb(var(--v-theme-primary));
-                color: white;
-                box-shadow: 0 17px 20px -8px rgba(var(--v-theme-primary), 0.2);
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(168, 85, 247, 0.95) 100%) !important;
+                color: white !important;
+                box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4);
+                border-radius: 12px;
             }
 
             .v-list-group__items .v-list-item.v-list-item--active,
             .v-list-group__items .v-list-item.v-list-item--active>.v-list-item__overlay {
                 background: transparent;
                 color: rgb(var(--v-theme-primary));
+                font-weight: 600;
             }
         }
     }

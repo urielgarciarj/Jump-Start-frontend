@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import axios, { AxiosError } from 'axios';
 import { defineProps, defineEmits } from 'vue';
+import { Icon } from '@iconify/vue';
 
 const props = defineProps({
     project: Object, // Recibe la vacante que se va a editar
@@ -108,79 +109,249 @@ const formattedEndDate = computed(() => formatDefaultDate(updateEndDate.value));
 </script>
 
 <template>
-     <v-col cols="12">
-        <v-alert v-if="error" type="error" variant="tonal" dismissible>
-            {{ error }}
-        </v-alert>
-    </v-col>
-    <v-form v-model="valid">
-        <div class="bg-light mt-6 pa-6 rounded-md">
-            <v-row>
-                <v-col cols="12" md="12">
-                    <v-label class="font-weight-semibold pb-2">Nombre del proyecto</v-label>
-                    <v-text-field v-model="updateName" :rules="notEmptyRule" required />
-                </v-col>
-
-                <v-col cols="12" md="3">
-                    <v-label class="font-weight-semibold pb-2">Fecha de Inicio</v-label>
-                    <v-text-field v-model="updateStartDate" :value="formattedStartDate" type="date" :rules="notEmptyRule" required />
-                </v-col>
-                <v-col cols="12" md="3">
-                    <v-label class="font-weight-semibold pb-2">Fecha Fin</v-label>
-                    <v-text-field v-model="updateEndDate" :value="formattedEndDate" type="date" />
-                </v-col>
-                <v-col cols="12" md="3">
-                    <v-label class="font-weight-semibold pb-2">Categoría</v-label>
-                    <v-select v-model="updateCategory" :items="categoryOptions" :rules="notEmptyRule" required />
-                </v-col>
-                <v-col cols="12" md="3">
-                    <v-label class="font-weight-semibold pb-2">Estado</v-label>
-                    <v-select v-model="updateStatus" :items="statusesOptions" item-title="text" item-value="value" :rules="notEmptyRule" required />
-                </v-col>
-                
-                <v-col cols="12">
-                    <v-label class="font-weight-semibold pb-2">Descripción</v-label>
-                    <v-textarea v-model="updateDescription" :rules="notEmptyRule" required />
-                </v-col>
-                <v-col cols="12" md="4">
-                    <v-label class="font-weight-semibold pb-2">Habilidades Requeridas</v-label>
-                    <v-text-field v-model="newSkill" label="Añadir nueva habilidad" placeholder="Ej: JavaScript, Diseño UX, Marketing Digital"
-                        variant="outlined" hide-details="auto" class="mb-4" @keyup.enter="addSkill(newSkill)"
-                    >
-                        <template v-slot:append>
-                            <v-btn color="success" size="sm" icon="mdi-plus" :disabled="!newSkill.trim()" @click="addSkill(newSkill)"></v-btn>
-                        </template>
-                    </v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                    <v-chip-group class="scrollable-chips">
-                        <v-chip
-                            v-for="(skill, index) in updateRequirements"
-                            :key="index"
-                            closable
-                            @click:close="removeSkill(index)"
-                            color="primary"
+    <div class="edit-project-form">
+        <div class="edit-form-header mb-4">
+            <Icon icon="mdi:pencil-outline" height="20" class="mr-2" />
+            <span class="text-subtitle-1 font-weight-bold">Editar Proyecto</span>
+        </div>
+        
+        <v-col cols="12">
+            <v-alert 
+                v-if="error" 
+                type="error" 
+                variant="tonal" 
+                dismissible
+                rounded="lg"
+                class="mb-4"
+            >
+                {{ error }}
+            </v-alert>
+        </v-col>
+        
+        <v-form v-model="valid">
+            <div class="form-content pa-6">
+                <v-row>
+                    <v-col cols="12" md="12">
+                        <v-label class="mb-2 font-weight-medium text-body-1">Nombre del proyecto</v-label>
+                        <v-text-field 
+                            v-model="updateName" 
+                            :rules="notEmptyRule" 
+                            required
                             variant="outlined"
-                        >
-                            {{ skill }}
-                        </v-chip>
-                    </v-chip-group>
-                </v-col>
-            </v-row>
-        </div>
+                            rounded="lg"
+                            color="primary"
+                            hide-details="auto"
+                        />
+                    </v-col>
 
-        <div class="d-flex align-center justify-end ga-3">
-            <v-btn @click="cancelEdit" flat variant="tonal" class="mt-6">Cancelar</v-btn>
-            <v-btn @click="submitVacant" :disabled="!valid" flat color="primary" class="mt-6">Guardar</v-btn>
-        </div>
-    </v-form>
+                    <v-col cols="12" md="3">
+                        <v-label class="mb-2 font-weight-medium text-body-1">Fecha de Inicio</v-label>
+                        <v-text-field 
+                            v-model="updateStartDate" 
+                            :value="formattedStartDate" 
+                            type="date" 
+                            :rules="notEmptyRule" 
+                            required
+                            variant="outlined"
+                            rounded="lg"
+                            color="primary"
+                            hide-details="auto"
+                        />
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-label class="mb-2 font-weight-medium text-body-1">Fecha Fin</v-label>
+                        <v-text-field 
+                            v-model="updateEndDate" 
+                            :value="formattedEndDate" 
+                            type="date"
+                            variant="outlined"
+                            rounded="lg"
+                            color="primary"
+                            hide-details="auto"
+                        />
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-label class="mb-2 font-weight-medium text-body-1">Categoría</v-label>
+                        <v-select 
+                            v-model="updateCategory" 
+                            :items="categoryOptions" 
+                            :rules="notEmptyRule" 
+                            required
+                            variant="outlined"
+                            rounded="lg"
+                            color="primary"
+                            hide-details="auto"
+                        />
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-label class="mb-2 font-weight-medium text-body-1">Estado</v-label>
+                        <v-select 
+                            v-model="updateStatus" 
+                            :items="statusesOptions" 
+                            item-title="text" 
+                            item-value="value" 
+                            :rules="notEmptyRule" 
+                            required
+                            variant="outlined"
+                            rounded="lg"
+                            color="primary"
+                            hide-details="auto"
+                        />
+                    </v-col>
+                    
+                    <v-col cols="12">
+                        <v-label class="mb-2 font-weight-medium text-body-1">Descripción</v-label>
+                        <v-textarea 
+                            v-model="updateDescription" 
+                            :rules="notEmptyRule" 
+                            required
+                            variant="outlined"
+                            rounded="lg"
+                            color="primary"
+                            rows="5"
+                            hide-details="auto"
+                        />
+                    </v-col>
+                    
+                    <v-col cols="12">
+                        <v-label class="mb-2 font-weight-medium text-body-1">Habilidades Requeridas</v-label>
+                        <v-text-field 
+                            v-model="newSkill" 
+                            label="Añadir nueva habilidad" 
+                            placeholder="Ej: JavaScript, Diseño UX, Marketing Digital"
+                            variant="outlined" 
+                            hide-details="auto" 
+                            class="mb-4" 
+                            @keyup.enter="addSkill(newSkill)"
+                            rounded="lg"
+                            color="primary"
+                        >
+                            <template v-slot:append>
+                                <v-btn 
+                                    color="success" 
+                                    size="sm" 
+                                    icon="mdi-plus" 
+                                    :disabled="!newSkill.trim()" 
+                                    @click="addSkill(newSkill)"
+                                    rounded="lg"
+                                ></v-btn>
+                            </template>
+                        </v-text-field>
+                        
+                        <div v-if="updateRequirements.length > 0" class="skills-container pa-3">
+                            <v-chip-group class="scrollable-chips">
+                                <v-chip
+                                    v-for="(skill, index) in updateRequirements"
+                                    :key="index"
+                                    closable
+                                    @click:close="removeSkill(index)"
+                                    color="primary"
+                                    variant="tonal"
+                                    size="small"
+                                    class="ma-1 skill-chip"
+                                >
+                                    {{ skill }}
+                                </v-chip>
+                            </v-chip-group>
+                        </div>
+                        <v-alert
+                            v-else
+                            type="info"
+                            variant="tonal"
+                            rounded="lg"
+                            class="mt-2"
+                        >
+                            <div class="text-caption">Añade al menos una habilidad requerida para el proyecto.</div>
+                        </v-alert>
+                    </v-col>
+                </v-row>
+            </div>
+
+            <div class="d-flex align-center justify-end ga-3 mt-6">
+                <v-btn 
+                    @click="cancelEdit" 
+                    variant="tonal" 
+                    rounded="lg"
+                    class="cancel-btn"
+                >
+                    Cancelar
+                </v-btn>
+                <v-btn 
+                    @click="submitVacant" 
+                    :disabled="!valid || updateRequirements.length === 0" 
+                    color="primary" 
+                    variant="flat"
+                    rounded="lg"
+                    class="save-btn"
+                >
+                    <Icon icon="mdi:check" height="18" class="mr-2" />
+                    Guardar Cambios
+                </v-btn>
+            </div>
+        </v-form>
+    </div>
 </template>
 
-<style>
+<style scoped>
+.edit-project-form {
+    padding: 8px;
+}
+
+.edit-form-header {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border-radius: 12px;
+    border-left: 3px solid rgb(99, 102, 241);
+    color: rgb(99, 102, 241);
+}
+
+.form-content {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.skills-container {
+    background: rgba(99, 102, 241, 0.03);
+    border-radius: 10px;
+    border: 1px dashed rgba(99, 102, 241, 0.2);
+    min-height: 60px;
+}
+
 .scrollable-chips {
-  max-height: 200px; /* Ajusta este valor según lo que necesites */
-  overflow-y: auto;  /* Permite el scroll vertical cuando sea necesario */
-  display: flex;
-  flex-wrap: wrap;
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-chip {
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.skill-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cancel-btn {
+    text-transform: none;
+    font-weight: 500;
+}
+
+.save-btn {
+    font-weight: 600;
+    text-transform: none;
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 </style>

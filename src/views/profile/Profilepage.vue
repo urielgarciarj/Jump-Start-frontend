@@ -101,92 +101,178 @@ onMounted(async () => {
 </script>
 
 <template>
-    <BaseBreadcrumb :title="pageTitle" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
-    <ProfileBanner 
-        :userId="userId"
-    />
-    
-    <v-row class="mt-4">
-        <!-- Columna lateral con información de perfil -->
-        <v-col cols="12" lg="4" md="4">
-            <!-- Organizamos IntroCard y SkillsCard verticalmente en la misma columna -->
-            <IntroCard />
-            
-            <SkillsCard 
-                :isOwnProfile="isOwnProfile" 
-                :canEdit="canEdit"
-                :isEditing="isEditing"
-                @cancelEdit="isEditing = false"
-                class="mb-4"
-            />
-        </v-col>
+    <div class="profile-page-container">
+        <BaseBreadcrumb :title="pageTitle" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+        <ProfileBanner 
+            :userId="userId"
+            class="mb-6"
+        />
         
-        <!-- Columna principal con posts -->
-        <v-col cols="12" md="8" lg="8">
+        <v-row class="mt-2">
+            <!-- Columna lateral con información de perfil -->
+            <v-col cols="12" lg="4" md="4">
+                <!-- Organizamos IntroCard y SkillsCard verticalmente en la misma columna -->
+                <div class="profile-sidebar">
+                    <IntroCard class="mb-4" />
+                    
+                    <SkillsCard 
+                        :isOwnProfile="isOwnProfile" 
+                        :canEdit="canEdit"
+                        :isEditing="isEditing"
+                        @cancelEdit="isEditing = false"
+                        class="mb-4"
+                    />
+                </div>
+            </v-col>
             
-            <v-alert v-if="showAlert" type="success" variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
-                <template v-slot:prepend>
-                <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
-                </template>
-                <div>{{ snackbarMessage }}</div>
-            </v-alert>
+            <!-- Columna principal con posts -->
+            <v-col cols="12" md="8" lg="8">
+                <div class="posts-container">
+                    <v-alert v-if="showAlert" type="success" variant="tonal" class="mb-4 success-alert" dismissible @mouseleave="showAlert = false" rounded="lg">
+                        <template v-slot:prepend>
+                            <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
+                        </template>
+                        <div class="font-weight-medium">{{ snackbarMessage }}</div>
+                    </v-alert>
 
-            <!-- Loader mientras se cargan los posts -->
-            <v-skeleton-loader
-                v-if="isLoadingPosts"
-                type="card, card"
-                class="mb-4"
-            ></v-skeleton-loader>
-            
-            <!-- Error al cargar posts -->
-            <v-alert
-                v-else-if="errorPosts"
-                type="error"
-                variant="tonal"
-                closable
-                class="mb-4"
-            >
-                {{ errorPosts }}
-                <template v-slot:append>
-                    <v-btn
-                        color="primary"
-                        variant="text"
-                        @click="fetchUserPosts"
+                    <!-- Loader mientras se cargan los posts -->
+                    <v-skeleton-loader
+                        v-if="isLoadingPosts"
+                        type="card, card"
+                        class="mb-4"
+                    ></v-skeleton-loader>
+                    
+                    <!-- Error al cargar posts -->
+                    <v-alert
+                        v-else-if="errorPosts"
+                        type="error"
+                        variant="tonal"
+                        closable
+                        class="mb-4"
+                        rounded="lg"
                     >
-                        Reintentar
-                    </v-btn>
-                </template>
-            </v-alert>
-            
-            <!-- Lista de posts -->
-            <template v-else>
-                <!-- Mensaje cuando no hay posts -->
-                <v-card
-                    v-if="posts.length === 0"
-                    class="pa-4 mb-4 text-center"
-                    variant="outlined"
-                >
-                    <v-icon icon="mdi-post" size="large" class="mb-2"></v-icon>
-                    <h3 class="text-h6 mb-2">No hay publicaciones disponibles</h3>
-                    <p class="text-body-2 text-medium-emphasis">
-                        {{ isOwnProfile ? 'Aún no has creado ninguna publicación.' : 'Este usuario aún no ha creado publicaciones.' }}
-                    </p>
-                    <!-- Botón para crear publicación (solo en perfil propio) -->
-                    <div v-if="canEdit" class="mb-2 pa-2">
-                        <PostForm @postCreated="addNewPost"/>
-                    </div>
-                </v-card>
-                
-                <!-- Grid de posts -->
-                <v-row v-else>
-                    <v-col v-for="post in posts" :key="post.id" cols="12">
-                        <PostItem 
-                            :post="post"
-                            @deletePost="handlePostDelete" 
-                        />
-                    </v-col>
-                </v-row>
-            </template>
-        </v-col>
-    </v-row>
+                        {{ errorPosts }}
+                        <template v-slot:append>
+                            <v-btn
+                                color="primary"
+                                variant="text"
+                                @click="fetchUserPosts"
+                            >
+                                Reintentar
+                            </v-btn>
+                        </template>
+                    </v-alert>
+                    
+                    <!-- Lista de posts -->
+                    <template v-else>
+                        <!-- Mensaje cuando no hay posts -->
+                        <v-card
+                            v-if="posts.length === 0"
+                            class="empty-posts-card pa-8 text-center"
+                            variant="outlined"
+                            rounded="lg"
+                        >
+                            <div class="empty-posts-icon mb-4">
+                                <v-icon icon="mdi-post-outline" size="64" color="primary" class="opacity-50"></v-icon>
+                            </div>
+                            <h3 class="text-h5 mb-3 font-weight-bold">No hay publicaciones disponibles</h3>
+                            <p class="text-body-1 text-medium-emphasis mb-6">
+                                {{ isOwnProfile ? 'Aún no has creado ninguna publicación. ¡Comparte tus ideas con la comunidad!' : 'Este usuario aún no ha creado publicaciones.' }}
+                            </p>
+                            <!-- Botón para crear publicación (solo en perfil propio) -->
+                            <div v-if="canEdit" class="d-flex justify-center">
+                                <PostForm @postCreated="addNewPost"/>
+                            </div>
+                        </v-card>
+                        
+                        <!-- Grid de posts -->
+                        <div v-else class="posts-grid">
+                            <div v-for="post in posts" :key="post.id" class="post-item-wrapper">
+                                <PostItem 
+                                    :post="post"
+                                    @deletePost="handlePostDelete" 
+                                />
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </v-col>
+        </v-row>
+    </div>
 </template>
+
+<style scoped>
+.profile-page-container {
+    padding-bottom: 2rem;
+}
+
+.profile-sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+.posts-container {
+    min-height: 400px;
+}
+
+.success-alert {
+    border-left: 4px solid rgb(76, 175, 80);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.empty-posts-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%);
+    border: 2px dashed rgba(99, 102, 241, 0.2);
+    transition: all 0.3s ease;
+}
+
+.empty-posts-card:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+}
+
+.empty-posts-icon {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.posts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.post-item-wrapper {
+    transition: transform 0.2s ease;
+}
+
+.post-item-wrapper:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 960px) {
+    .profile-sidebar {
+        position: relative;
+        top: 0;
+    }
+}
+</style>

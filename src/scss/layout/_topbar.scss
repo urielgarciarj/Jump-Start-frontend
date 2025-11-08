@@ -2,7 +2,8 @@
     .v-toolbar__content {
         padding: 0 24px 0 10px;
         display: flex;
-        gap:8px;
+        gap: 12px;
+        align-items: center;
 
         >.v-btn:first-child {
             margin-inline-start: 0;
@@ -10,13 +11,17 @@
 
         .v-btn {
             &.custom-hover-primary{
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 .iconify{
                     color: rgba(var(--v-theme-textPrimary), 0.7) !important;
+                    transition: all 0.3s ease;
                 }
                 &:hover{
-                    background-color: rgb(var(--v-theme-lightprimary)) ;
+                    background-color: rgb(var(--v-theme-lightprimary)) !important;
+                    transform: scale(1.05);
                     .iconify{
                         color: rgb(var(--v-theme-primary)) !important;
+                        transform: scale(1.1);
                     }   
                    
                 }

@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import axios from 'axios';
-import { PhoneIcon, SchoolIcon } from 'vue-tabler-icons';
+import { PhoneIcon, SchoolIcon, BriefcaseIcon, MailIcon, MapPinIcon } from 'vue-tabler-icons';
 import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
@@ -86,29 +86,34 @@ function close() {
 <template>
     <v-row>
         <v-col cols="12">
-            <v-card variant="outlined">
-                <v-card-item class="d-flex justify-space-between align-center">
-                    <div class="d-flex gap-3 mb-3">
-                        <h4 class="text-h4">Información personal</h4>
-                        <v-dialog v-model="dialog" max-width="500">
+            <v-card variant="outlined" class="intro-card" rounded="lg">
+                <v-card-item class="pa-6">
+                    <div class="d-flex justify-space-between align-center mb-4">
+                        <div class="d-flex align-center gap-2">
+                            <div class="card-icon-wrapper">
+                                <Icon icon="mdi:account-circle-outline" height="24" class="card-icon" />
+                            </div>
+                            <h4 class="text-h5 font-weight-bold mb-0">Información personal</h4>
+                        </div>
+                        <v-dialog v-model="dialog" max-width="600">
                             <template v-slot:activator="{ props }">
-                                <v-btn v-if="isOwnProfile" color="lightsuccess" v-bind="props" size="29">
-                                    <Icon icon="solar:pen-linear" class="text-success" height="15" />
-                                    <v-tooltip location="bottom">Editar</v-tooltip>
+                                <v-btn v-if="isOwnProfile" color="success" v-bind="props" size="small" variant="flat" class="edit-btn">
+                                    <Icon icon="solar:pen-linear" height="18" class="mr-1" />
+                                    Editar
                                 </v-btn>
                             </template>
-                            <v-card>
+                            <v-card rounded="lg">
                                 <v-card-title class="pa-4 bg-primary">
-                                    <span class="title text-white">Editar Carta de Presentación</span>
+                                    <span class="title text-white">Editar Información Personal</span>
                                 </v-card-title>
 
-                                <v-card-text>
+                                <v-card-text class="pa-4">
                                     <v-form ref="form" v-model="valid" lazy-validation>
                                         <v-row>
                                             <v-col cols="12" lg="12">
-                                                <v-label class="mb-2 font-weight-medium mt-5">Mi introducción</v-label>
-                                                <v-textarea v-model="profileIntroduction" persistent-hint variant="outlined" hide-details placeholder="Escribe tu introducción" color="primary" required></v-textarea>
-                                                <v-label class="mb-2 font-weight-medium mt-5">Empresa</v-label>
+                                                <v-label class="mb-2 font-weight-medium">Mi introducción</v-label>
+                                                <v-textarea v-model="profileIntroduction" persistent-hint variant="outlined" hide-details placeholder="Escribe tu introducción" color="primary" required class="mb-3"></v-textarea>
+                                                <v-label class="mb-2 font-weight-medium">Empresa</v-label>
                                                 <v-text-field
                                                     v-model="profileCompany"
                                                     persistent-hint
@@ -116,9 +121,10 @@ function close() {
                                                     hide-details
                                                     placeholder="Escribe la empresa donde laboras"
                                                     color="primary"
+                                                    class="mb-3"
                                                 ></v-text-field>
 
-                                                <v-label class="mb-2 font-weight-medium mt-5">Educacion Universitaria</v-label>
+                                                <v-label class="mb-2 font-weight-medium">Educación Universitaria</v-label>
                                                 <v-text-field
                                                     v-model="profileUniversity"
                                                     persistent-hint
@@ -126,32 +132,35 @@ function close() {
                                                     hide-details
                                                     placeholder="Escribe tu escuela universitaria"
                                                     color="primary"
+                                                    class="mb-3"
                                                 ></v-text-field>
-                                                <v-label class="mb-2 font-weight-medium mt-5">Email</v-label>
+                                                <v-label class="mb-2 font-weight-medium">Email</v-label>
                                                 <v-text-field
                                                     v-model="email"
                                                     persistent-hint
                                                     variant="outlined"
                                                     hide-details
-                                                    placeholder="Escribe tu correo electronico"
+                                                    placeholder="Escribe tu correo electrónico"
                                                     color="primary"
+                                                    class="mb-3"
                                                 ></v-text-field>
-                                                <v-label class="mb-2 font-weight-medium mt-5">Telefono</v-label>
+                                                <v-label class="mb-2 font-weight-medium">Teléfono</v-label>
                                                 <v-text-field
                                                     v-model="profilePhone"
                                                     persistent-hint
                                                     variant="outlined"
                                                     hide-details
-                                                    placeholder="Escribe tu telefono"
+                                                    placeholder="Escribe tu teléfono"
                                                     color="primary"
+                                                    class="mb-3"
                                                 ></v-text-field>
-                                                <v-label class="mb-2 font-weight-medium mt-5">Ubicacion</v-label>
+                                                <v-label class="mb-2 font-weight-medium">Ubicación</v-label>
                                                 <v-text-field
                                                     v-model="profileLocation"
                                                     persistent-hint
                                                     variant="outlined"
                                                     hide-details
-                                                    placeholder="Ubicacion"
+                                                    placeholder="Ubicación"
                                                     color="primary"
                                                 ></v-text-field>
                                             </v-col>
@@ -161,37 +170,171 @@ function close() {
 
                                 <v-card-actions class="pa-4">
                                     <v-spacer></v-spacer>
-                                    <v-btn color="error" variant="flat" @click="close">Cancel</v-btn>
-                                    <v-btn color="primary" variant="flat" @click="saveChanges">Save</v-btn>
+                                    <v-btn color="error" variant="flat" @click="close">Cancelar</v-btn>
+                                    <v-btn color="primary" variant="flat" @click="saveChanges">Guardar</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
                     </div>
-                    <p class="my-3 text-subtitle-1 lh-md textSecondary mb-6">
-                        {{ profileIntroduction || 'Mi trayectoria...' }}
-                    </p>
-                    <div class="d-flex gap-3 mb-5">
-                        <BriefcaseIcon size="21" />
-                        <span class="text-h6">{{ profileCompany || 'Aun no agregado' }}</span>
+                    
+                    <div v-if="profileIntroduction" class="intro-text mb-6">
+                        <p class="text-body-1 lh-md textSecondary mb-0">
+                            {{ profileIntroduction }}
+                        </p>
                     </div>
-                    <div class="d-flex gap-3 mb-5">
-                        <SchoolIcon size="21" />
-                        <span class="text-h6">{{ profileUniversity || 'Aun no agregado' }}</span>
+                    <div v-else class="intro-text mb-6">
+                        <p class="text-body-1 lh-md text-medium-emphasis mb-0 italic">
+                            {{ isOwnProfile ? 'Comparte información sobre ti...' : 'No hay información disponible.' }}
+                        </p>
                     </div>
-                    <div class="d-flex gap-3 mb-5">
-                        <MailIcon size="21" />
-                        <span class="text-h6">{{ email || 'Aun no agregado' }}</span>
-                    </div>
-                    <div class="d-flex gap-3 mb-5">
-                        <PhoneIcon size="21" />
-                        <span class="text-h6">{{ profilePhone || 'Aun no agregado' }}</span>
-                    </div>
-                    <div class="d-flex gap-3 mb-5">
-                        <MapPinIcon size="21" />
-                        <span class="text-h6">{{ profileLocation || 'Aun no agregado' }}</span>
+                    
+                    <v-divider class="mb-4"></v-divider>
+                    
+                    <div class="info-items">
+                        <div class="info-item mb-4">
+                            <div class="info-icon-wrapper">
+                                <BriefcaseIcon size="20" stroke-width="1.5" />
+                            </div>
+                            <div class="info-content">
+                                <span class="text-caption text-medium-emphasis">Empresa</span>
+                                <span class="text-body-1 font-weight-medium">{{ profileCompany || 'No especificado' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-4">
+                            <div class="info-icon-wrapper">
+                                <SchoolIcon size="20" stroke-width="1.5" />
+                            </div>
+                            <div class="info-content">
+                                <span class="text-caption text-medium-emphasis">Universidad</span>
+                                <span class="text-body-1 font-weight-medium">{{ profileUniversity || 'No especificado' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-4">
+                            <div class="info-icon-wrapper">
+                                <MailIcon size="20" stroke-width="1.5" />
+                            </div>
+                            <div class="info-content">
+                                <span class="text-caption text-medium-emphasis">Email</span>
+                                <span class="text-body-1 font-weight-medium">{{ email || 'No especificado' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-4">
+                            <div class="info-icon-wrapper">
+                                <PhoneIcon size="20" stroke-width="1.5" />
+                            </div>
+                            <div class="info-content">
+                                <span class="text-caption text-medium-emphasis">Teléfono</span>
+                                <span class="text-body-1 font-weight-medium">{{ profilePhone || 'No especificado' }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon-wrapper">
+                                <MapPinIcon size="20" stroke-width="1.5" />
+                            </div>
+                            <div class="info-content">
+                                <span class="text-caption text-medium-emphasis">Ubicación</span>
+                                <span class="text-body-1 font-weight-medium">{{ profileLocation || 'No especificado' }}</span>
+                            </div>
+                        </div>
                     </div>
                 </v-card-item>
             </v-card>
         </v-col>
     </v-row>
 </template>
+
+<style scoped>
+.intro-card {
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.intro-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.card-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon {
+    color: rgb(99, 102, 241);
+}
+
+.edit-btn {
+    border-radius: 8px;
+    text-transform: none;
+    font-weight: 500;
+}
+
+.intro-text {
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%);
+    border-radius: 12px;
+    border-left: 3px solid rgb(99, 102, 241);
+}
+
+.info-items {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.info-item:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+.info-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: rgb(99, 102, 241);
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.italic {
+    font-style: italic;
+}
+
+@media (max-width: 600px) {
+    .intro-card {
+        border-radius: 12px !important;
+    }
+    
+    .info-item {
+        padding: 8px;
+    }
+}
+</style>
