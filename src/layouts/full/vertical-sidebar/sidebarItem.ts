@@ -46,6 +46,12 @@ const sidebarItem: menu[] = [
                 icon: 'airbuds-case-minimalistic-line-duotone',
                 to: '/projects/kanban-board',
                 rolesAllowed: 'docente'
+            },
+            {
+                title: 'Buscar Estudiantes',
+                icon: 'magnifer-line-duotone',
+                to: '/students/search',
+                rolesAllowed: 'docente,reclutador'
             }
         ]
     },
