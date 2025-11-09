@@ -23,13 +23,14 @@ watch(priority, (newPriority) => {
 </script>
 
 <template>
-    <v-app-bar elevation="0" :priority="priority" height="70" class="main-head">
+    <v-app-bar elevation="0" :priority="priority" height="75" class="main-head modern-header">
         <v-btn
-            class="hidden-lg-and-up custom-hover-primary"
+            class="hidden-lg-and-up custom-hover-primary mobile-menu-btn"
             size="small"
-            variant="text"
+            variant="flat"
             color="primary"
             icon
+            rounded="lg"
             @click.stop="customizer.SET_SIDEBAR_DRAWER"
         >
             <Icon icon="solar:hamburger-menu-line-duotone" height="22" />
@@ -38,19 +39,23 @@ watch(priority, (newPriority) => {
         <!-- ---------------------------------------------- -->
         <!-- Search part -->
         <!-- ---------------------------------------------- -->
-        <Searchbar />
+        <div class="header-search-wrapper">
+            <Searchbar />
+        </div>
 
         <v-spacer class="hidden-sm-and-down" />
 
         <!-- ---------------------------------------------- -->
         <!-- Mobile Logo -->
         <!-- ---------------------------------------------- -->
-        <div class="hidden-md-and-up">
+        <div class="hidden-md-and-up mobile-logo-wrapper">
             <Logo />
         </div>
 
         <!-- ThemeToggler -->
-        <ThemeToggler/>
+        <div class="header-action-btn">
+            <ThemeToggler/>
+        </div>
 
         <!-- ---------------------------------------------- -->
         <!-- Notification -->
@@ -62,14 +67,14 @@ watch(priority, (newPriority) => {
         <!-- ---------------------------------------------- -->
         <!-- User Profile -->
         <!-- ---------------------------------------------- -->
-        <div class="hidden-sm-and-down">
+        <div class="hidden-sm-and-down header-profile-wrapper">
             <ProfileDD />
         </div>
 
         <!----Mobile ----->
-        <v-menu :close-on-content-click="true" class="mobile_popup ">
+        <v-menu :close-on-content-click="true" class="mobile_popup">
             <template v-slot:activator="{ props }">
-                <v-btn icon class="hidden-md-and-up custom-hover-primary"  color="primary" variant="text" v-bind="props" size="small">
+                <v-btn icon class="hidden-md-and-up custom-hover-primary mobile-profile-btn" color="primary" variant="flat" v-bind="props" size="small" rounded="lg">
                     <!-- <Icon icon="solar:menu-dots-bold-duotone" height="22"   /> -->
                     <ProfileDD />
                 </v-btn>
@@ -91,3 +96,48 @@ watch(priority, (newPriority) => {
         </v-menu>
     </v-app-bar>
 </template>
+
+<style scoped>
+.modern-header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.98) 100%) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.mobile-menu-btn {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35) !important;
+}
+
+.header-search-wrapper {
+    margin-left: 8px;
+}
+
+.header-action-btn {
+    margin-right: 8px;
+}
+
+.header-profile-wrapper {
+    margin-right: 8px;
+}
+
+.mobile-logo-wrapper {
+    margin-left: 8px;
+}
+
+.mobile-profile-btn {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
+    transition: all 0.3s ease;
+}
+
+.mobile-profile-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35) !important;
+}
+</style>

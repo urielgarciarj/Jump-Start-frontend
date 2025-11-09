@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { defineProps, defineEmits } from 'vue';
+import { Icon } from '@iconify/vue';
 
 const props = defineProps({
   post: Object, // Recibe el post que se va a editar
@@ -73,16 +74,118 @@ const handleFileChange = (event: Event) => {
 
 <template>
   <v-form v-model="valid" @submit.prevent="savePost">
-    <v-card-text>
-      <v-text-field v-model="editedTitle" label="Título" :rules="notEmptyRule" outlined dense autofocus required />
-      <v-textarea v-model="editedDescription" label="Descripción" :rules="notEmptyRule" outlined dense required />
-      <v-select v-model="editedCategory"
-        :items="categories" label="Categoría" :rules="notEmptyRule" outlined dense required />
-      <v-file-input @change="handleFileChange" accept="image/*" label="Adjuntar nueva imagen" hide-details variant="outlined"> </v-file-input>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn @click="cancelEdit" variant="tonal" size="small">Cancelar</v-btn>
-      <v-btn @click="savePost" :disabled="!valid" variant="tonal" size="small" color="primary">Guardar</v-btn>
-    </v-card-actions>
+    <div class="edit-form-content">
+      <div class="edit-form-header mb-4">
+        <Icon icon="mdi:pencil-outline" height="20" class="mr-2" />
+        <span class="text-subtitle-1 font-weight-bold">Editar Publicación</span>
+      </div>
+      
+      <v-text-field 
+        v-model="editedTitle" 
+        label="Título" 
+        :rules="notEmptyRule" 
+        variant="outlined" 
+        rounded="lg"
+        color="primary"
+        hide-details="auto"
+        class="mb-3"
+        autofocus 
+        required 
+      />
+      
+      <v-textarea 
+        v-model="editedDescription" 
+        label="Descripción" 
+        :rules="notEmptyRule" 
+        variant="outlined" 
+        rounded="lg"
+        color="primary"
+        rows="5"
+        hide-details="auto"
+        class="mb-3"
+        required 
+      />
+      
+      <v-select 
+        v-model="editedCategory"
+        :items="categories" 
+        label="Categoría" 
+        :rules="notEmptyRule" 
+        variant="outlined" 
+        rounded="lg"
+        color="primary"
+        hide-details="auto"
+        class="mb-3"
+        required 
+      />
+      
+      <v-file-input 
+        @change="handleFileChange" 
+        accept="image/*" 
+        label="Adjuntar nueva imagen (opcional)" 
+        hide-details
+        variant="outlined"
+        rounded="lg"
+        color="primary"
+        prepend-icon="mdi:image-outline"
+        class="mb-3"
+      />
+      
+      <div class="edit-form-actions mt-4">
+        <v-btn 
+          @click="cancelEdit" 
+          variant="tonal" 
+          rounded="lg"
+          class="mr-2"
+        >
+          Cancelar
+        </v-btn>
+        <v-btn 
+          @click="savePost" 
+          :disabled="!valid" 
+          variant="flat" 
+          color="primary" 
+          rounded="lg"
+          class="save-btn"
+        >
+          <Icon icon="mdi:check" height="18" class="mr-2" />
+          Guardar Cambios
+        </v-btn>
+      </div>
+    </div>
   </v-form>
 </template>
+
+<style scoped>
+.edit-form-content {
+    padding: 8px;
+}
+
+.edit-form-header {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border-radius: 12px;
+    border-left: 3px solid rgb(99, 102, 241);
+    color: rgb(99, 102, 241);
+}
+
+.edit-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.save-btn {
+    font-weight: 600;
+    text-transform: none;
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+</style>

@@ -1,17 +1,32 @@
 <script setup>
 import { Icon } from '@iconify/vue';
 import { useAuthStore } from '@/stores/auth';
+import { computed } from 'vue';
 
 const props = defineProps({ item: Object, level: Number });
 
 const authStore = useAuthStore();
 const userRole = authStore.userRole;
+
+// Función para verificar si el usuario tiene permisos
+const hasPermission = computed(() => {
+    if (!props.item.rolesAllowed) {
+        return true; // Si no hay restricción de roles, todos pueden acceder
+    }
+    
+    // Si rolesAllowed es un string, puede ser un solo rol o múltiples separados por coma
+    const allowedRoles = typeof props.item.rolesAllowed === 'string' 
+        ? props.item.rolesAllowed.split(',').map(r => r.trim().toLowerCase())
+        : [props.item.rolesAllowed.toLowerCase()];
+    
+    return allowedRoles.includes(userRole?.toLowerCase() || '');
+});
 </script>
 
 <template>
     <!---Single Item-->
     <v-list-item 
-        v-if="userRole.toLowerCase() === item.rolesAllowed || !item.rolesAllowed"
+        v-if="hasPermission"
         :to="item.type === 'external' ? '' : item.to"
         :href="item.type === 'external' ? item.to : ''"
         rounded

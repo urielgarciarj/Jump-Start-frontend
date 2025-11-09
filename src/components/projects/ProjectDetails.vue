@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, RouterLink } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import axios, { AxiosError } from 'axios';
 import { router } from '@/router';
 import UpdateProjectForm from './UpdateProject.vue';
 import EnrollForm from './enrolls/CreateEnrollForm.vue';
 import UserImage from '@/assets/images/profile/user-5.jpg';
+import { CircleIcon } from 'vue-tabler-icons';
+import { Icon } from '@iconify/vue';
 
 const page = ref({ title: 'Detalles del Proyecto' });
 const breadcrumbs = ref([
@@ -211,95 +213,165 @@ const getMatchColor = (percentage: number) => {
 </script>
 
 <template>
-    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
-    <v-alert v-if="showAlert" :type="alertType"  variant="tonal" class="mb-3" dismissible @mouseleave="showAlert = false">
-        <template v-slot:prepend>
-        <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
-        </template>
-        <div>{{ snackbarMessage }}</div>
-    </v-alert>
-    
-    <!-- Card principal con pestañas -->
-    <v-card elevation="10" class="mb-6">
-        <!-- Tabs para detalle - solicitudes -->
-        <v-card-item>
-            <v-tabs v-model="tab" color="primary" class="border-bottom">
-                <v-tab value="one">General</v-tab>
-                <v-tab value="two">Participantes</v-tab>
-                <v-tab value="three" v-if="projectDetail?.professor.id === userId">Solicitudes</v-tab>
-            </v-tabs>
-            <div class="mt-5">
+    <div class="project-details-container">
+        <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
+        
+        <v-alert 
+            v-if="showAlert" 
+            :type="alertType"  
+            variant="tonal" 
+            class="mb-4 alert-modern" 
+            dismissible 
+            @mouseleave="showAlert = false"
+            rounded="lg"
+        >
+            <template v-slot:prepend>
+                <Icon icon="mdi:check-circle-outline" height="24" />
+            </template>
+            <div class="font-weight-medium">{{ snackbarMessage }}</div>
+        </v-alert>
+        
+        <!-- Card principal con pestañas -->
+        <v-card variant="outlined" rounded="lg" class="project-details-card mb-6">
+            <!-- Tabs para detalle - solicitudes -->
+            <v-card-item class="pa-0">
+                <v-tabs v-model="tab" color="primary" class="project-tabs">
+                    <v-tab value="one" class="tab-modern">
+                        <Icon icon="mdi:information-outline" height="18" class="mr-2" />
+                        General
+                    </v-tab>
+                    <v-tab value="two" class="tab-modern">
+                        <Icon icon="mdi:account-group-outline" height="18" class="mr-2" />
+                        Participantes
+                    </v-tab>
+                    <v-tab value="three" v-if="projectDetail?.professor.id === userId" class="tab-modern">
+                        <Icon icon="mdi:clipboard-text-outline" height="18" class="mr-2" />
+                        Solicitudes
+                    </v-tab>
+                </v-tabs>
+            <div class="pa-6">
                 <v-row v-if="error">
                     <v-col cols="12">
-                        <v-alert v-if="error" type="error" variant="tonal" dismissible>
+                        <v-alert 
+                            v-if="error" 
+                            type="error" 
+                            variant="tonal" 
+                            dismissible
+                            rounded="lg"
+                        >
                             {{ error }}
                         </v-alert>
                     </v-col>
                 </v-row>
+                
                 <v-window v-model="tab" v-if="!error">
                     <!-- Main information of the project -->
                     <v-window-item value="one">
                         <!-- Only view -->
-                        <div v-if="!showEditForm" class="bg-light mt-6 pa-6 rounded-md">
+                        <div v-if="!showEditForm" class="project-info-section pa-6">
+                            <div class="project-header-info mb-6">
+                                <h2 class="text-h4 font-weight-bold mb-2">{{ projectDetail?.name }}</h2>
+                                <div class="d-flex align-center text-body-2 text-medium-emphasis">
+                                    <Icon icon="mdi:account-tie-outline" height="18" class="mr-2" />
+                                    <RouterLink 
+                                        class="text-decoration-none professor-link" 
+                                        :to="`/profile/${projectDetail?.professor.id}`"
+                                    >
+                                        {{ projectDetail?.professor.name }} {{ projectDetail?.professor.lastName }}
+                                    </RouterLink>
+                                </div>
+                            </div>
+                            
                             <v-row>
-                                <v-col cols="12" md="12">
-                                    <h3>Proyecto: {{ projectDetail?.name }}</h3>
-                                    <span class="text-subtitle-2 opacity-50">
-                                        <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        Docente: {{ projectDetail?.professor.name }} {{ projectDetail?.professor.lastName }}
-                                    </span>
+                                <v-col cols="12" md="3">
+                                    <div class="info-card pa-4">
+                                        <div class="info-label mb-2">
+                                            <Icon icon="mdi:calendar-start" height="18" class="mr-2" />
+                                            <span class="text-caption font-weight-bold">Fecha de Inicio</span>
+                                        </div>
+                                        <div class="text-body-2">{{ formatDateTime(projectDetail?.startDate) }}</div>
+                                    </div>
                                 </v-col>
                                 <v-col cols="12" md="3">
-                                    <h3>Fecha de Inicio</h3>
-                                    <span class="text-subtitle-1 opacity-50">
-                                        <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ formatDateTime(projectDetail?.startDate) }}
-                                    </span>
+                                    <div class="info-card pa-4">
+                                        <div class="info-label mb-2">
+                                            <Icon icon="mdi:calendar-end" height="18" class="mr-2" />
+                                            <span class="text-caption font-weight-bold">Fecha Fin</span>
+                                        </div>
+                                        <div class="text-body-2">{{ formatDateTime(projectDetail?.endDate) }}</div>
+                                    </div>
                                 </v-col>
                                 <v-col cols="12" md="3">
-                                    <h3>Fecha Fin</h3>
-                                    <span class="text-subtitle-1 opacity-50">
-                                        <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ formatDateTime(projectDetail?.endDate) }}
-                                    </span>
+                                    <div class="info-card pa-4">
+                                        <div class="info-label mb-2">
+                                            <Icon icon="mdi:tag-outline" height="18" class="mr-2" />
+                                            <span class="text-caption font-weight-bold">Categoría</span>
+                                        </div>
+                                        <div class="text-body-2">{{ projectDetail?.category }}</div>
+                                    </div>
                                 </v-col>
                                 <v-col cols="12" md="3">
-                                    <h3>Categoría</h3>
-                                    <span class="text-subtitle-1 opacity-50">
-                                        <CircleIcon size="8" fill="inherit" class="color-inherits mr-1" />
-                                        {{ projectDetail?.category }}
-                                    </span>
-                                </v-col>
-                                <v-col cols="12" md="3">
-                                    <h3>Estado</h3>
-                                    <v-chip class="font-weight-bold bg-light" :color="getStatusColor(projectDetail?.status)" size="small" rounded="sm">
-                                        {{ capitalizeFirstLetter(projectDetail?.status || '') }}
-                                    </v-chip>
+                                    <div class="info-card pa-4">
+                                        <div class="info-label mb-2">
+                                            <Icon icon="mdi:information-outline" height="18" class="mr-2" />
+                                            <span class="text-caption font-weight-bold">Estado</span>
+                                        </div>
+                                        <v-chip 
+                                            class="font-weight-bold" 
+                                            :color="getStatusColor(projectDetail?.status)" 
+                                            size="small" 
+                                            rounded="lg"
+                                        >
+                                            {{ capitalizeFirstLetter(projectDetail?.status || '') }}
+                                        </v-chip>
+                                    </div>
                                 </v-col>
 
                                 <v-col cols="12" md="12">
-                                    <h3>Descripción</h3>
-                                    <span class="text-subtitle-1 opacity-50">
-                                        {{ projectDetail?.description }}
-                                    </span>
+                                    <div class="description-section pa-4 mb-4">
+                                        <div class="d-flex align-center mb-3">
+                                            <Icon icon="mdi:text-box-outline" height="20" class="mr-2" />
+                                            <h3 class="text-h6 font-weight-bold mb-0">Descripción</h3>
+                                        </div>
+                                        <p class="text-body-2 mb-0">{{ projectDetail?.description }}</p>
+                                    </div>
                                 </v-col>
                                 <v-col cols="12" md="12">
-                                    <h3>Habilidades Requeridas</h3>
-                                    <span class="text-subtitle-1 opacity-50">
-                                        {{ projectDetail?.requirements }}
-                                    </span>
+                                    <div class="requirements-section pa-4">
+                                        <div class="d-flex align-center mb-3">
+                                            <Icon icon="mdi:lightbulb-on-outline" height="20" class="mr-2" />
+                                            <h3 class="text-h6 font-weight-bold mb-0">Habilidades Requeridas</h3>
+                                        </div>
+                                        <p class="text-body-2 mb-0">{{ projectDetail?.requirements }}</p>
+                                    </div>
                                 </v-col>
                             </v-row>
                         </div>
+                        
                         <!-- Botones para editar - eliminar -->
                         <div v-if="!showEditForm && projectDetail?.professor.id === userId" class="d-flex ga-3 justify-end mt-6">
-                            <v-btn @click.stop="handleDeleteProject()" color="error" flat >
+                            <v-btn 
+                                @click.stop="handleDeleteProject()" 
+                                color="error" 
+                                variant="flat"
+                                rounded="lg"
+                                class="action-btn-modern"
+                            >
+                                <Icon icon="mdi:delete-outline" height="18" class="mr-2" />
                                 Eliminar
                             </v-btn>
-                            <v-btn  @click.stop="editProject()" color="primary" flat
-                                >Editar</v-btn
+                            <v-btn 
+                                @click.stop="editProject()" 
+                                color="primary" 
+                                variant="flat"
+                                rounded="lg"
+                                class="action-btn-modern"
                             >
+                                <Icon icon="mdi:pencil-outline" height="18" class="mr-2" />
+                                Editar
+                            </v-btn>
                         </div>
+                        
                         <!-- Boton para enviar solicitud *solo estudiantes -->
                         <div v-if="!showEditForm && userRole.toLowerCase() === 'estudiante' && projectDetail?.status === 'abierto'" class="d-flex ga-3 justify-end mt-6">
                             <EnrollForm :project="projectDetail?.id" @enrollSaved="handleEnrollSaved" @enrollDeleted="handleEnrollDeleted"/>
@@ -317,39 +389,57 @@ const getMatchColor = (percentage: number) => {
                     <!-- Data table with the ACEPTED students  -->
                     <v-window-item value="two">
                         <v-col cols="12">
-                            <v-data-table items-per-page="5" :headers="headers" :items="aceptedEnrollsList" item-value="name"
-                                v-model:sort-by="sortBy" class="border rounded-md datatabels">
+                            <div v-if="aceptedEnrollsList.length === 0" class="empty-table-state pa-8 text-center">
+                                <Icon icon="mdi:account-group-outline" height="64" class="mb-4 opacity-50" />
+                                <h3 class="text-h6 mb-2">No hay participantes</h3>
+                                <p class="text-body-2 text-medium-emphasis">Aún no hay estudiantes aceptados en este proyecto.</p>
+                            </div>
+                            <v-data-table 
+                                v-else
+                                items-per-page="5" 
+                                :headers="headers" 
+                                :items="aceptedEnrollsList" 
+                                item-value="name"
+                                v-model:sort-by="sortBy" 
+                                class="modern-table"
+                                rounded="lg"
+                            >
                                 <template v-slot:item="{ item }">
-                                    <tr>
+                                    <tr class="table-row-modern">
                                         <td>
-                                            <v-avatar size="32" class="text-h5 font-weight-medium"> 
+                                            <v-avatar size="40" class="table-avatar"> 
                                                 <template v-if="item.user.profile?.picture">
-                                                    <img :src="item.user.profile?.picture" alt="icon" height="32" />
+                                                    <img :src="item.user.profile?.picture" alt="icon" height="40" />
                                                 </template>
                                                 <template v-else>
-                                                    {{ item.name.charAt(0).toUpperCase() }}
+                                                    <div class="avatar-initials">
+                                                        {{ item.name.charAt(0).toUpperCase() }}
+                                                    </div>
                                                 </template>
                                             </v-avatar>
                                         </td>
                                         <td>
-                                            <span class="text-subtitle ml-2 custom-text-primary">
-                                                <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${item?.user.id}`" >
-                                                    {{ item.name }}
-                                                </RouterLink>
-                                            </span>
+                                            <RouterLink 
+                                                class="student-name text-decoration-none" 
+                                                :to="`/profile/${item?.user.id}`"
+                                            >
+                                                {{ item.name }}
+                                            </RouterLink>
                                         </td>
-                                        <td>{{ formatDateTime(item.dateCreated) }}</td>
-                                        <td>{{ item.comments }}</td>
+                                        <td class="text-body-2">{{ formatDateTime(item.dateCreated) }}</td>
+                                        <td class="text-body-2">{{ item.comments || 'Sin comentarios' }}</td>
                                         <td v-if="projectDetail?.professor.id === userId">
-                                            <div class="d-flex align-center">
-                                                <v-tooltip text="Rechazar">
-                                                    <template v-slot:activator="{ props }">
-                                                        <v-btn icon flat class="mx-2" color="error" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Rechazado')" v-bind="props">
-                                                            <v-icon class="text-24">mdi-close</v-icon>
-                                                        </v-btn>
-                                                    </template>
-                                                </v-tooltip>
-                                            </div>
+                                            <v-btn 
+                                                icon 
+                                                variant="text" 
+                                                color="error" 
+                                                size="small"
+                                                @click="aceptOrRejectStudent(item.id, 'Rechazado')"
+                                                class="action-btn-table"
+                                            >
+                                                <Icon icon="mdi:close" height="18" />
+                                                <v-tooltip activator="parent" location="bottom">Rechazar</v-tooltip>
+                                            </v-btn>
                                         </td>
                                     </tr>
                                 </template>
@@ -359,45 +449,69 @@ const getMatchColor = (percentage: number) => {
                     <!-- Data table with the PENDING students  -->
                     <v-window-item value="three" v-if="projectDetail?.professor.id === userId">
                         <v-col cols="12">
-                            <v-data-table items-per-page="5" :headers="headers" :items="pendingEnrollsList" item-value="name"
-                                v-model:sort-by="sortBy" class="border rounded-md datatabels">
+                            <div v-if="pendingEnrollsList.length === 0" class="empty-table-state pa-8 text-center">
+                                <Icon icon="mdi:clipboard-text-outline" height="64" class="mb-4 opacity-50" />
+                                <h3 class="text-h6 mb-2">No hay solicitudes pendientes</h3>
+                                <p class="text-body-2 text-medium-emphasis">No hay solicitudes de participación pendientes de revisión.</p>
+                            </div>
+                            <v-data-table 
+                                v-else
+                                items-per-page="5" 
+                                :headers="headers" 
+                                :items="pendingEnrollsList" 
+                                item-value="name"
+                                v-model:sort-by="sortBy" 
+                                class="modern-table"
+                                rounded="lg"
+                            >
                                 <template v-slot:item="{ item }">
-                                    <tr>
+                                    <tr class="table-row-modern">
                                         <td>
-                                            <v-avatar size="32" class="text-h5 font-weight-medium"> 
+                                            <v-avatar size="40" class="table-avatar"> 
                                                 <template v-if="item.user.profile?.picture">
-                                                    <img :src="item.user.profile?.picture" alt="icon" height="32" />
+                                                    <img :src="item.user.profile?.picture" alt="icon" height="40" />
                                                 </template>
                                                 <template v-else>
-                                                    {{ item.name.charAt(0).toUpperCase() }}
+                                                    <div class="avatar-initials">
+                                                        {{ item.name.charAt(0).toUpperCase() }}
+                                                    </div>
                                                 </template>
                                             </v-avatar>
                                         </td>
                                         <td>
-                                            <span class="text-subtitle ml-2 custom-text-primary">
-                                                <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${item?.user.id}`" >
-                                                    {{ item.name }}
-                                                </RouterLink>
-                                            </span>
+                                            <RouterLink 
+                                                class="student-name text-decoration-none" 
+                                                :to="`/profile/${item?.user.id}`"
+                                            >
+                                                {{ item.name }}
+                                            </RouterLink>
                                         </td>
-                                        <td>{{ formatDateTime(item.dateCreated) }}</td>
-                                        <td>{{ item.comments }}</td>
+                                        <td class="text-body-2">{{ formatDateTime(item.dateCreated) }}</td>
+                                        <td class="text-body-2">{{ item.comments || 'Sin comentarios' }}</td>
                                         <td>
-                                            <div class="d-flex align-center">
-                                                <v-tooltip text="Aceptar">
-                                                    <template v-slot:activator="{ props }">
-                                                        <v-btn icon flat class="mx-2" color="success" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Aceptado')" v-bind="props">
-                                                            <v-icon class="text-24">mdi-checkbox-marked-circle-outline</v-icon>
-                                                        </v-btn>
-                                                    </template>
-                                                </v-tooltip>
-                                                <v-tooltip text="Rechazar">
-                                                    <template v-slot:activator="{ props }">
-                                                        <v-btn icon flat class="mx-2" color="error" variant="tonal" size="sm" @click="aceptOrRejectStudent(item.id, 'Rechazado')" v-bind="props">
-                                                            <v-icon class="text-24">mdi-close</v-icon>
-                                                        </v-btn>
-                                                    </template>
-                                                </v-tooltip>
+                                            <div class="d-flex align-center gap-2">
+                                                <v-btn 
+                                                    icon 
+                                                    variant="text" 
+                                                    color="success" 
+                                                    size="small"
+                                                    @click="aceptOrRejectStudent(item.id, 'Aceptado')"
+                                                    class="action-btn-table"
+                                                >
+                                                    <Icon icon="mdi:check-circle-outline" height="18" />
+                                                    <v-tooltip activator="parent" location="bottom">Aceptar</v-tooltip>
+                                                </v-btn>
+                                                <v-btn 
+                                                    icon 
+                                                    variant="text" 
+                                                    color="error" 
+                                                    size="small"
+                                                    @click="aceptOrRejectStudent(item.id, 'Rechazado')"
+                                                    class="action-btn-table"
+                                                >
+                                                    <Icon icon="mdi:close" height="18" />
+                                                    <v-tooltip activator="parent" location="bottom">Rechazar</v-tooltip>
+                                                </v-btn>
                                             </div>
                                         </td>
                                     </tr>
@@ -411,150 +525,441 @@ const getMatchColor = (percentage: number) => {
     </v-card>
 
     <!-- Confirmation Dialog Delete Project-->
-    <v-dialog v-model="showConfirmation" max-width="500px">
-        <v-card>
-            <v-card-title class="pa-4 bg-primary">Eliminar Proyecto</v-card-title>
-            <v-card-text>
-                <h5 class="text-16">¿Estás seguro de que deseas eliminar este proyecto?</h5>
-                <h6>Al eliminar el proyecto, los participantes ya no podrán acceder a él y todas las solicitudes asociadas serán canceladas de manera permanente.</h6>
+    <v-dialog v-model="showConfirmation" max-width="500px" persistent>
+        <v-card rounded="lg">
+            <v-card-title class="pa-4 bg-error text-white">
+                <Icon icon="mdi:alert-circle" height="24" class="mr-2" />
+                Eliminar Proyecto
+            </v-card-title>
+            <v-card-text class="pa-4">
+                <p class="text-body-1 mb-2 font-weight-medium">¿Estás seguro de que deseas eliminar este proyecto?</p>
+                <p class="text-body-2 text-medium-emphasis mb-0">
+                    Al eliminar el proyecto, los participantes ya no podrán acceder a él y todas las solicitudes asociadas serán canceladas de manera permanente.
+                </p>
             </v-card-text>
-            <v-card-actions class="d-flex justify-end">
-                <v-btn variant="tonal" class="px-4" @click="showConfirmation = false">Cancelar</v-btn>
-                <v-btn color="error" class="px-4" variant="tonal" @click="confirmDelete">Si, Eliminar</v-btn>
+            <v-card-actions class="pa-4">
+                <v-spacer></v-spacer>
+                <v-btn variant="tonal" @click="showConfirmation = false" rounded="lg">Cancelar</v-btn>
+                <v-btn color="error" variant="flat" @click="confirmDelete" rounded="lg">Sí, Eliminar</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
     
     <!-- Sección de estudiantes recomendados *** Solo disponible para el docente que creo el proyecto -->
-    <v-card v-if="projectDetail?.professor.id === userId" elevation="10" class="mt-6">
-        <v-card-item>
-            <v-container>
+    <v-card 
+        v-if="projectDetail?.professor.id === userId" 
+        variant="outlined" 
+        rounded="lg"
+        class="recommended-section mt-6"
+    >
+        <v-card-item class="pa-6">
+            <div class="section-header mb-6">
+                <div class="d-flex align-center mb-3">
+                    <div class="section-icon-wrapper mr-3">
+                        <Icon icon="mdi:account-star-outline" height="24" />
+                    </div>
+                    <h2 class="text-h4 font-weight-bold mb-0">Estudiantes Recomendados</h2>
+                </div>
+                <p class="text-body-1 text-medium-emphasis mb-0">
+                    Estos estudiantes han sido recomendados basados en la coincidencia de sus habilidades 
+                    con los requerimientos del proyecto.
+                </p>
+            </div>
+            
+            <!-- Indicador de carga -->
+            <div v-if="isLoadingRecommendations" class="loading-recommendations pa-8 text-center">
+                <v-progress-circular indeterminate color="primary" size="48"></v-progress-circular>
+                <p class="mt-4 text-body-2">Cargando recomendaciones...</p>
+            </div>
+            
+            <!-- Mensaje si no hay recomendaciones -->
+            <v-alert
+                v-else-if="recommendedUsers.length === 0"
+                type="info"
+                variant="tonal"
+                rounded="lg"
+                class="mb-4"
+            >
+                <template v-slot:prepend>
+                    <Icon icon="mdi:information-outline" height="24" />
+                </template>
+                <div class="font-weight-medium">No se encontraron estudiantes</div>
+                <div class="text-caption mt-1">No hay estudiantes que coincidan con los requisitos del proyecto en este momento.</div>
+            </v-alert>
+            
+            <!-- Cards de estudiantes recomendados -->
+            <div v-else>
+                <!-- Estudiante con mejor match -->
+                <v-alert 
+                    color="success" 
+                    variant="tonal" 
+                    class="mb-6 best-match-alert"
+                    rounded="lg"
+                >
+                    <template v-slot:prepend>
+                        <Icon icon="mdi:trophy-outline" height="24" />
+                    </template>
+                    <div class="font-weight-medium">
+                        El estudiante <strong>{{ recommendedUsers[0].name }} {{ recommendedUsers[0].lastName }}</strong> 
+                        tiene la mejor coincidencia con un <strong>{{ recommendedUsers[0].matchPercentage }}%</strong> 
+                        de compatibilidad con los requisitos del proyecto.
+                    </div>
+                </v-alert>
+                
+                <!-- Lista de estudiantes recomendados -->
                 <v-row>
-                    <v-col cols="12">
-                        <h2 class="text-h4 mb-3">Estudiantes Recomendados</h2>
-                        <p class="text-subtitle-1 mb-6">
-                            Estos estudiantes han sido recomendados basados en la coincidencia de sus habilidades 
-                            con los requerimientos del proyecto.
-                        </p>
-                    </v-col>
-                </v-row>
-                
-                <!-- Indicador de carga -->
-                <v-row v-if="isLoadingRecommendations">
-                    <v-col cols="12" class="d-flex justify-center">
-                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                    </v-col>
-                </v-row>
-                
-                <!-- Mensaje si no hay recomendaciones -->
-                <v-row v-else-if="recommendedUsers.length === 0">
-                    <v-col cols="12">
-                        <v-alert type="info" variant="tonal">
-                            No se encontraron estudiantes que coincidan con los requisitos del proyecto.
-                        </v-alert>
-                    </v-col>
-                </v-row>
-                
-                <!-- Cards de estudiantes recomendados -->
-                <v-row v-else>
-                    <!-- Estudiante con mejor match -->
-                    <v-col cols="12" v-if="recommendedUsers.length > 0">
-                        <v-alert color="success" icon="mdi-trophy" variant="tonal" class="mb-4">
-                            El estudiante <strong>{{ recommendedUsers[0].name }} {{ recommendedUsers[0].lastName }}</strong> 
-                            tiene la mejor coincidencia con un {{ recommendedUsers[0].matchPercentage }}% 
-                            de compatibilidad con los requisitos del proyecto.
-                        </v-alert>
-                    </v-col>
-                    
-                    <!-- Lista de estudiantes recomendados -->
                     <v-col cols="12" md="4" sm="6" v-for="(user, index) in recommendedUsers" :key="user.userId">
-                        <v-card elevation="3" class="mb-4 recommended-student-card">
+                        <v-card 
+                            variant="outlined" 
+                            rounded="lg"
+                            class="recommended-student-card mb-4"
+                            :class="{ 'best-match': index === 0 }"
+                        >
                             <!-- Badge para el mejor match -->
-                            <v-badge
-                                v-if="index === 0"
-                                color="success"
-                                icon="mdi-star"
-                                location="top end"
-                            ></v-badge>
+                            <div v-if="index === 0" class="best-match-badge">
+                                <Icon icon="mdi:star" height="20" />
+                                <span class="ml-1 text-caption font-weight-bold">Mejor Match</span>
+                            </div>
                             
                             <!-- Contenido de la card -->
-                            <v-card-item>
+                            <v-card-item class="pa-6">
                                 <div class="d-flex align-center mb-4">
-                                    <v-avatar size="100" color="secondary" class="userImage">
-                                        <img :src="user.picture || UserImage" alt="Mathew" width="100" />
+                                    <v-avatar size="80" class="recommended-avatar">
+                                        <img :src="user.picture || UserImage" alt="user" width="80" />
                                     </v-avatar>
-                                    <div>
-                                        <v-card-title class="text-h5 mb-1 pa-0 custom-text-primary">
-                                            <RouterLink class="text-decoration-none color-inherits custom-title" :to="`/profile/${user?.userId}`" >
-                                                {{ user.name }} {{ user.lastName }}
-                                            </RouterLink>
-                                        </v-card-title>
-                                        <v-card-subtitle class="pa-0 text-medium-emphasis">
+                                    <div class="ml-4 flex-grow-1">
+                                        <RouterLink 
+                                            class="recommended-name text-decoration-none" 
+                                            :to="`/profile/${user?.userId}`"
+                                        >
+                                            {{ user.name }} {{ user.lastName }}
+                                        </RouterLink>
+                                        <div class="text-caption text-medium-emphasis mt-1">
+                                            <Icon icon="mdi:email-outline" height="14" class="mr-1" />
                                             {{ user.email }}
-                                        </v-card-subtitle>
-                                        <v-card-subtitle v-if="user.university" class="pa-0 text-medium-emphasis">
+                                        </div>
+                                        <div v-if="user.university" class="text-caption text-medium-emphasis mt-1">
+                                            <Icon icon="mdi:school-outline" height="14" class="mr-1" />
                                             {{ user.university }}
-                                        </v-card-subtitle>
+                                        </div>
                                     </div>
                                 </div>
                                 
                                 <!-- Indicador de coincidencia -->
-                                <v-divider class="mb-3"></v-divider>
+                                <v-divider class="mb-4"></v-divider>
                                 <div class="d-flex align-center justify-space-between mb-4">
-                                    <span class="text-subtitle-1 font-weight-bold">Nivel de coincidencia:</span>
+                                    <span class="text-subtitle-2 font-weight-bold">Nivel de coincidencia:</span>
                                     <v-chip
                                         :color="getMatchColor(user.matchPercentage)"
-                                        class="font-weight-bold"
+                                        class="font-weight-bold match-chip"
+                                        rounded="lg"
                                     >
                                         {{ user.matchPercentage }}%
                                     </v-chip>
                                 </div>
                                 
                                 <!-- Habilidades coincidentes -->
-                                <div class="mb-2">
-                                    <span class="text-subtitle-2 font-weight-bold">Habilidades requeridas que posee:</span>
-                                    <v-chip-group class="mt-2">
+                                <div class="mb-3">
+                                    <span class="text-caption font-weight-bold mb-2 d-block">Habilidades requeridas que posee:</span>
+                                    <div class="skills-recommended">
                                         <v-chip
                                             v-for="(count, skill) in user.skillFrequency"
                                             :key="skill"
                                             color="primary"
                                             variant="tonal"
                                             size="small"
-                                            class="ma-1"
+                                            class="ma-1 skill-chip-recommended"
                                         >
                                             {{ skill }} 
                                             <span v-if="count > 1" class="ml-1">({{ count }})</span>
                                         </v-chip>
-                                    </v-chip-group>
+                                    </div>
                                 </div>
                                 
                                 <!-- Score de coincidencia -->
-                                <div class="text-subtitle-2 text-medium-emphasis mt-2">
-                                    Score de coincidencia: <strong>{{ user.matchScore }}</strong>
+                                <div class="text-caption text-medium-emphasis mt-3 pt-3 border-top">
+                                    Score de coincidencia: <strong class="text-primary">{{ user.matchScore }}</strong>
                                 </div>
                             </v-card-item>
                         </v-card>
                     </v-col>
                 </v-row>
-            </v-container>
+            </div>
         </v-card-item>
     </v-card>
+    </div>
 </template>
 
 <style scoped>
-.recommended-student-card {
-  position: relative;
-  transition: transform 0.2s ease-in-out;
+.project-details-container {
+    padding-bottom: 2rem;
 }
 
-.userImage {
-    border: 4px solid rgb(255, 255, 255);
-    position: relative; /* Asegúrate de que el contenedor tenga position: relative */
+.alert-modern {
+    border-left: 4px solid;
+    animation: slideIn 0.3s ease;
+}
+
+.project-details-card {
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.project-tabs {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+    border-bottom: 2px solid rgba(99, 102, 241, 0.1);
+}
+
+.tab-modern {
+    text-transform: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tab-modern:hover {
+    background-color: rgba(99, 102, 241, 0.08);
+}
+
+.project-info-section {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.project-header-info {
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.1);
+}
+
+.professor-link {
+    color: rgb(99, 102, 241);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.professor-link:hover {
+    color: rgb(79, 70, 229);
+    text-decoration: underline;
+}
+
+.info-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.info-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    color: rgb(99, 102, 241);
+}
+
+.description-section, .requirements-section {
+    background: white;
+    border-radius: 10px;
+    border-left: 3px solid rgb(99, 102, 241);
+    border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.action-btn-modern {
+    font-weight: 600;
+    text-transform: none;
+    transition: all 0.2s ease;
+}
+
+.action-btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.empty-table-state {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%);
+    border-radius: 12px;
+    border: 2px dashed rgba(99, 102, 241, 0.2);
+}
+
+.modern-table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-row-modern {
+    transition: all 0.2s ease;
+}
+
+.table-row-modern:hover {
+    background-color: rgba(99, 102, 241, 0.03);
+}
+
+.table-avatar {
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.avatar-initials {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.student-name {
+    font-weight: 600;
+    color: rgb(99, 102, 241);
+    transition: all 0.2s ease;
+}
+
+.student-name:hover {
+    color: rgb(79, 70, 229);
+    text-decoration: underline;
+}
+
+.action-btn-table {
+    transition: all 0.2s ease;
+}
+
+.action-btn-table:hover {
+    transform: scale(1.1);
+}
+
+.recommended-section {
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.section-header {
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.1);
+}
+
+.section-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(99, 102, 241);
+}
+
+.loading-recommendations {
+    background: rgba(99, 102, 241, 0.02);
+    border-radius: 12px;
+}
+
+.best-match-alert {
+    border-left: 4px solid rgb(76, 175, 80);
+}
+
+.recommended-student-card {
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 .recommended-student-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.recommended-student-card.best-match {
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.02) 0%, rgba(99, 102, 241, 0.02) 100%);
+}
+
+.best-match-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg, rgb(76, 175, 80) 0%, rgb(56, 142, 60) 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    z-index: 1;
+}
+
+.recommended-avatar {
+    border: 3px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.recommended-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+}
+
+.recommended-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    transition: all 0.2s ease;
+}
+
+.recommended-name:hover {
+    color: rgb(99, 102, 241);
+}
+
+.match-chip {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 0.875rem;
+}
+
+.skills-recommended {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.skill-chip-recommended {
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.skill-chip-recommended:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 960px) {
+    .project-details-card {
+        border-radius: 12px !important;
+    }
+    
+    .recommended-student-card {
+        margin-bottom: 16px;
+    }
 }
 </style>
 

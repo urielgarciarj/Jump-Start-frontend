@@ -174,101 +174,279 @@ const navigateToPage = (path: string) => {
 </script>
 
 <template>
-    <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
-    <v-row class="d-flex align-center mb-4" no-gutters>
-        <v-col cols="12" sm="6" md="4" class="d-flex justify-start pr-2">
-            <v-text-field
-                v-model="searchQuery"
-                variant="outlined"
-                prepend-inner-icon="mdi-magnify"
-                placeholder="Búscar"
-                hide-details
-                density="compact"
-                color="primary"
-            ></v-text-field>
-        </v-col>
+    <div class="vacancies-page-modern">
+        <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
         
-        <!-- Select para filtrar entre todas las vacantes y las recomendadas (solo para estudiantes) -->
-        <v-col v-if="userRole.toLowerCase() === 'estudiante'" cols="12" sm="6" md="4" class="d-flex justify-start pl-2">
-            <v-select
-                v-model="filterType"
-                :items="filterOptions"
-                item-title="title"
-                item-value="value"
-                variant="outlined"
-                hide-details
-                density="compact"
-                color="primary"
-                label="Tipo de vacantes"
-                @update:model-value="handleFilterChange"
-                :menu-props="{ contentClass: 'filter-menu' }"
-            ></v-select>
-        </v-col>
+        <!-- Header moderno con búsqueda y filtros -->
+        <v-card class="vacancies-header-modern mb-6" elevation="0">
+            <v-card-item class="pa-6">
+                <v-row class="align-center" no-gutters>
+                    <v-col cols="12" sm="6" md="4" class="pr-sm-2 mb-sm-0 mb-3">
+                        <v-text-field
+                            v-model="searchQuery"
+                            variant="outlined"
+                            prepend-inner-icon="mdi-magnify"
+                            placeholder="Buscar ofertas laborales..."
+                            hide-details
+                            density="comfortable"
+                            color="primary"
+                            class="search-field-modern"
+                        ></v-text-field>
+                    </v-col>
+                    
+                    <!-- Select para filtrar entre todas las vacantes y las recomendadas (solo para estudiantes) -->
+                    <v-col v-if="userRole.toLowerCase() === 'estudiante'" cols="12" sm="6" md="4" class="pl-sm-2 pr-md-2 mb-md-0 mb-3">
+                        <v-select
+                            v-model="filterType"
+                            :items="filterOptions"
+                            item-title="title"
+                            item-value="value"
+                            variant="outlined"
+                            hide-details
+                            density="comfortable"
+                            color="primary"
+                            label="Tipo de vacantes"
+                            prepend-inner-icon="mdi-filter-outline"
+                            @update:model-value="handleFilterChange"
+                            class="filter-select-modern"
+                            :menu-props="{ contentClass: 'filter-menu' }"
+                        ></v-select>
+                    </v-col>
+                    
+                    <v-col 
+                        v-if="userRole.toLowerCase() === 'reclutador'" 
+                        :cols="12" 
+                        :sm="userRole.toLowerCase() === 'estudiante' ? 12 : 6" 
+                        :md="userRole.toLowerCase() === 'estudiante' ? 4 : 4" 
+                        class="d-flex justify-end pl-md-2"
+                    >
+                        <v-btn 
+                            color="primary" 
+                            size="large"
+                            @click="navigateToPage('/new/job-opportunity')"
+                            class="new-vacant-btn-modern"
+                        >
+                            <v-icon start>mdi-plus-circle</v-icon>
+                            Nueva Oferta Laboral
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-item>
+        </v-card>
         
-        <v-col v-if="userRole.toLowerCase() === 'reclutador'" 
-            :cols="12" 
-            :sm="userRole.toLowerCase() === 'estudiante' ? 12 : 6" 
-            :md="userRole.toLowerCase() === 'estudiante' ? 4 : 8" 
-            class="d-flex justify-end pl-2">
-            <!-- Usar nuestra función de navegación personalizada en lugar de 'to' -->
-            <v-btn 
-                color="primary" 
-                flat 
-                @click="navigateToPage('/new/job-opportunity')"
+        <!-- Indicador de carga -->
+        <v-overlay v-if="isLoading" :value="isLoading" class="align-center justify-center">
+            <div class="loading-container">
+                <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+                <p class="mt-4 text-h6">Cargando ofertas laborales...</p>
+            </div>
+        </v-overlay>
+        
+        <!-- Mensaje cuando no hay vacantes recomendadas -->
+        <v-alert
+            v-if="filterType === 'recommended' && recommendedVacants.length === 0 && !isLoading"
+            type="info"
+            variant="tonal"
+            class="mb-4 alert-modern"
+            border="start"
+            border-color="info"
+        >
+            <template v-slot:prepend>
+                <v-icon>mdi-information-outline</v-icon>
+            </template>
+            <div class="text-h6 mb-2">No hay vacantes recomendadas disponibles</div>
+            <div>Añade más habilidades a tu perfil para obtener recomendaciones personalizadas.</div>
+        </v-alert>
+        
+        <!-- Información de coincidencia para vacantes recomendadas -->
+        <v-alert
+            v-if="filterType === 'recommended' && recommendedVacants.length > 0"
+            type="success"
+            variant="tonal"
+            class="mb-4 alert-modern"
+            border="start"
+            border-color="success"
+        >
+            <template v-slot:prepend>
+                <v-icon>mdi-check-circle-outline</v-icon>
+            </template>
+            <div class="text-h6 mb-1">¡Vacantes recomendadas para ti!</div>
+            <div>Estas ofertas han sido seleccionadas basadas en tus habilidades y perfil profesional.</div>
+        </v-alert>
+        
+        <!-- Vista de todas las vacantes -->
+        <div v-if="filterType === 'all'" key="all-vacants" class="vacancies-grid">
+            <div v-for="vacant in filteredVacants" :key="'all-'+vacant.id" class="vacancy-item-wrapper">
+                <VacantContent :vacant="vacant"/>
+            </div>
+            <v-alert
+                v-if="filteredVacants.length === 0 && !isLoading"
+                type="info"
+                variant="tonal"
+                class="no-results-alert"
             >
-                Nueva Oferta Laboral
-            </v-btn>
-        </v-col>
-    </v-row>
-    
-    <!-- Indicador de carga -->
-    <v-overlay v-if="isLoading" :value="isLoading" class="align-center justify-center">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </v-overlay>
-    
-    <!-- Mensaje cuando no hay vacantes recomendadas -->
-    <v-alert
-        v-if="filterType === 'recommended' && recommendedVacants.length === 0 && !isLoading"
-        type="info"
-        variant="tonal"
-        class="mb-4"
-    >
-        No hay vacantes recomendadas disponibles. Añade más habilidades a tu perfil para obtener recomendaciones.
-    </v-alert>
-    
-    <!-- Información de coincidencia para vacantes recomendadas -->
-    <v-alert
-        v-if="filterType === 'recommended' && recommendedVacants.length > 0"
-        type="success"
-        variant="tonal"
-        class="mb-4"
-    >
-        Estas vacantes han sido recomendadas basadas en tus habilidades.
-    </v-alert>
-    
-    <!-- Vista de todas las vacantes -->
-    <v-row v-if="filterType === 'all'" key="all-vacants">
-        <v-col v-for="vacant in filteredVacants" :key="'all-'+vacant.id" cols="12" md="12">
-            <VacantContent :vacant="vacant"/>
-        </v-col>
-    </v-row>
-    
-    <!-- Vista de vacantes recomendadas -->
-    <v-row v-else key="recommended-vacants">
-        <v-col v-for="vacant in filteredVacants" :key="'rec-'+vacant.id" cols="12" md="12">
-            <VacantContent :vacant="vacant"/>
-        </v-col>
-    </v-row>
+                <template v-slot:prepend>
+                    <v-icon>mdi-information-outline</v-icon>
+                </template>
+                <div class="text-h6 mb-1">No se encontraron ofertas laborales</div>
+                <div>Intenta ajustar tus criterios de búsqueda.</div>
+            </v-alert>
+        </div>
+        
+        <!-- Vista de vacantes recomendadas -->
+        <div v-else key="recommended-vacants" class="vacancies-grid">
+            <div v-for="vacant in filteredVacants" :key="'rec-'+vacant.id" class="vacancy-item-wrapper">
+                <VacantContent :vacant="vacant"/>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style scoped lang="scss">
+.vacancies-page-modern {
+    width: 100%;
+    animation: fadeIn 0.6s ease;
+}
+
+.vacancies-header-modern {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    transition: all 0.3s ease;
+}
+
+.vacancies-header-modern:hover {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.search-field-modern :deep(.v-field) {
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-field-modern :deep(.v-field:hover) {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.search-field-modern :deep(.v-field--focused) {
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+}
+
+.filter-select-modern :deep(.v-field) {
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filter-select-modern :deep(.v-field:hover) {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.new-vacant-btn-modern {
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgb(99, 102, 241) 0%, rgb(168, 85, 247) 100%);
+}
+
+.new-vacant-btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.new-vacant-btn-modern:active {
+    transform: translateY(0);
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgb(99, 102, 241);
+}
+
+.alert-modern {
+    border-radius: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.vacancies-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.vacancy-item-wrapper {
+    animation: fadeInUp 0.5s ease;
+    animation-fill-mode: both;
+}
+
+.vacancy-item-wrapper:nth-child(1) { animation-delay: 0.1s; }
+.vacancy-item-wrapper:nth-child(2) { animation-delay: 0.2s; }
+.vacancy-item-wrapper:nth-child(3) { animation-delay: 0.3s; }
+.vacancy-item-wrapper:nth-child(4) { animation-delay: 0.4s; }
+.vacancy-item-wrapper:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.no-results-alert {
+    border-radius: 12px;
+    margin-top: 24px;
+}
+
+.filter-menu {
+    z-index: 100;
+}
+
 @media (max-width: 1279px) {
     .v-card {
         position: unset;
     }
 }
 
-.filter-menu {
-  z-index: 100;
+@media (max-width: 960px) {
+    .vacancies-header-modern :deep(.v-card-item) {
+        padding: 20px !important;
+    }
+    
+    .new-vacant-btn-modern {
+        width: 100%;
+    }
 }
 </style>

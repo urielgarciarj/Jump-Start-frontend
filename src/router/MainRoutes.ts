@@ -50,6 +50,20 @@ const MainRoutes = {
             path: '/vancants/searchresult/:id',
             component: () => import('@/components/vacancies/VacantSearchResult.vue')
         },
+        {   // Pagina para buscar estudiantes por skills, disponible solo para docentes y reclutadores
+            name: 'Buscar Estudiantes',
+            path: '/students/search',
+            component: () => import('@/views/SearchStudents.vue'),
+            beforeEnter: (to, from, next) => {
+                const authStore = useAuthStore();
+                const userRole = authStore.userRole?.toLowerCase();
+                if (userRole === 'docente' || userRole === 'reclutador') {
+                    next();  // Permite la navegación si el rol es 'docente' o 'reclutador'
+                } else {
+                    next({ name: 'Starter' });  // Redirige si no es 'docente' o 'reclutador'
+                }
+            }
+        },
         // {    // Ruta de prueba para subir imagenes 
         //     name: 'Sample Page 3',
         //     path: '/photos',
